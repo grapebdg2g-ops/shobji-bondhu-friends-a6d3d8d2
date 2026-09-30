@@ -8,6 +8,13 @@
       "when": 1788673149619,
       "tag": "0000_cron_secret_auth",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790781378807,
+      "tag": "0001_grant_profile_cover_select",
+      "breakpoints": true
     }
   ]
 }

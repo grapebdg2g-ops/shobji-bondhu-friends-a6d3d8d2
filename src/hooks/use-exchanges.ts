@@ -58,7 +58,7 @@ export function useExchanges(filters: ExchangeFilters) {
   // Realtime: just invalidate active filter sets — Query will refetch only what's mounted
   useEffect(() => {
     const ch = supabase
-      .channel("exchanges-rt")
+      .channel(`exchanges-rt-${Math.random().toString(36).slice(2, 10)}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "exchanges" }, () => {
         qc.invalidateQueries({ queryKey: ["exchanges"] });
       })
