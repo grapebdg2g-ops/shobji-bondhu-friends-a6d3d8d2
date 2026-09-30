@@ -46,9 +46,13 @@ export function useDirectThreads() {
     void refresh();
     if (!user) return;
     let channel: ReturnType<typeof supabase.channel> | null = null;
+    // Unique topic per hook instance: the hook is mounted in several places
+    // (nav badge + messages page) and reusing a topic returns an already
+    // subscribed channel, which throws when adding callbacks.
+    const instanceId = Math.random().toString(36).slice(2, 10);
     try {
       channel = supabase
-        .channel(`direct-thread-list-${user.id}`)
+        .channel(`direct-thread-list-${user.id}-${instanceId}`)
         .on(
           "postgres_changes",
           { event: "*", schema: "public", table: "direct_messages" },

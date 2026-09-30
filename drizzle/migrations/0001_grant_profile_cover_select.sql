@@ -1,0 +1,1 @@
+GRANT SELECT (cover_url) ON public.profiles TO authenticated, anon;
