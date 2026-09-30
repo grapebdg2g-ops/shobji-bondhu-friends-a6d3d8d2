@@ -73,7 +73,7 @@ export function PostReactionPicker({
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={value ? `${active.label} reaction পরিবর্তন করুন` : "প্রতিক্রিয়া দিন"}
-        onClick={() => setOpen((current) => !current)}
+        onClick={() => setOpen(true)}
         className={`home-pressable min-h-11 min-w-0 gap-1 rounded-lg px-1 text-xs font-semibold ${value ? active.className : "text-muted-foreground"}`}
       >
         {value ? (
