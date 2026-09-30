@@ -49,9 +49,9 @@ export function PostSocialActions({
             <span>প্রথমে আপনিই প্রতিক্রিয়া দিন</span>
           )}
         </div>
-        <button type="button" onClick={onComment} className="max-w-[46%] shrink-0 truncate font-semibold hover:text-primary">
+        <Button type="button" variant="ghost" onClick={onComment} className="h-auto max-w-[46%] shrink-0 truncate px-0 py-0 text-xs font-semibold text-muted-foreground hover:text-primary">
           {commentsCount > 0 ? `${commentsCount}টি মন্তব্য` : "মন্তব্য করুন"}
-        </button>
+        </Button>
       </div>
       <div className="grid min-w-0 grid-cols-4 border-t border-border/60 px-2 py-1.5">
         <PostReactionPicker value={myReaction} onChange={onReact} />

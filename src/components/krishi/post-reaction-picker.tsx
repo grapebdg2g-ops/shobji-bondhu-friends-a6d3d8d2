@@ -45,7 +45,7 @@ export function PostReactionPicker({
         <div
           role="menu"
           aria-label="প্রতিক্রিয়া বাছুন"
-          className="reaction-tray absolute bottom-[calc(100%+8px)] left-0 z-30 flex w-max max-w-[calc(100vw-2rem)] items-end gap-0.5 rounded-full border border-border bg-card px-2 py-1.5 shadow-[var(--shadow-lift)]"
+          className="reaction-tray absolute bottom-[calc(100%+8px)] left-0 z-30 grid w-[min(20rem,calc(100vw-2rem))] grid-cols-7 items-end gap-0.5 rounded-full border border-border bg-card px-2 py-1.5 shadow-[var(--shadow-lift)]"
         >
           {REACTION_TYPES.map((reaction) => {
             const meta = REACTION_META[reaction];
@@ -59,7 +59,7 @@ export function PostReactionPicker({
                 title={meta.label}
                 aria-label={`${meta.label} reaction দিন`}
                 onClick={() => { onChange(value === reaction ? null : reaction); setOpen(false); }}
-                className={`reaction-option h-10 w-10 rounded-full p-1 ${value === reaction ? "bg-primary/10 ring-2 ring-primary" : "hover:bg-muted"}`}
+                className={`reaction-option h-10 w-full min-w-0 rounded-full p-1 ${value === reaction ? "bg-primary/10 ring-2 ring-primary" : "hover:bg-muted"}`}
               >
                 <img src={meta.image} alt="" aria-hidden="true" className="h-8 w-8 select-none object-contain" draggable={false} />
               </Button>

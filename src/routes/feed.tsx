@@ -484,7 +484,7 @@ function PostCard({
   };
 
   return (
-    <article className={`home-pressable relative min-w-0 overflow-hidden rounded-2xl border-2 ${isSuccessHighlight ? "border-amber-400 bg-gradient-to-br from-amber-50 to-white" : meta.border} shadow-sm`}>
+    <article className={`home-pressable relative min-w-0 rounded-2xl border-2 ${isSuccessHighlight ? "border-amber-400 bg-gradient-to-br from-amber-50 to-white" : meta.border} shadow-sm`}>
       {isSuccessHighlight && (
         <div className="absolute top-2 right-2 flex items-center gap-1 bg-amber-400 text-white px-2 py-0.5 rounded-full text-[10px] font-bold shadow z-10">
           <Star className="h-3 w-3 fill-current" /> সাফল্যের গল্প

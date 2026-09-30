@@ -504,7 +504,7 @@ function MiniPostCard({
   };
 
   return (
-    <article className="home-pressable min-w-0 overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+    <article className="home-pressable min-w-0 rounded-2xl border border-gray-100 bg-white shadow-sm">
       <div className="p-4">
         <div className="flex min-w-0 items-start gap-3">
           <Link to="/u/$userId" params={{ userId: post.user_id }} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#2D6A4F]/15 font-bold text-[#2D6A4F]">{post.user_name?.[0] ?? "ক"}</Link>
