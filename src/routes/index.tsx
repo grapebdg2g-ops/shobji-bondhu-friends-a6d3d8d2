@@ -36,7 +36,7 @@ function Index() {
       className="flex min-h-screen flex-col items-center justify-center px-8 text-center"
       style={{ background: "var(--gradient-brand)" }}
     >
-      <div className="animate-in fade-in zoom-in duration-700 flex flex-col items-center gap-6">
+      <div className="flex flex-col items-center gap-6">
         <div className="flex h-28 w-28 items-center justify-center rounded-3xl bg-white/15 backdrop-blur-sm ring-4 ring-white/20 shadow-2xl overflow-hidden">
           <img src={logo} alt="কৃষক বন্ধু লোগো" width={96} height={96} fetchPriority="high" decoding="async" className="h-24 w-24 object-contain" />
         </div>
