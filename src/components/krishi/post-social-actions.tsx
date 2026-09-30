@@ -1,6 +1,7 @@
 import { Bookmark, MessageCircle, Share2 } from "lucide-react";
 import { PostReactionPicker } from "@/components/krishi/post-reaction-picker";
 import { REACTION_META, REACTION_TYPES, type ReactionType } from "@/lib/reactions";
+import { Button } from "@/components/ui/button";
 
 export function PostSocialActions({
   myReaction,
@@ -39,7 +40,7 @@ export function PostSocialActions({
             <>
               <span className="flex shrink-0 items-center -space-x-1" aria-hidden="true">
                 {topReactions.map((reaction) => (
-                  <span key={reaction} className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-card bg-muted text-[11px]">{REACTION_META[reaction].emoji}</span>
+                   <span key={reaction} className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-card bg-muted p-0.5"><img src={REACTION_META[reaction].image} alt="" className="h-full w-full object-contain" /></span>
                 ))}
               </span>
               <span className="truncate">{totalReactions} জনের প্রতিক্রিয়া</span>
@@ -54,34 +55,37 @@ export function PostSocialActions({
       </div>
       <div className="grid min-w-0 grid-cols-4 border-t border-border/60 px-2 py-1.5">
         <PostReactionPicker value={myReaction} onChange={onReact} />
-        <button
+         <Button
           type="button"
           onClick={onComment}
           aria-label="মন্তব্য দেখুন বা লিখুন"
-          className={`home-pressable min-w-0 flex min-h-11 items-center justify-center gap-1 rounded-lg px-1 text-xs font-semibold ${commentOpen ? "text-primary" : "text-muted-foreground"}`}
+           variant="ghost"
+           className={`home-pressable min-h-11 min-w-0 gap-1 rounded-lg px-1 text-xs font-semibold ${commentOpen ? "text-primary" : "text-muted-foreground"}`}
         >
           <MessageCircle className="h-4 w-4" />
           <span className="hidden min-[360px]:inline">{commentLabel}</span>
           {commentsCount > 0 && <span>({commentsCount})</span>}
-        </button>
-        <button
+         </Button>
+         <Button
           type="button"
           onClick={onSave}
           aria-label={saved ? "সংরক্ষণ থেকে সরান" : "পোস্ট সংরক্ষণ করুন"}
-          className={`home-pressable min-w-0 flex min-h-11 items-center justify-center gap-1 rounded-lg px-1 text-xs font-semibold ${saved ? "text-amber-600" : "text-muted-foreground"}`}
+           variant="ghost"
+           className={`home-pressable min-h-11 min-w-0 gap-1 rounded-lg px-1 text-xs font-semibold ${saved ? "text-reaction-care" : "text-muted-foreground"}`}
         >
           <Bookmark className={`h-4 w-4 ${saved ? "fill-current" : ""}`} />
           <span className="hidden min-[360px]:inline">সংরক্ষণ</span>
-        </button>
-        <button
+         </Button>
+         <Button
           type="button"
           onClick={onShare}
           aria-label="পোস্ট শেয়ার করুন"
-          className="home-pressable min-w-0 flex min-h-11 items-center justify-center gap-1 rounded-lg px-1 text-xs font-semibold text-muted-foreground"
+           variant="ghost"
+           className="home-pressable min-h-11 min-w-0 gap-1 rounded-lg px-1 text-xs font-semibold text-muted-foreground"
         >
           <Share2 className="h-4 w-4" />
           <span className="hidden min-[360px]:inline">শেয়ার</span>
-        </button>
+         </Button>
       </div>
     </div>
   );

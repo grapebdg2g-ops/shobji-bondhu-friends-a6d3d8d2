@@ -392,6 +392,7 @@ function FeedPage() {
             <PostCard
               key={p.id}
               post={p}
+              visiblePostIds={displayPosts.map((post) => post.id)}
               mode={filter}
               onShare={() => share(p)}
               saved={savedIds.includes(p.id)}
@@ -439,6 +440,7 @@ function PostSkeleton() {
 
 function PostCard({
   post,
+  visiblePostIds,
   mode = "all",
   saved,
   onShare,
@@ -447,6 +449,7 @@ function PostCard({
   onDeleted,
 }: {
   post: Post;
+  visiblePostIds: string[];
   mode?: "all" | "help" | "success";
   saved: boolean;
   onShare: () => void;
@@ -461,7 +464,7 @@ function PostCard({
   const text = expanded || !long ? post.content : post.content.slice(0, 180) + "...";
   const isAnswered = post.type === "help" && post.comments_count > 0;
   const isSuccessHighlight = mode === "success" && post.type === "success";
-  const { counts: reactionCounts, mine: myReaction, setReaction } = usePostReactions(post.id);
+  const { counts: reactionCounts, mine: myReaction, setReaction } = usePostReactions(post.id, visiblePostIds);
 
   const handleReaction = async (reaction: Parameters<typeof setReaction>[0]) => {
     const result = await setReaction(reaction);

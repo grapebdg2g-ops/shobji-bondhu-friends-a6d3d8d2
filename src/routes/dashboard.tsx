@@ -459,6 +459,7 @@ function CommunityFeedSection({ userName, onCompose }: { userName: string | null
             <div key={post.id} className="animate-fade-in" style={{ animationDelay: `${i * 80}ms`, animationFillMode: "both" }}>
               <MiniPostCard
                 post={post}
+                visiblePostIds={posts.map((item) => item.id)}
                 saved={savedIds.includes(post.id)}
                 commentsOpen={openComments === post.id}
                 onSave={() => toggleSave(post)}
@@ -477,6 +478,7 @@ function CommunityFeedSection({ userName, onCompose }: { userName: string | null
 
 function MiniPostCard({
   post,
+  visiblePostIds,
   saved,
   commentsOpen,
   onSave,
@@ -485,6 +487,7 @@ function MiniPostCard({
   onCommentAdded,
 }: {
   post: Post;
+  visiblePostIds: string[];
   saved: boolean;
   commentsOpen: boolean;
   onSave: () => void;
@@ -492,7 +495,7 @@ function MiniPostCard({
   onComment: () => void;
   onCommentAdded: () => void;
 }) {
-  const { counts: reactionCounts, mine: myReaction, setReaction } = usePostReactions(post.id);
+  const { counts: reactionCounts, mine: myReaction, setReaction } = usePostReactions(post.id, visiblePostIds);
   const handleReaction = async (reaction: Parameters<typeof setReaction>[0]) => {
     const result = await setReaction(reaction);
     if (!result.ok) {
