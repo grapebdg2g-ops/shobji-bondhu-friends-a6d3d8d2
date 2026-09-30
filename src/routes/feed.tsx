@@ -392,6 +392,7 @@ function FeedPage() {
             <PostCard
               key={p.id}
               post={p}
+              visiblePostIds={displayPosts.map((post) => post.id)}
               mode={filter}
               onShare={() => share(p)}
               saved={savedIds.includes(p.id)}
@@ -439,6 +440,7 @@ function PostSkeleton() {
 
 function PostCard({
   post,
+  visiblePostIds,
   mode = "all",
   saved,
   onShare,
@@ -447,6 +449,7 @@ function PostCard({
   onDeleted,
 }: {
   post: Post;
+  visiblePostIds: string[];
   mode?: "all" | "help" | "success";
   saved: boolean;
   onShare: () => void;
@@ -461,7 +464,7 @@ function PostCard({
   const text = expanded || !long ? post.content : post.content.slice(0, 180) + "...";
   const isAnswered = post.type === "help" && post.comments_count > 0;
   const isSuccessHighlight = mode === "success" && post.type === "success";
-  const { counts: reactionCounts, mine: myReaction, setReaction } = usePostReactions(post.id);
+  const { counts: reactionCounts, mine: myReaction, setReaction } = usePostReactions(post.id, visiblePostIds);
 
   const handleReaction = async (reaction: Parameters<typeof setReaction>[0]) => {
     const result = await setReaction(reaction);
@@ -481,7 +484,7 @@ function PostCard({
   };
 
   return (
-    <article className={`home-pressable relative min-w-0 overflow-hidden rounded-2xl border-2 ${isSuccessHighlight ? "border-amber-400 bg-gradient-to-br from-amber-50 to-white" : meta.border} shadow-sm`}>
+    <article className={`home-pressable relative min-w-0 rounded-2xl border-2 ${isSuccessHighlight ? "border-amber-400 bg-gradient-to-br from-amber-50 to-white" : meta.border} shadow-sm`}>
       {isSuccessHighlight && (
         <div className="absolute top-2 right-2 flex items-center gap-1 bg-amber-400 text-white px-2 py-0.5 rounded-full text-[10px] font-bold shadow z-10">
           <Star className="h-3 w-3 fill-current" /> সাফল্যের গল্প

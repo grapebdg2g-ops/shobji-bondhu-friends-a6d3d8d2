@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/contexts/user-context";
@@ -19,7 +19,7 @@ type ReactionState = {
   mine: ReactionType | null;
 };
 
-const emptyCounts = (): Record<ReactionType, number> => ({
+export const emptyReactionCounts = (): Record<ReactionType, number> => ({
   like: 0,
   love: 0,
   care: 0,
@@ -38,36 +38,23 @@ const isMissingReactionTable = (error: { code?: string; message?: string } | nul
   );
 };
 
-export function usePostReactions(postId: string) {
+export function usePostReactions(postId: string, visiblePostIds: string[] = [postId]) {
   const { user: profileUser } = useUser();
   const queryClient = useQueryClient();
-  const [authUserId, setAuthUserId] = useState<string | null>(null);
-  const queryKey = useMemo(() => ["post-reactions", postId] as const, [postId]);
-
-  useEffect(() => {
-    let active = true;
-    supabase.auth.getSession().then(({ data }) => {
-      if (active) setAuthUserId(data.session?.user.id ?? null);
-    });
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (active) setAuthUserId(session?.user.id ?? null);
-    });
-    return () => {
-      active = false;
-      subscription.unsubscribe();
-    };
-  }, []);
-
-  const currentUserId = authUserId ?? profileUser?.id ?? null;
+  const postIdsKey = useMemo(
+    () => Array.from(new Set(visiblePostIds.filter(Boolean))).sort().join(","),
+    [visiblePostIds],
+  );
+  const postIds = useMemo(() => postIdsKey.split(",").filter(Boolean), [postIdsKey]);
+  const queryKey = useMemo(() => ["post-reactions-batch", postIdsKey] as const, [postIdsKey]);
+  const currentUserId = profileUser?.id ?? null;
   const { data: rows = [], isLoading } = useQuery({
     queryKey,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("post_reactions")
         .select("post_id, user_id, reaction_type")
-        .eq("post_id", postId);
+        .in("post_id", postIds);
       if (!error) return (data as PostReaction[]) ?? [];
       if (!isMissingReactionTable(error)) throw new Error(error.message);
 
@@ -75,7 +62,7 @@ export function usePostReactions(postId: string) {
       const { data: legacyLikes, error: legacyError } = await supabase
         .from("post_likes")
         .select("post_id, user_id")
-        .eq("post_id", postId);
+        .in("post_id", postIds);
       if (legacyError) throw new Error(legacyError.message);
       return ((legacyLikes as { post_id: string; user_id: string }[]) ?? []).map((like) => ({
         ...like,
@@ -86,14 +73,15 @@ export function usePostReactions(postId: string) {
   });
 
   const state = useMemo<ReactionState>(() => {
-    const counts = emptyCounts();
+    const counts = emptyReactionCounts();
     let mine: ReactionType | null = null;
     for (const row of rows) {
+      if (row.post_id !== postId) continue;
       if (row.reaction_type in counts) counts[row.reaction_type] += 1;
       if (row.user_id === currentUserId) mine = row.reaction_type;
     }
     return { counts, mine };
-  }, [currentUserId, rows]);
+  }, [currentUserId, postId, rows]);
 
   const setReaction = useCallback(
     async (reaction: ReactionType | null): Promise<ReactionWriteResult> => {
