@@ -106,14 +106,18 @@ function LoginPage() {
       return toast.error("পাসওয়ার্ড কমপক্ষে ৬ অক্ষর হতে হবে");
     }
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email: regEmail,
       password: regPassword,
       options: { emailRedirectTo: window.location.origin },
     });
     if (error) { toast.error(error.message); setLoading(false); return; }
-    toast.success("অ্যাকাউন্ট তৈরি হয়েছে! প্রোফাইল সম্পূর্ণ করুন।");
-    await afterLogin();
+    if (data.session) {
+      toast.success("অ্যাকাউন্ট তৈরি হয়েছে! প্রোফাইল সম্পূর্ণ করুন।");
+      await afterLogin();
+    } else {
+      toast.success("অ্যাকাউন্ট তৈরি হয়েছে! আপনার ইমেইল চেক করে কনফার্মেশন লিংকে ক্লিক করুন, তারপর প্রবেশ করুন।", { duration: 8000 });
+    }
     setLoading(false);
   };
 
