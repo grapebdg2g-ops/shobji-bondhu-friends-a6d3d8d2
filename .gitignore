@@ -17,7 +17,7 @@ dist-ssr
 *.local
 
 # Environment files — never commit real credentials
-.env
+# .env must stay tracked — hosted build reads VITE_* from it
 .env.*
 !.env.example
 
