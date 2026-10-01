@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowLeft,
   CalendarDays,
@@ -9,6 +9,7 @@ import {
   Search,
   SlidersHorizontal,
   Sprout,
+  UserX,
   Users,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -19,6 +20,16 @@ import { LazyImage } from "@/components/krishi/lazy-image";
 import { DirectMessagePopup } from "@/components/krishi/direct-message-popup";
 import { type ConnectionRow } from "@/hooks/use-connections";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export const Route = createFileRoute("/friends")({
   component: FriendsPage,
