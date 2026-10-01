@@ -1504,6 +1504,23 @@ export type Database = {
           upazila: string
         }[]
       }
+      unfriend_connection: {
+        Args: { connection_id: string }
+        Returns: {
+          addressee_id: string
+          created_at: string
+          id: string
+          requester_id: string
+          status: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "connections"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
     }
     Enums: {
       app_role: "farmer" | "expert" | "moderator" | "admin"

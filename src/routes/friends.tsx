@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowLeft,
   CalendarDays,
@@ -9,6 +9,7 @@ import {
   Search,
   SlidersHorizontal,
   Sprout,
+  UserX,
   Users,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -19,6 +20,16 @@ import { LazyImage } from "@/components/krishi/lazy-image";
 import { DirectMessagePopup } from "@/components/krishi/direct-message-popup";
 import { type ConnectionRow } from "@/hooks/use-connections";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export const Route = createFileRoute("/friends")({
   component: FriendsPage,
@@ -211,8 +222,30 @@ function FacebookFriendRow({
   connection: ConnectionRow;
 }) {
   const navigate = useNavigate();
+  const { user } = useUser();
+  const queryClient = useQueryClient();
   const [contactBusy, setContactBusy] = useState(false);
+  const [removeBusy, setRemoveBusy] = useState(false);
+  const [removeOpen, setRemoveOpen] = useState(false);
   const [messageOpen, setMessageOpen] = useState(false);
+
+  const confirmRemove = async () => {
+    if (!connection?.id || removeBusy) return;
+    setRemoveBusy(true);
+    const { error } = await supabase.rpc("unfriend_connection", { connection_id: connection.id });
+    setRemoveBusy(false);
+    if (error) {
+      toast.error("বন্ধু সরানো যায়নি, আবার চেষ্টা করুন");
+      return;
+    }
+    setRemoveOpen(false);
+    toast.success(`${profile.name || "কৃষক"} বন্ধু তালিকা থেকে সরানো হয়েছে`);
+    await queryClient.invalidateQueries({ queryKey: ["friends-page", user?.id] });
+    await queryClient.invalidateQueries({ queryKey: ["connections"] });
+    await queryClient.invalidateQueries({ queryKey: ["friend-connections"] });
+    await queryClient.invalidateQueries({ queryKey: ["friend-requests"] });
+  };
+
   const contact = async (kind: "message" | "call") => {
     if (kind === "message") {
       setMessageOpen(true);
@@ -302,8 +335,40 @@ function FacebookFriendRow({
         >
           <Phone className="h-4 w-4" />
         </button>
+        <button
+          type="button"
+          disabled={removeBusy}
+          onClick={() => setRemoveOpen(true)}
+          aria-label={`${profile.name} কে বন্ধু তালিকা থেকে সরান`}
+          className="flex h-9 w-9 items-center justify-center rounded-full bg-[#FDECEC] text-[#D93025] transition hover:bg-[#FBDCDC] disabled:opacity-50"
+        >
+          <UserX className="h-4 w-4" />
+        </button>
       </div>
       </div>
+      <AlertDialog open={removeOpen} onOpenChange={setRemoveOpen}>
+        <AlertDialogContent className="max-w-sm rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>আপনি কি নিশ্চিত মুছে ফেলতে চান?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {profile.name || "এই কৃষক"} আপনার বন্ধু তালিকা থেকে সরে যাবে। চাইলে পরে আবার সংযোগের অনুরোধ পাঠাতে পারবেন।
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={removeBusy}>বাতিল</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={removeBusy}
+              onClick={(event) => {
+                event.preventDefault();
+                void confirmRemove();
+              }}
+              className="bg-[#D93025] text-white hover:bg-[#B3261E]"
+            >
+              {removeBusy ? "সরানো হচ্ছে..." : "মুছে ফেলুন"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <DirectMessagePopup
         recipient={profile}
         open={messageOpen}
