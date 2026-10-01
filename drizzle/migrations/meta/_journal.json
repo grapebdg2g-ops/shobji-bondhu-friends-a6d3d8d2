@@ -15,6 +15,13 @@
       "when": 1790781378807,
       "tag": "0001_grant_profile_cover_select",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790847043327,
+      "tag": "0002_create_soil_reports",
+      "breakpoints": true
     }
   ]
 }
