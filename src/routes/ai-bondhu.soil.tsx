@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useRef, useState } from "react";
 import {
@@ -25,6 +25,7 @@ import {
   Save,
   Share2,
   Printer,
+  Calculator,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -338,6 +339,24 @@ function SoilAnalysisPage() {
                 </span>
               </div>
             </div>
+
+            <Link
+              to="/ai-bondhu/calculator"
+              className="flex items-center justify-between gap-3 rounded-2xl border border-emerald-200 bg-white px-4 py-3.5 shadow-sm transition active:bg-emerald-50"
+            >
+              <span className="flex items-center gap-3">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+                  <Calculator className="h-5 w-5" />
+                </span>
+                <span>
+                  <span className="block text-sm font-black text-gray-900">সরাসরি সারের হিসাব দরকার?</span>
+                  <span className="mt-0.5 block text-[11px] text-gray-500">
+                    মাটি পরীক্ষা ছাড়াই সার ক্যালকুলেটরে ফসলভিত্তিক ডোজ বের করুন
+                  </span>
+                </span>
+              </span>
+              <ArrowLeft className="h-4 w-4 rotate-180 shrink-0 text-emerald-600" />
+            </Link>
 
             <form onSubmit={handleSubmit} className="space-y-5 pb-6">
               <Card icon={Upload} title="ছবি বা রিপোর্ট দিয়ে শুরু করুন">
@@ -1017,6 +1036,12 @@ function ResultView({ result, onReset }: { result: SoilAnalysisResult; onReset: 
           <RefreshCw className="mr-2 inline h-4 w-4" /> নতুন বিশ্লেষণ
         </BengaliButton>
       </div>
+      <Link
+        to="/ai-bondhu/calculator"
+        className="flex items-center justify-center gap-2 rounded-2xl border-2 border-emerald-600 bg-emerald-50 py-3.5 text-sm font-bold text-emerald-800 transition active:bg-emerald-100 print:hidden"
+      >
+        <Calculator className="h-4 w-4" /> সার ক্যালকুলেটরে ফসলভিত্তিক হিসাব করুন
+      </Link>
     </div>
   );
 }
