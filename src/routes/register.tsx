@@ -53,7 +53,7 @@ function RegisterPage() {
     await refreshUser();
     setSaving(false);
     toast.success("স্বাগতম, " + name);
-    navigate({ to: "/dashboard" });
+    navigate({ to: "/onboarding" });
   };
 
   return (
