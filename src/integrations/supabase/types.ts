@@ -933,6 +933,42 @@ export type Database = {
         }
         Relationships: []
       }
+      profile_details: {
+        Row: {
+          address_line: string | null
+          courier_phone: string | null
+          created_at: string
+          onboarding_completed_at: string | null
+          post_office: string | null
+          postcode: string | null
+          updated_at: string
+          user_id: string
+          village: string | null
+        }
+        Insert: {
+          address_line?: string | null
+          courier_phone?: string | null
+          created_at?: string
+          onboarding_completed_at?: string | null
+          post_office?: string | null
+          postcode?: string | null
+          updated_at?: string
+          user_id: string
+          village?: string | null
+        }
+        Update: {
+          address_line?: string | null
+          courier_phone?: string | null
+          created_at?: string
+          onboarding_completed_at?: string | null
+          post_office?: string | null
+          postcode?: string | null
+          updated_at?: string
+          user_id?: string
+          village?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -1455,6 +1491,19 @@ export type Database = {
         }
       }
       set_cron_secret: { Args: { _value: string }; Returns: undefined }
+      suggest_farmers_by_crops: {
+        Args: { _limit?: number }
+        Returns: {
+          avatar_url: string
+          common_crops: string[]
+          crops: string[]
+          district: string
+          id: string
+          is_verified: boolean
+          name: string
+          upazila: string
+        }[]
+      }
     }
     Enums: {
       app_role: "farmer" | "expert" | "moderator" | "admin"
