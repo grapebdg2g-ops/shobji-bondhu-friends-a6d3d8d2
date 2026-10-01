@@ -9,168 +9,68 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AdminRouteImport } from './routes/admin'
-import { Route as ConnectionsRouteImport } from './routes/connections'
-import { Route as CropDiaryRouteImport } from './routes/crop-diary'
-import { Route as CropGuideRouteImport } from './routes/crop-guide'
-import { Route as CropPlannerRouteImport } from './routes/crop-planner'
-import { Route as DashboardRouteImport } from './routes/dashboard'
-import { Route as DiseaseDetectionRouteImport } from './routes/disease-detection'
-import { Route as ExchangeRouteImport } from './routes/exchange'
-import { Route as FarmersRouteImport } from './routes/farmers'
-import { Route as FeedRouteImport } from './routes/feed'
-import { Route as FriendsRouteImport } from './routes/friends'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as MessagesRouteImport } from './routes/messages'
-import { Route as ModerationRouteImport } from './routes/moderation'
-import { Route as NotificationsRouteImport } from './routes/notifications'
-import { Route as OfflineRouteImport } from './routes/offline'
-import { Route as OnboardingRouteImport } from './routes/onboarding'
-import { Route as OrganicFertilizerRouteImport } from './routes/organic-fertilizer'
-import { Route as PricePredictionRouteImport } from './routes/price-prediction'
-import { Route as PricesRouteImport } from './routes/prices'
-import { Route as RegisterRouteImport } from './routes/register'
 import { Route as WeatherRouteImport } from './routes/weather'
-import { Route as AdminIndexRouteImport } from './routes/admin.index'
-import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
-import { Route as AdminAuditRouteImport } from './routes/admin.audit'
-import { Route as AdminContentRouteImport } from './routes/admin.content'
-import { Route as AdminDiseasesRouteImport } from './routes/admin.diseases'
-import { Route as AdminExchangesRouteImport } from './routes/admin.exchanges'
-import { Route as AdminNotifyRouteImport } from './routes/admin.notify'
-import { Route as AdminPricesRouteImport } from './routes/admin.prices'
-import { Route as AdminProRouteImport } from './routes/admin.pro'
-import { Route as AdminReportsRouteImport } from './routes/admin.reports'
-import { Route as AdminUsersRouteImport } from './routes/admin.users'
-import { Route as AiBondhuIndexRouteImport } from './routes/ai-bondhu.index'
-import { Route as AiBondhuCalculatorRouteImport } from './routes/ai-bondhu.calculator'
-import { Route as AiBondhuCalendarRouteImport } from './routes/ai-bondhu.calendar'
-import { Route as AiBondhuDiseaseRouteImport } from './routes/ai-bondhu.disease'
-import { Route as AiBondhuPesticideRouteImport } from './routes/ai-bondhu.pesticide'
-import { Route as AiBondhuSoilRouteImport } from './routes/ai-bondhu.soil'
-import { Route as CropGuideIndexRouteImport } from './routes/crop-guide.index'
-import { Route as CropPlannerMyPlansRouteImport } from './routes/crop-planner.my-plans'
-import { Route as MessagesUserIdRouteImport } from './routes/messages.$userId'
-import { Route as PricePredictionHistoryRouteImport } from './routes/price-prediction.history'
-import { Route as ProfileIndexRouteImport } from './routes/profile.index'
-import { Route as ProfileDiseaseHistoryRouteImport } from './routes/profile.disease-history'
-import { Route as UUserIdRouteImport } from './routes/u.$userId'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as PricesRouteImport } from './routes/prices'
+import { Route as PricePredictionRouteImport } from './routes/price-prediction'
+import { Route as OrganicFertilizerRouteImport } from './routes/organic-fertilizer'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as OfflineRouteImport } from './routes/offline'
+import { Route as NotificationsRouteImport } from './routes/notifications'
+import { Route as ModerationRouteImport } from './routes/moderation'
+import { Route as MessagesRouteImport } from './routes/messages'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as FriendsRouteImport } from './routes/friends'
+import { Route as FeedRouteImport } from './routes/feed'
+import { Route as FarmersRouteImport } from './routes/farmers'
+import { Route as ExchangeRouteImport } from './routes/exchange'
+import { Route as DiseaseDetectionRouteImport } from './routes/disease-detection'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as CropPlannerRouteImport } from './routes/crop-planner'
+import { Route as CropGuideRouteImport } from './routes/crop-guide'
+import { Route as CropDiaryRouteImport } from './routes/crop-diary'
+import { Route as ConnectionsRouteImport } from './routes/connections'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as VegetableGuideIndexRouteImport } from './routes/vegetable-guide.index'
+import { Route as ProfileIndexRouteImport } from './routes/profile.index'
+import { Route as CropGuideIndexRouteImport } from './routes/crop-guide.index'
+import { Route as AiBondhuIndexRouteImport } from './routes/ai-bondhu.index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as VegetableGuideSlugRouteImport } from './routes/vegetable-guide.$slug'
+import { Route as UUserIdRouteImport } from './routes/u.$userId'
+import { Route as ProfileDiseaseHistoryRouteImport } from './routes/profile.disease-history'
+import { Route as PricePredictionHistoryRouteImport } from './routes/price-prediction.history'
+import { Route as MessagesUserIdRouteImport } from './routes/messages.$userId'
+import { Route as CropPlannerMyPlansRouteImport } from './routes/crop-planner.my-plans'
+import { Route as AiBondhuSoilRouteImport } from './routes/ai-bondhu.soil'
+import { Route as AiBondhuPesticideRouteImport } from './routes/ai-bondhu.pesticide'
+import { Route as AiBondhuDiseaseRouteImport } from './routes/ai-bondhu.disease'
+import { Route as AiBondhuCalendarRouteImport } from './routes/ai-bondhu.calendar'
+import { Route as AiBondhuCalculatorRouteImport } from './routes/ai-bondhu.calculator'
+import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminReportsRouteImport } from './routes/admin.reports'
+import { Route as AdminProRouteImport } from './routes/admin.pro'
+import { Route as AdminPricesRouteImport } from './routes/admin.prices'
+import { Route as AdminNotifyRouteImport } from './routes/admin.notify'
+import { Route as AdminExchangesRouteImport } from './routes/admin.exchanges'
+import { Route as AdminDiseasesRouteImport } from './routes/admin.diseases'
+import { Route as AdminContentRouteImport } from './routes/admin.content'
+import { Route as AdminAuditRouteImport } from './routes/admin.audit'
+import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AiBondhuChatIndexRouteImport } from './routes/ai-bondhu.chat.index'
-import { Route as AiBondhuChatSessionIdRouteImport } from './routes/ai-bondhu.chat.$sessionId'
-import { Route as CropGuideNewCropRouteImport } from './routes/crop-guide.new.$crop'
 import { Route as CropGuidePlanPlanIdRouteImport } from './routes/crop-guide.plan.$planId'
-import { Route as ApiPublicHooksCheckPredictionAccuracyRouteImport } from './routes/api/public/hooks/check-prediction-accuracy'
-import { Route as ApiPublicHooksCropRemindersRouteImport } from './routes/api/public/hooks/crop-reminders'
-import { Route as ApiPublicHooksFetchGovtPricesRouteImport } from './routes/api/public/hooks/fetch-govt-prices'
-import { Route as ApiPublicHooksSendScheduledBroadcastsRouteImport } from './routes/api/public/hooks/send-scheduled-broadcasts'
+import { Route as CropGuideNewCropRouteImport } from './routes/crop-guide.new.$crop'
+import { Route as AiBondhuChatSessionIdRouteImport } from './routes/ai-bondhu.chat.$sessionId'
 import { Route as ApiPublicHooksWeatherAlertsRouteImport } from './routes/api/public/hooks/weather-alerts'
+import { Route as ApiPublicHooksSendScheduledBroadcastsRouteImport } from './routes/api/public/hooks/send-scheduled-broadcasts'
+import { Route as ApiPublicHooksFetchGovtPricesRouteImport } from './routes/api/public/hooks/fetch-govt-prices'
+import { Route as ApiPublicHooksCropRemindersRouteImport } from './routes/api/public/hooks/crop-reminders'
+import { Route as ApiPublicHooksCheckPredictionAccuracyRouteImport } from './routes/api/public/hooks/check-prediction-accuracy'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ConnectionsRoute = ConnectionsRouteImport.update({
-  id: '/connections',
-  path: '/connections',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CropDiaryRoute = CropDiaryRouteImport.update({
-  id: '/crop-diary',
-  path: '/crop-diary',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CropGuideRoute = CropGuideRouteImport.update({
-  id: '/crop-guide',
-  path: '/crop-guide',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CropPlannerRoute = CropPlannerRouteImport.update({
-  id: '/crop-planner',
-  path: '/crop-planner',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DiseaseDetectionRoute = DiseaseDetectionRouteImport.update({
-  id: '/disease-detection',
-  path: '/disease-detection',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ExchangeRoute = ExchangeRouteImport.update({
-  id: '/exchange',
-  path: '/exchange',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FarmersRoute = FarmersRouteImport.update({
-  id: '/farmers',
-  path: '/farmers',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FeedRoute = FeedRouteImport.update({
-  id: '/feed',
-  path: '/feed',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FriendsRoute = FriendsRouteImport.update({
-  id: '/friends',
-  path: '/friends',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MessagesRoute = MessagesRouteImport.update({
-  id: '/messages',
-  path: '/messages',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ModerationRoute = ModerationRouteImport.update({
-  id: '/moderation',
-  path: '/moderation',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const NotificationsRoute = NotificationsRouteImport.update({
-  id: '/notifications',
-  path: '/notifications',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OfflineRoute = OfflineRouteImport.update({
-  id: '/offline',
-  path: '/offline',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OnboardingRoute = OnboardingRouteImport.update({
-  id: '/onboarding',
-  path: '/onboarding',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OrganicFertilizerRoute = OrganicFertilizerRouteImport.update({
-  id: '/organic-fertilizer',
-  path: '/organic-fertilizer',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PricePredictionRoute = PricePredictionRouteImport.update({
-  id: '/price-prediction',
-  path: '/price-prediction',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PricesRoute = PricesRouteImport.update({
-  id: '/prices',
-  path: '/prices',
+const WeatherRoute = WeatherRouteImport.update({
+  id: '/weather',
+  path: '/weather',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RegisterRoute = RegisterRouteImport.update({
@@ -178,129 +78,109 @@ const RegisterRoute = RegisterRouteImport.update({
   path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
-const WeatherRoute = WeatherRouteImport.update({
-  id: '/weather',
-  path: '/weather',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminIndexRoute = AdminIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
-  id: '/analytics',
-  path: '/analytics',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminAuditRoute = AdminAuditRouteImport.update({
-  id: '/audit',
-  path: '/audit',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminContentRoute = AdminContentRouteImport.update({
-  id: '/content',
-  path: '/content',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminDiseasesRoute = AdminDiseasesRouteImport.update({
-  id: '/diseases',
-  path: '/diseases',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminExchangesRoute = AdminExchangesRouteImport.update({
-  id: '/exchanges',
-  path: '/exchanges',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminNotifyRoute = AdminNotifyRouteImport.update({
-  id: '/notify',
-  path: '/notify',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminPricesRoute = AdminPricesRouteImport.update({
+const PricesRoute = PricesRouteImport.update({
   id: '/prices',
   path: '/prices',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminProRoute = AdminProRouteImport.update({
-  id: '/pro',
-  path: '/pro',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminReportsRoute = AdminReportsRouteImport.update({
-  id: '/reports',
-  path: '/reports',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminUsersRoute = AdminUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AiBondhuIndexRoute = AiBondhuIndexRouteImport.update({
-  id: '/ai-bondhu/',
-  path: '/ai-bondhu/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AiBondhuCalculatorRoute = AiBondhuCalculatorRouteImport.update({
-  id: '/ai-bondhu/calculator',
-  path: '/ai-bondhu/calculator',
+const PricePredictionRoute = PricePredictionRouteImport.update({
+  id: '/price-prediction',
+  path: '/price-prediction',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AiBondhuCalendarRoute = AiBondhuCalendarRouteImport.update({
-  id: '/ai-bondhu/calendar',
-  path: '/ai-bondhu/calendar',
+const OrganicFertilizerRoute = OrganicFertilizerRouteImport.update({
+  id: '/organic-fertilizer',
+  path: '/organic-fertilizer',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AiBondhuDiseaseRoute = AiBondhuDiseaseRouteImport.update({
-  id: '/ai-bondhu/disease',
-  path: '/ai-bondhu/disease',
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AiBondhuPesticideRoute = AiBondhuPesticideRouteImport.update({
-  id: '/ai-bondhu/pesticide',
-  path: '/ai-bondhu/pesticide',
+const OfflineRoute = OfflineRouteImport.update({
+  id: '/offline',
+  path: '/offline',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AiBondhuSoilRoute = AiBondhuSoilRouteImport.update({
-  id: '/ai-bondhu/soil',
-  path: '/ai-bondhu/soil',
+const NotificationsRoute = NotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CropGuideIndexRoute = CropGuideIndexRouteImport.update({
+const ModerationRoute = ModerationRouteImport.update({
+  id: '/moderation',
+  path: '/moderation',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MessagesRoute = MessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FriendsRoute = FriendsRouteImport.update({
+  id: '/friends',
+  path: '/friends',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeedRoute = FeedRouteImport.update({
+  id: '/feed',
+  path: '/feed',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FarmersRoute = FarmersRouteImport.update({
+  id: '/farmers',
+  path: '/farmers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExchangeRoute = ExchangeRouteImport.update({
+  id: '/exchange',
+  path: '/exchange',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DiseaseDetectionRoute = DiseaseDetectionRouteImport.update({
+  id: '/disease-detection',
+  path: '/disease-detection',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CropPlannerRoute = CropPlannerRouteImport.update({
+  id: '/crop-planner',
+  path: '/crop-planner',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CropGuideRoute = CropGuideRouteImport.update({
+  id: '/crop-guide',
+  path: '/crop-guide',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CropDiaryRoute = CropDiaryRouteImport.update({
+  id: '/crop-diary',
+  path: '/crop-diary',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConnectionsRoute = ConnectionsRouteImport.update({
+  id: '/connections',
+  path: '/connections',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => CropGuideRoute,
-} as any)
-const CropPlannerMyPlansRoute = CropPlannerMyPlansRouteImport.update({
-  id: '/my-plans',
-  path: '/my-plans',
-  getParentRoute: () => CropPlannerRoute,
-} as any)
-const MessagesUserIdRoute = MessagesUserIdRouteImport.update({
-  id: '/$userId',
-  path: '/$userId',
-  getParentRoute: () => MessagesRoute,
-} as any)
-const PricePredictionHistoryRoute = PricePredictionHistoryRouteImport.update({
-  id: '/history',
-  path: '/history',
-  getParentRoute: () => PricePredictionRoute,
-} as any)
-const ProfileIndexRoute = ProfileIndexRouteImport.update({
-  id: '/profile/',
-  path: '/profile/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProfileDiseaseHistoryRoute = ProfileDiseaseHistoryRouteImport.update({
-  id: '/profile/disease-history',
-  path: '/profile/disease-history',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const UUserIdRoute = UUserIdRouteImport.update({
-  id: '/u/$userId',
-  path: '/u/$userId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const VegetableGuideIndexRoute = VegetableGuideIndexRouteImport.update({
@@ -308,47 +188,155 @@ const VegetableGuideIndexRoute = VegetableGuideIndexRouteImport.update({
   path: '/vegetable-guide/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfileIndexRoute = ProfileIndexRouteImport.update({
+  id: '/profile/',
+  path: '/profile/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CropGuideIndexRoute = CropGuideIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => CropGuideRoute,
+} as any)
+const AiBondhuIndexRoute = AiBondhuIndexRouteImport.update({
+  id: '/ai-bondhu/',
+  path: '/ai-bondhu/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
 const VegetableGuideSlugRoute = VegetableGuideSlugRouteImport.update({
   id: '/vegetable-guide/$slug',
   path: '/vegetable-guide/$slug',
   getParentRoute: () => rootRouteImport,
+} as any)
+const UUserIdRoute = UUserIdRouteImport.update({
+  id: '/u/$userId',
+  path: '/u/$userId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileDiseaseHistoryRoute = ProfileDiseaseHistoryRouteImport.update({
+  id: '/profile/disease-history',
+  path: '/profile/disease-history',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PricePredictionHistoryRoute = PricePredictionHistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
+  getParentRoute: () => PricePredictionRoute,
+} as any)
+const MessagesUserIdRoute = MessagesUserIdRouteImport.update({
+  id: '/$userId',
+  path: '/$userId',
+  getParentRoute: () => MessagesRoute,
+} as any)
+const CropPlannerMyPlansRoute = CropPlannerMyPlansRouteImport.update({
+  id: '/my-plans',
+  path: '/my-plans',
+  getParentRoute: () => CropPlannerRoute,
+} as any)
+const AiBondhuSoilRoute = AiBondhuSoilRouteImport.update({
+  id: '/ai-bondhu/soil',
+  path: '/ai-bondhu/soil',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AiBondhuPesticideRoute = AiBondhuPesticideRouteImport.update({
+  id: '/ai-bondhu/pesticide',
+  path: '/ai-bondhu/pesticide',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AiBondhuDiseaseRoute = AiBondhuDiseaseRouteImport.update({
+  id: '/ai-bondhu/disease',
+  path: '/ai-bondhu/disease',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AiBondhuCalendarRoute = AiBondhuCalendarRouteImport.update({
+  id: '/ai-bondhu/calendar',
+  path: '/ai-bondhu/calendar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AiBondhuCalculatorRoute = AiBondhuCalculatorRouteImport.update({
+  id: '/ai-bondhu/calculator',
+  path: '/ai-bondhu/calculator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminReportsRoute = AdminReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminProRoute = AdminProRouteImport.update({
+  id: '/pro',
+  path: '/pro',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPricesRoute = AdminPricesRouteImport.update({
+  id: '/prices',
+  path: '/prices',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminNotifyRoute = AdminNotifyRouteImport.update({
+  id: '/notify',
+  path: '/notify',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminExchangesRoute = AdminExchangesRouteImport.update({
+  id: '/exchanges',
+  path: '/exchanges',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminDiseasesRoute = AdminDiseasesRouteImport.update({
+  id: '/diseases',
+  path: '/diseases',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminContentRoute = AdminContentRouteImport.update({
+  id: '/content',
+  path: '/content',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAuditRoute = AdminAuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AiBondhuChatIndexRoute = AiBondhuChatIndexRouteImport.update({
   id: '/ai-bondhu/chat/',
   path: '/ai-bondhu/chat/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AiBondhuChatSessionIdRoute = AiBondhuChatSessionIdRouteImport.update({
-  id: '/ai-bondhu/chat/$sessionId',
-  path: '/ai-bondhu/chat/$sessionId',
-  getParentRoute: () => rootRouteImport,
+const CropGuidePlanPlanIdRoute = CropGuidePlanPlanIdRouteImport.update({
+  id: '/plan/$planId',
+  path: '/plan/$planId',
+  getParentRoute: () => CropGuideRoute,
 } as any)
 const CropGuideNewCropRoute = CropGuideNewCropRouteImport.update({
   id: '/new/$crop',
   path: '/new/$crop',
   getParentRoute: () => CropGuideRoute,
 } as any)
-const CropGuidePlanPlanIdRoute = CropGuidePlanPlanIdRouteImport.update({
-  id: '/plan/$planId',
-  path: '/plan/$planId',
-  getParentRoute: () => CropGuideRoute,
+const AiBondhuChatSessionIdRoute = AiBondhuChatSessionIdRouteImport.update({
+  id: '/ai-bondhu/chat/$sessionId',
+  path: '/ai-bondhu/chat/$sessionId',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicHooksCheckPredictionAccuracyRoute =
-  ApiPublicHooksCheckPredictionAccuracyRouteImport.update({
-    id: '/api/public/hooks/check-prediction-accuracy',
-    path: '/api/public/hooks/check-prediction-accuracy',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksCropRemindersRoute =
-  ApiPublicHooksCropRemindersRouteImport.update({
-    id: '/api/public/hooks/crop-reminders',
-    path: '/api/public/hooks/crop-reminders',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksFetchGovtPricesRoute =
-  ApiPublicHooksFetchGovtPricesRouteImport.update({
-    id: '/api/public/hooks/fetch-govt-prices',
-    path: '/api/public/hooks/fetch-govt-prices',
+const ApiPublicHooksWeatherAlertsRoute =
+  ApiPublicHooksWeatherAlertsRouteImport.update({
+    id: '/api/public/hooks/weather-alerts',
+    path: '/api/public/hooks/weather-alerts',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiPublicHooksSendScheduledBroadcastsRoute =
@@ -357,10 +345,22 @@ const ApiPublicHooksSendScheduledBroadcastsRoute =
     path: '/api/public/hooks/send-scheduled-broadcasts',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiPublicHooksWeatherAlertsRoute =
-  ApiPublicHooksWeatherAlertsRouteImport.update({
-    id: '/api/public/hooks/weather-alerts',
-    path: '/api/public/hooks/weather-alerts',
+const ApiPublicHooksFetchGovtPricesRoute =
+  ApiPublicHooksFetchGovtPricesRouteImport.update({
+    id: '/api/public/hooks/fetch-govt-prices',
+    path: '/api/public/hooks/fetch-govt-prices',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksCropRemindersRoute =
+  ApiPublicHooksCropRemindersRouteImport.update({
+    id: '/api/public/hooks/crop-reminders',
+    path: '/api/public/hooks/crop-reminders',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksCheckPredictionAccuracyRoute =
+  ApiPublicHooksCheckPredictionAccuracyRouteImport.update({
+    id: '/api/public/hooks/check-prediction-accuracy',
+    path: '/api/public/hooks/check-prediction-accuracy',
     getParentRoute: () => rootRouteImport,
   } as any)
 
@@ -770,151 +770,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/connections': {
-      id: '/connections'
-      path: '/connections'
-      fullPath: '/connections'
-      preLoaderRoute: typeof ConnectionsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/crop-diary': {
-      id: '/crop-diary'
-      path: '/crop-diary'
-      fullPath: '/crop-diary'
-      preLoaderRoute: typeof CropDiaryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/crop-guide': {
-      id: '/crop-guide'
-      path: '/crop-guide'
-      fullPath: '/crop-guide'
-      preLoaderRoute: typeof CropGuideRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/crop-planner': {
-      id: '/crop-planner'
-      path: '/crop-planner'
-      fullPath: '/crop-planner'
-      preLoaderRoute: typeof CropPlannerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/disease-detection': {
-      id: '/disease-detection'
-      path: '/disease-detection'
-      fullPath: '/disease-detection'
-      preLoaderRoute: typeof DiseaseDetectionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/exchange': {
-      id: '/exchange'
-      path: '/exchange'
-      fullPath: '/exchange'
-      preLoaderRoute: typeof ExchangeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/farmers': {
-      id: '/farmers'
-      path: '/farmers'
-      fullPath: '/farmers'
-      preLoaderRoute: typeof FarmersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/feed': {
-      id: '/feed'
-      path: '/feed'
-      fullPath: '/feed'
-      preLoaderRoute: typeof FeedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/friends': {
-      id: '/friends'
-      path: '/friends'
-      fullPath: '/friends'
-      preLoaderRoute: typeof FriendsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/messages': {
-      id: '/messages'
-      path: '/messages'
-      fullPath: '/messages'
-      preLoaderRoute: typeof MessagesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/moderation': {
-      id: '/moderation'
-      path: '/moderation'
-      fullPath: '/moderation'
-      preLoaderRoute: typeof ModerationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/notifications': {
-      id: '/notifications'
-      path: '/notifications'
-      fullPath: '/notifications'
-      preLoaderRoute: typeof NotificationsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/offline': {
-      id: '/offline'
-      path: '/offline'
-      fullPath: '/offline'
-      preLoaderRoute: typeof OfflineRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/onboarding': {
-      id: '/onboarding'
-      path: '/onboarding'
-      fullPath: '/onboarding'
-      preLoaderRoute: typeof OnboardingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/organic-fertilizer': {
-      id: '/organic-fertilizer'
-      path: '/organic-fertilizer'
-      fullPath: '/organic-fertilizer'
-      preLoaderRoute: typeof OrganicFertilizerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/price-prediction': {
-      id: '/price-prediction'
-      path: '/price-prediction'
-      fullPath: '/price-prediction'
-      preLoaderRoute: typeof PricePredictionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/prices': {
-      id: '/prices'
-      path: '/prices'
-      fullPath: '/prices'
-      preLoaderRoute: typeof PricesRouteImport
+    '/weather': {
+      id: '/weather'
+      path: '/weather'
+      fullPath: '/weather'
+      preLoaderRoute: typeof WeatherRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/register': {
@@ -924,179 +784,151 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/weather': {
-      id: '/weather'
-      path: '/weather'
-      fullPath: '/weather'
-      preLoaderRoute: typeof WeatherRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/': {
-      id: '/admin/'
-      path: '/'
-      fullPath: '/admin/'
-      preLoaderRoute: typeof AdminIndexRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/analytics': {
-      id: '/admin/analytics'
-      path: '/analytics'
-      fullPath: '/admin/analytics'
-      preLoaderRoute: typeof AdminAnalyticsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/audit': {
-      id: '/admin/audit'
-      path: '/audit'
-      fullPath: '/admin/audit'
-      preLoaderRoute: typeof AdminAuditRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/content': {
-      id: '/admin/content'
-      path: '/content'
-      fullPath: '/admin/content'
-      preLoaderRoute: typeof AdminContentRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/diseases': {
-      id: '/admin/diseases'
-      path: '/diseases'
-      fullPath: '/admin/diseases'
-      preLoaderRoute: typeof AdminDiseasesRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/exchanges': {
-      id: '/admin/exchanges'
-      path: '/exchanges'
-      fullPath: '/admin/exchanges'
-      preLoaderRoute: typeof AdminExchangesRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/notify': {
-      id: '/admin/notify'
-      path: '/notify'
-      fullPath: '/admin/notify'
-      preLoaderRoute: typeof AdminNotifyRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/prices': {
-      id: '/admin/prices'
+    '/prices': {
+      id: '/prices'
       path: '/prices'
-      fullPath: '/admin/prices'
-      preLoaderRoute: typeof AdminPricesRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/pro': {
-      id: '/admin/pro'
-      path: '/pro'
-      fullPath: '/admin/pro'
-      preLoaderRoute: typeof AdminProRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/reports': {
-      id: '/admin/reports'
-      path: '/reports'
-      fullPath: '/admin/reports'
-      preLoaderRoute: typeof AdminReportsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/users': {
-      id: '/admin/users'
-      path: '/users'
-      fullPath: '/admin/users'
-      preLoaderRoute: typeof AdminUsersRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/ai-bondhu/': {
-      id: '/ai-bondhu/'
-      path: '/ai-bondhu'
-      fullPath: '/ai-bondhu/'
-      preLoaderRoute: typeof AiBondhuIndexRouteImport
+      fullPath: '/prices'
+      preLoaderRoute: typeof PricesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/ai-bondhu/calculator': {
-      id: '/ai-bondhu/calculator'
-      path: '/ai-bondhu/calculator'
-      fullPath: '/ai-bondhu/calculator'
-      preLoaderRoute: typeof AiBondhuCalculatorRouteImport
+    '/price-prediction': {
+      id: '/price-prediction'
+      path: '/price-prediction'
+      fullPath: '/price-prediction'
+      preLoaderRoute: typeof PricePredictionRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/ai-bondhu/calendar': {
-      id: '/ai-bondhu/calendar'
-      path: '/ai-bondhu/calendar'
-      fullPath: '/ai-bondhu/calendar'
-      preLoaderRoute: typeof AiBondhuCalendarRouteImport
+    '/organic-fertilizer': {
+      id: '/organic-fertilizer'
+      path: '/organic-fertilizer'
+      fullPath: '/organic-fertilizer'
+      preLoaderRoute: typeof OrganicFertilizerRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/ai-bondhu/disease': {
-      id: '/ai-bondhu/disease'
-      path: '/ai-bondhu/disease'
-      fullPath: '/ai-bondhu/disease'
-      preLoaderRoute: typeof AiBondhuDiseaseRouteImport
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/ai-bondhu/pesticide': {
-      id: '/ai-bondhu/pesticide'
-      path: '/ai-bondhu/pesticide'
-      fullPath: '/ai-bondhu/pesticide'
-      preLoaderRoute: typeof AiBondhuPesticideRouteImport
+    '/offline': {
+      id: '/offline'
+      path: '/offline'
+      fullPath: '/offline'
+      preLoaderRoute: typeof OfflineRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/ai-bondhu/soil': {
-      id: '/ai-bondhu/soil'
-      path: '/ai-bondhu/soil'
-      fullPath: '/ai-bondhu/soil'
-      preLoaderRoute: typeof AiBondhuSoilRouteImport
+    '/notifications': {
+      id: '/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof NotificationsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/crop-guide/': {
-      id: '/crop-guide/'
+    '/moderation': {
+      id: '/moderation'
+      path: '/moderation'
+      fullPath: '/moderation'
+      preLoaderRoute: typeof ModerationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/messages': {
+      id: '/messages'
+      path: '/messages'
+      fullPath: '/messages'
+      preLoaderRoute: typeof MessagesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/friends': {
+      id: '/friends'
+      path: '/friends'
+      fullPath: '/friends'
+      preLoaderRoute: typeof FriendsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/feed': {
+      id: '/feed'
+      path: '/feed'
+      fullPath: '/feed'
+      preLoaderRoute: typeof FeedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/farmers': {
+      id: '/farmers'
+      path: '/farmers'
+      fullPath: '/farmers'
+      preLoaderRoute: typeof FarmersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/exchange': {
+      id: '/exchange'
+      path: '/exchange'
+      fullPath: '/exchange'
+      preLoaderRoute: typeof ExchangeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/disease-detection': {
+      id: '/disease-detection'
+      path: '/disease-detection'
+      fullPath: '/disease-detection'
+      preLoaderRoute: typeof DiseaseDetectionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/crop-planner': {
+      id: '/crop-planner'
+      path: '/crop-planner'
+      fullPath: '/crop-planner'
+      preLoaderRoute: typeof CropPlannerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/crop-guide': {
+      id: '/crop-guide'
+      path: '/crop-guide'
+      fullPath: '/crop-guide'
+      preLoaderRoute: typeof CropGuideRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/crop-diary': {
+      id: '/crop-diary'
+      path: '/crop-diary'
+      fullPath: '/crop-diary'
+      preLoaderRoute: typeof CropDiaryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/connections': {
+      id: '/connections'
+      path: '/connections'
+      fullPath: '/connections'
+      preLoaderRoute: typeof ConnectionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
       path: '/'
-      fullPath: '/crop-guide/'
-      preLoaderRoute: typeof CropGuideIndexRouteImport
-      parentRoute: typeof CropGuideRoute
-    }
-    '/crop-planner/my-plans': {
-      id: '/crop-planner/my-plans'
-      path: '/my-plans'
-      fullPath: '/crop-planner/my-plans'
-      preLoaderRoute: typeof CropPlannerMyPlansRouteImport
-      parentRoute: typeof CropPlannerRoute
-    }
-    '/messages/$userId': {
-      id: '/messages/$userId'
-      path: '/$userId'
-      fullPath: '/messages/$userId'
-      preLoaderRoute: typeof MessagesUserIdRouteImport
-      parentRoute: typeof MessagesRoute
-    }
-    '/price-prediction/history': {
-      id: '/price-prediction/history'
-      path: '/history'
-      fullPath: '/price-prediction/history'
-      preLoaderRoute: typeof PricePredictionHistoryRouteImport
-      parentRoute: typeof PricePredictionRoute
-    }
-    '/profile/': {
-      id: '/profile/'
-      path: '/profile'
-      fullPath: '/profile/'
-      preLoaderRoute: typeof ProfileIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/profile/disease-history': {
-      id: '/profile/disease-history'
-      path: '/profile/disease-history'
-      fullPath: '/profile/disease-history'
-      preLoaderRoute: typeof ProfileDiseaseHistoryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/u/$userId': {
-      id: '/u/$userId'
-      path: '/u/$userId'
-      fullPath: '/u/$userId'
-      preLoaderRoute: typeof UUserIdRouteImport
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/vegetable-guide/': {
@@ -1106,12 +938,180 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VegetableGuideIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/profile/': {
+      id: '/profile/'
+      path: '/profile'
+      fullPath: '/profile/'
+      preLoaderRoute: typeof ProfileIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/crop-guide/': {
+      id: '/crop-guide/'
+      path: '/'
+      fullPath: '/crop-guide/'
+      preLoaderRoute: typeof CropGuideIndexRouteImport
+      parentRoute: typeof CropGuideRoute
+    }
+    '/ai-bondhu/': {
+      id: '/ai-bondhu/'
+      path: '/ai-bondhu'
+      fullPath: '/ai-bondhu/'
+      preLoaderRoute: typeof AiBondhuIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/vegetable-guide/$slug': {
       id: '/vegetable-guide/$slug'
       path: '/vegetable-guide/$slug'
       fullPath: '/vegetable-guide/$slug'
       preLoaderRoute: typeof VegetableGuideSlugRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/u/$userId': {
+      id: '/u/$userId'
+      path: '/u/$userId'
+      fullPath: '/u/$userId'
+      preLoaderRoute: typeof UUserIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile/disease-history': {
+      id: '/profile/disease-history'
+      path: '/profile/disease-history'
+      fullPath: '/profile/disease-history'
+      preLoaderRoute: typeof ProfileDiseaseHistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/price-prediction/history': {
+      id: '/price-prediction/history'
+      path: '/history'
+      fullPath: '/price-prediction/history'
+      preLoaderRoute: typeof PricePredictionHistoryRouteImport
+      parentRoute: typeof PricePredictionRoute
+    }
+    '/messages/$userId': {
+      id: '/messages/$userId'
+      path: '/$userId'
+      fullPath: '/messages/$userId'
+      preLoaderRoute: typeof MessagesUserIdRouteImport
+      parentRoute: typeof MessagesRoute
+    }
+    '/crop-planner/my-plans': {
+      id: '/crop-planner/my-plans'
+      path: '/my-plans'
+      fullPath: '/crop-planner/my-plans'
+      preLoaderRoute: typeof CropPlannerMyPlansRouteImport
+      parentRoute: typeof CropPlannerRoute
+    }
+    '/ai-bondhu/soil': {
+      id: '/ai-bondhu/soil'
+      path: '/ai-bondhu/soil'
+      fullPath: '/ai-bondhu/soil'
+      preLoaderRoute: typeof AiBondhuSoilRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ai-bondhu/pesticide': {
+      id: '/ai-bondhu/pesticide'
+      path: '/ai-bondhu/pesticide'
+      fullPath: '/ai-bondhu/pesticide'
+      preLoaderRoute: typeof AiBondhuPesticideRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ai-bondhu/disease': {
+      id: '/ai-bondhu/disease'
+      path: '/ai-bondhu/disease'
+      fullPath: '/ai-bondhu/disease'
+      preLoaderRoute: typeof AiBondhuDiseaseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ai-bondhu/calendar': {
+      id: '/ai-bondhu/calendar'
+      path: '/ai-bondhu/calendar'
+      fullPath: '/ai-bondhu/calendar'
+      preLoaderRoute: typeof AiBondhuCalendarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ai-bondhu/calculator': {
+      id: '/ai-bondhu/calculator'
+      path: '/ai-bondhu/calculator'
+      fullPath: '/ai-bondhu/calculator'
+      preLoaderRoute: typeof AiBondhuCalculatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/reports': {
+      id: '/admin/reports'
+      path: '/reports'
+      fullPath: '/admin/reports'
+      preLoaderRoute: typeof AdminReportsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/pro': {
+      id: '/admin/pro'
+      path: '/pro'
+      fullPath: '/admin/pro'
+      preLoaderRoute: typeof AdminProRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/prices': {
+      id: '/admin/prices'
+      path: '/prices'
+      fullPath: '/admin/prices'
+      preLoaderRoute: typeof AdminPricesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/notify': {
+      id: '/admin/notify'
+      path: '/notify'
+      fullPath: '/admin/notify'
+      preLoaderRoute: typeof AdminNotifyRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/exchanges': {
+      id: '/admin/exchanges'
+      path: '/exchanges'
+      fullPath: '/admin/exchanges'
+      preLoaderRoute: typeof AdminExchangesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/diseases': {
+      id: '/admin/diseases'
+      path: '/diseases'
+      fullPath: '/admin/diseases'
+      preLoaderRoute: typeof AdminDiseasesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/content': {
+      id: '/admin/content'
+      path: '/content'
+      fullPath: '/admin/content'
+      preLoaderRoute: typeof AdminContentRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/audit': {
+      id: '/admin/audit'
+      path: '/audit'
+      fullPath: '/admin/audit'
+      preLoaderRoute: typeof AdminAuditRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/analytics': {
+      id: '/admin/analytics'
+      path: '/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AdminAnalyticsRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/ai-bondhu/chat/': {
       id: '/ai-bondhu/chat/'
@@ -1120,12 +1120,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AiBondhuChatIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/ai-bondhu/chat/$sessionId': {
-      id: '/ai-bondhu/chat/$sessionId'
-      path: '/ai-bondhu/chat/$sessionId'
-      fullPath: '/ai-bondhu/chat/$sessionId'
-      preLoaderRoute: typeof AiBondhuChatSessionIdRouteImport
-      parentRoute: typeof rootRouteImport
+    '/crop-guide/plan/$planId': {
+      id: '/crop-guide/plan/$planId'
+      path: '/plan/$planId'
+      fullPath: '/crop-guide/plan/$planId'
+      preLoaderRoute: typeof CropGuidePlanPlanIdRouteImport
+      parentRoute: typeof CropGuideRoute
     }
     '/crop-guide/new/$crop': {
       id: '/crop-guide/new/$crop'
@@ -1134,32 +1134,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CropGuideNewCropRouteImport
       parentRoute: typeof CropGuideRoute
     }
-    '/crop-guide/plan/$planId': {
-      id: '/crop-guide/plan/$planId'
-      path: '/plan/$planId'
-      fullPath: '/crop-guide/plan/$planId'
-      preLoaderRoute: typeof CropGuidePlanPlanIdRouteImport
-      parentRoute: typeof CropGuideRoute
-    }
-    '/api/public/hooks/check-prediction-accuracy': {
-      id: '/api/public/hooks/check-prediction-accuracy'
-      path: '/api/public/hooks/check-prediction-accuracy'
-      fullPath: '/api/public/hooks/check-prediction-accuracy'
-      preLoaderRoute: typeof ApiPublicHooksCheckPredictionAccuracyRouteImport
+    '/ai-bondhu/chat/$sessionId': {
+      id: '/ai-bondhu/chat/$sessionId'
+      path: '/ai-bondhu/chat/$sessionId'
+      fullPath: '/ai-bondhu/chat/$sessionId'
+      preLoaderRoute: typeof AiBondhuChatSessionIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/hooks/crop-reminders': {
-      id: '/api/public/hooks/crop-reminders'
-      path: '/api/public/hooks/crop-reminders'
-      fullPath: '/api/public/hooks/crop-reminders'
-      preLoaderRoute: typeof ApiPublicHooksCropRemindersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/hooks/fetch-govt-prices': {
-      id: '/api/public/hooks/fetch-govt-prices'
-      path: '/api/public/hooks/fetch-govt-prices'
-      fullPath: '/api/public/hooks/fetch-govt-prices'
-      preLoaderRoute: typeof ApiPublicHooksFetchGovtPricesRouteImport
+    '/api/public/hooks/weather-alerts': {
+      id: '/api/public/hooks/weather-alerts'
+      path: '/api/public/hooks/weather-alerts'
+      fullPath: '/api/public/hooks/weather-alerts'
+      preLoaderRoute: typeof ApiPublicHooksWeatherAlertsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/hooks/send-scheduled-broadcasts': {
@@ -1169,11 +1155,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksSendScheduledBroadcastsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/hooks/weather-alerts': {
-      id: '/api/public/hooks/weather-alerts'
-      path: '/api/public/hooks/weather-alerts'
-      fullPath: '/api/public/hooks/weather-alerts'
-      preLoaderRoute: typeof ApiPublicHooksWeatherAlertsRouteImport
+    '/api/public/hooks/fetch-govt-prices': {
+      id: '/api/public/hooks/fetch-govt-prices'
+      path: '/api/public/hooks/fetch-govt-prices'
+      fullPath: '/api/public/hooks/fetch-govt-prices'
+      preLoaderRoute: typeof ApiPublicHooksFetchGovtPricesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/crop-reminders': {
+      id: '/api/public/hooks/crop-reminders'
+      path: '/api/public/hooks/crop-reminders'
+      fullPath: '/api/public/hooks/crop-reminders'
+      preLoaderRoute: typeof ApiPublicHooksCropRemindersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/check-prediction-accuracy': {
+      id: '/api/public/hooks/check-prediction-accuracy'
+      path: '/api/public/hooks/check-prediction-accuracy'
+      fullPath: '/api/public/hooks/check-prediction-accuracy'
+      preLoaderRoute: typeof ApiPublicHooksCheckPredictionAccuracyRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
