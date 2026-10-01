@@ -21,6 +21,9 @@ import {
   CloudRain,
   ArrowUpRight,
   Activity,
+  UserCheck,
+  UserPlus,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useNotifications } from "@/hooks/use-notifications";
@@ -46,7 +49,10 @@ export const Route = createFileRoute("/dashboard")({
 function Dashboard() {
   const navigate = useNavigate();
   const { user, loading } = useUser();
-  const { unreadCount } = useNotifications(user?.id ?? null);
+  const { unreadCount, items: notifItems, markRead } = useNotifications(user?.id ?? null);
+  const friendNotifs = notifItems.filter(
+    (n) => !n.is_read && (n.type === "friend_added" || n.type === "connection_request"),
+  );
   const { setCollapsed } = useSidebar();
   const [createOpen, setCreateOpen] = useState(false);
 
@@ -128,6 +134,32 @@ function Dashboard() {
       </header>
 
       <div className="relative -mt-8 px-4 sm:px-6">
+        {friendNotifs.length > 0 && (
+          <div className="mb-3 space-y-2">
+            {friendNotifs.slice(0, 3).map((n) => (
+              <div key={n.id} className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3 shadow-[var(--shadow-card)]">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  {n.type === "friend_added" ? <UserCheck className="h-5 w-5" /> : <UserPlus className="h-5 w-5" />}
+                </div>
+                <button
+                  type="button"
+                  className="min-w-0 flex-1 text-left"
+                  onClick={() => {
+                    void markRead(n.id);
+                    if (n.type === "friend_added" && n.ref_id) navigate({ to: "/u/$userId", params: { userId: n.ref_id } });
+                    else navigate({ to: "/connections" });
+                  }}
+                >
+                  <p className="text-sm font-extrabold text-foreground">{n.title}</p>
+                  <p className="truncate text-xs text-muted-foreground">{n.body}</p>
+                </button>
+                <button type="button" aria-label="বন্ধ করুন" onClick={() => void markRead(n.id)} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-muted">
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
         <WeatherAlertBanner district={user?.district} />
         {/* SECTION 2 — Weather */}
         <DashboardWeatherWidget district={user?.district} upazila={user?.upazila} />
