@@ -490,7 +490,7 @@ export function AiChatView({ sessionId: initialSessionId }: { sessionId?: string
   const savedBadge = isSaved && !dirtySinceSave;
 
   return (
-    <div className="flex h-[calc(100dvh-4rem-env(safe-area-inset-bottom))] min-h-0 overflow-hidden bg-[#F0FFF4] md:h-dvh">
+    <div className={`flex min-h-0 overflow-hidden bg-[#F0FFF4] md:h-dvh ${user ? "h-[calc(100dvh-4rem-env(safe-area-inset-bottom))]" : "h-dvh"}`}>
       {/* Desktop sidebar */}
       <div className="hidden md:block shrink-0">{Sidebar}</div>
 
