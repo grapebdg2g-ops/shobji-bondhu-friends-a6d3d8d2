@@ -22,7 +22,11 @@ import {
   Upload,
   X,
   Loader2,
+  Save,
+  Share2,
+  Printer,
 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
   analyzeSoil,
@@ -677,10 +681,11 @@ function NutrientSelect({
 function ResultView({ result, onReset }: { result: SoilAnalysisResult; onReset: () => void }) {
   const colors = scoreColor(result.healthScore);
   const dash = 2 * Math.PI * 42;
+  const [saving, setSaving] = useState(false);
 
-  const copyReport = async () => {
-    const text = [
-      `মৃত্তিকা বিশ্লেষণ রিপোর্ট`,
+  const buildReportText = () =>
+    [
+      `🌱 মৃত্তিকা বিশ্লেষণ রিপোর্ট`,
       `স্বাস্থ্য স্কোর: ${toBn(result.healthScore)}/১০০ (${result.scoreLabel})`,
       result.summary,
       ``,
@@ -698,14 +703,57 @@ function ResultView({ result, onReset }: { result: SoilAnalysisResult; onReset: 
         : []),
       ``,
       `উপযুক্ত ফসল: ${result.suitableCrops.join(", ")}`,
+      ``,
+      `— কৃষক বন্ধু অ্যাপ`,
     ].join("\n");
+
+  const copyReport = async () => {
     try {
-      await navigator.clipboard.writeText(text);
+      await navigator.clipboard.writeText(buildReportText());
       toast.success("রিপোর্ট কপি হয়েছে");
     } catch {
       toast.error("কপি করা যায়নি");
     }
   };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const { data: sess } = await supabase.auth.getSession();
+      const uid = sess.session?.user.id;
+      if (!uid) {
+        toast.error("সংরক্ষণ করতে লগইন করুন");
+        return;
+      }
+      const { error } = await supabase.from("soil_reports").insert({
+        user_id: uid,
+        health_score: result.healthScore,
+        area_label: result.areaLabel,
+        result_json: JSON.parse(JSON.stringify(result)),
+      });
+      if (error) throw error;
+      toast.success("রিপোর্ট সংরক্ষণ হয়েছে");
+    } catch {
+      toast.error("সংরক্ষণ করা যায়নি");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleShare = async () => {
+    const text = buildReportText();
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: "মৃত্তিকা বিশ্লেষণ রিপোর্ট", text });
+        return;
+      } catch {
+        /* user cancelled */
+      }
+    }
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+  };
+
+  const handlePrint = () => window.print();
 
   return (
     <div className="space-y-5 pb-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -929,7 +977,31 @@ function ResultView({ result, onReset }: { result: SoilAnalysisResult; onReset: 
         </div>
       )}
 
-      <div className="flex gap-3">
+      <div className="grid grid-cols-3 gap-2.5 print:hidden">
+        <BengaliButton
+          variant="primary"
+          className="py-3.5 text-sm rounded-2xl"
+          onClick={handleSave}
+          disabled={saving}
+        >
+          <Save className="mr-1.5 inline h-4 w-4" /> {saving ? "সংরক্ষণ..." : "সংরক্ষণ"}
+        </BengaliButton>
+        <BengaliButton
+          variant="outline"
+          className="py-3.5 text-sm rounded-2xl border-emerald-200 text-emerald-700"
+          onClick={handleShare}
+        >
+          <Share2 className="mr-1.5 inline h-4 w-4" /> শেয়ার
+        </BengaliButton>
+        <BengaliButton
+          variant="outline"
+          className="py-3.5 text-sm rounded-2xl border-emerald-200 text-emerald-700"
+          onClick={handlePrint}
+        >
+          <Printer className="mr-1.5 inline h-4 w-4" /> প্রিন্ট
+        </BengaliButton>
+      </div>
+      <div className="flex gap-3 print:hidden">
         <BengaliButton
           variant="outline"
           className="flex-1 py-4 text-sm rounded-2xl border-emerald-200 text-emerald-700"
