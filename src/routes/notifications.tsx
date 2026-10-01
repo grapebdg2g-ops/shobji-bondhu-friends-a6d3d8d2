@@ -60,7 +60,7 @@ function NotificationsPage() {
     else if (n.ref_type === "connection") navigate({ to: "/connections" });
     else if (n.ref_type === "post") navigate({ to: "/feed" });
     else if (n.ref_type === "price") navigate({ to: "/prices" });
-    else if (n.ref_type === "crop_reminder") navigate({ to: "/crop-diary" });
+    else if (n.ref_type === "crop_reminder" || n.ref_type === "crop_plan_task") navigate({ to: "/crop-diary" });
   };
 
   return (

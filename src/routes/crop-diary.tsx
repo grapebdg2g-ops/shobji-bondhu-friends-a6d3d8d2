@@ -147,7 +147,8 @@ function CropDiaryPage() {
   const completedTodayTasks = todayTasks.filter((item) =>
     completions.has(`${item.plan.id}::${item.taskId}`),
   ).length;
-  const dueReminders = reminders.filter((r) => !r.is_done && r.reminder_date <= todayIso());
+  // Only today's pending reminders count as "due"; past-date ones are shown as overdue in the list.
+  const dueReminders = reminders.filter((r) => !r.is_done && r.reminder_date === todayIso());
   const latestEntry = entries[0] ?? null;
 
   async function toggleTask(item: TodayTask) {
@@ -236,18 +237,32 @@ function CropDiaryPage() {
   }
 
   async function completeReminder(reminder: Reminder) {
+    const next = !reminder.is_done;
     const { error } = await supabase
       .from("crop_reminders" as never)
-      .update({ is_done: true } as never)
+      .update({ is_done: next } as never)
       .eq("id", reminder.id);
     if (error) {
       toast.error("রিমাইন্ডার আপডেট করা যায়নি");
       return;
     }
     setReminders((current) =>
-      current.map((r) => (r.id === reminder.id ? { ...r, is_done: true } : r)),
+      current.map((r) => (r.id === reminder.id ? { ...r, is_done: next } : r)),
     );
-    toast.success("রিমাইন্ডার সম্পন্ন হয়েছে");
+    toast.success(next ? "রিমাইন্ডার সম্পন্ন হয়েছে" : "রিমাইন্ডার আবার চালু হয়েছে");
+  }
+
+  async function removeReminder(reminder: Reminder) {
+    const { error } = await supabase
+      .from("crop_reminders" as never)
+      .update({ is_active: false } as never)
+      .eq("id", reminder.id);
+    if (error) {
+      toast.error("রিমাইন্ডার বাদ দেওয়া যায়নি");
+      return;
+    }
+    setReminders((current) => current.filter((r) => r.id !== reminder.id));
+    toast.success("রিমাইন্ডার থেকে বাদ দেওয়া হয়েছে");
   }
 
   async function deleteDiaryEntry(id: string) {
@@ -387,6 +402,7 @@ function CropDiaryPage() {
             loading={loading}
             onAdd={() => setReminderOpen(true)}
             onComplete={completeReminder}
+            onRemove={removeReminder}
           />
         )}
       </section>
@@ -672,11 +688,13 @@ function ReminderTab({
   loading,
   onAdd,
   onComplete,
+  onRemove,
 }: {
   reminders: Reminder[];
   loading: boolean;
   onAdd: () => void;
   onComplete: (reminder: Reminder) => void;
+  onRemove: (reminder: Reminder) => void;
 }) {
   return (
     <>
@@ -705,19 +723,22 @@ function ReminderTab({
         />
       ) : (
         <div className="space-y-3">
-          {reminders.map((reminder) => {
-            const due = !reminder.is_done && reminder.reminder_date <= todayIso();
+          {[...reminders]
+            .sort((a, b) => Number(a.is_done) - Number(b.is_done) || a.reminder_date.localeCompare(b.reminder_date))
+            .map((reminder) => {
+            const today = todayIso();
+            const isToday = !reminder.is_done && reminder.reminder_date === today;
+            const overdue = !reminder.is_done && reminder.reminder_date < today;
             return (
               <div
                 key={reminder.id}
-                className={`flex items-center gap-3 rounded-2xl border p-4 ${reminder.is_done ? "border-emerald-200 bg-emerald-50/70" : due ? "border-amber-200 bg-amber-50" : "border-border bg-card"}`}
+                className={`flex items-center gap-3 rounded-2xl border p-4 ${reminder.is_done ? "border-emerald-200 bg-emerald-50/70" : overdue ? "border-destructive/30 bg-destructive/5" : isToday ? "border-amber-200 bg-amber-50" : "border-border bg-card"}`}
               >
                 <button
                   type="button"
-                  disabled={reminder.is_done}
                   onClick={() => onComplete(reminder)}
                   className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 ${reminder.is_done ? "border-primary bg-primary text-primary-foreground" : "border-amber-400 text-amber-600"}`}
-                  aria-label="রিমাইন্ডার সম্পন্ন করুন"
+                  aria-label={reminder.is_done ? "আবার চালু করুন" : "সম্পন্ন হিসেবে টিক দিন"}
                 >
                   {reminder.is_done ? <Check className="h-4 w-4" /> : <Bell className="h-4 w-4" />}
                 </button>
@@ -729,10 +750,20 @@ function ReminderTab({
                   </p>
                   <p className="mt-0.5 truncate text-xs text-muted-foreground">
                     {reminder.crop_type} · {dateLabel(reminder.reminder_date)}
-                    {due ? " · আজ" : ""}
+                    {isToday ? " · আজ" : ""}
+                    {overdue ? " · তারিখ পেরিয়ে গেছে" : ""}
+                    {reminder.is_done ? " · সম্পন্ন" : ""}
                   </p>
                   {reminder.note && <p className="mt-1 text-xs text-gray-600">{reminder.note}</p>}
                 </div>
+                <button
+                  type="button"
+                  onClick={() => onRemove(reminder)}
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                  aria-label="রিমাইন্ডার বাদ দিন"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
               </div>
             );
           })}
