@@ -1,6 +1,15 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ArrowLeft, Plus, ChevronRight, Check, Trash2, RotateCcw } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { FARMING_STAGES } from "@/data/farming-guide";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/contexts/user-context";
@@ -33,6 +42,7 @@ function CropGuideIndex() {
   const [loadingPlans, setLoadingPlans] = useState(true);
   const [tab, setTab] = useState<"active" | "done">("active");
   const [busy, setBusy] = useState<string | null>(null);
+  const [toDelete, setToDelete] = useState<Plan | null>(null);
 
   useEffect(() => {
     if (loading) return;
@@ -62,7 +72,6 @@ function CropGuideIndex() {
   }
 
   async function remove(p: Plan) {
-    if (!confirm(`${p.crop_type} তালিকা থেকে মুছে ফেলবেন?`)) return;
     setBusy(p.id);
     // Remove dependent records first, then the plan
     await supabase.from("crop_task_completions").delete().eq("plan_id", p.id);
@@ -154,7 +163,7 @@ function CropGuideIndex() {
                     </button>
                     <button
                       disabled={busy === p.id}
-                      onClick={() => remove(p)}
+                      onClick={() => setToDelete(p)}
                       aria-label="মুছে ফেলুন"
                       className="px-3 py-2 rounded-lg border border-red-200 text-red-600 text-xs font-bold inline-flex items-center gap-1 disabled:opacity-50"
                     >
@@ -190,6 +199,30 @@ function CropGuideIndex() {
           })}
         </div>
       </section>
+
+      <AlertDialog open={!!toDelete} onOpenChange={(o) => !o && setToDelete(null)}>
+        <AlertDialogContent className="max-w-[320px] rounded-2xl p-6">
+          <AlertDialogHeader className="items-center text-center">
+            <AlertDialogTitle className="text-lg font-bold text-center leading-relaxed">
+              আপনি কি নিশ্চিত মুছে ফেলতে চান?
+            </AlertDialogTitle>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-row gap-3 mt-2">
+            <AlertDialogCancel className="flex-1 mt-0 rounded-xl border-border font-bold">
+              বাতিল
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="flex-1 rounded-xl bg-red-600 text-white hover:bg-red-700 font-bold"
+              onClick={() => {
+                if (toDelete) remove(toDelete);
+                setToDelete(null);
+              }}
+            >
+              মুছে ফেলুন
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </main>
   );
 }
