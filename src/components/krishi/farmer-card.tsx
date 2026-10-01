@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BadgeCheck, Check, Clock3, MapPin, MessageCircle, Phone, UserPlus, X } from "lucide-react";
+import { BadgeCheck, Check, Clock3, MapPin, MessageCircle, Phone, Sprout, UserPlus, X } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -125,6 +125,16 @@ export function FarmerCard({
                 ? `${profile.upazila}, ${profile.district}`
                 : (profile.district ?? "বাংলাদেশ")}
             </p>
+            {profile.crops && profile.crops.length > 0 && (
+              <div className="mt-1.5 flex flex-wrap items-start gap-1" aria-label="চাষের ফসল">
+                <Sprout className="mr-0.5 mt-0.5 h-3 w-3 shrink-0 text-primary" aria-hidden="true" />
+                {profile.crops.map((crop) => (
+                  <span key={crop} className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold leading-tight text-primary">
+                    {crop}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </Link>
       </div>
