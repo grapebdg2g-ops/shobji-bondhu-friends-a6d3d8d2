@@ -26,6 +26,7 @@ import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as ModerationRouteImport } from './routes/moderation'
 import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as OfflineRouteImport } from './routes/offline'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as OrganicFertilizerRouteImport } from './routes/organic-fertilizer'
 import { Route as PricePredictionRouteImport } from './routes/price-prediction'
 import { Route as PricesRouteImport } from './routes/prices'
@@ -150,6 +151,11 @@ const NotificationsRoute = NotificationsRouteImport.update({
 const OfflineRoute = OfflineRouteImport.update({
   id: '/offline',
   path: '/offline',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OrganicFertilizerRoute = OrganicFertilizerRouteImport.update({
@@ -376,6 +382,7 @@ export interface FileRoutesByFullPath {
   '/moderation': typeof ModerationRoute
   '/notifications': typeof NotificationsRoute
   '/offline': typeof OfflineRoute
+  '/onboarding': typeof OnboardingRoute
   '/organic-fertilizer': typeof OrganicFertilizerRoute
   '/price-prediction': typeof PricePredictionRouteWithChildren
   '/prices': typeof PricesRoute
@@ -433,6 +440,7 @@ export interface FileRoutesByTo {
   '/moderation': typeof ModerationRoute
   '/notifications': typeof NotificationsRoute
   '/offline': typeof OfflineRoute
+  '/onboarding': typeof OnboardingRoute
   '/organic-fertilizer': typeof OrganicFertilizerRoute
   '/price-prediction': typeof PricePredictionRouteWithChildren
   '/prices': typeof PricesRoute
@@ -493,6 +501,7 @@ export interface FileRoutesById {
   '/moderation': typeof ModerationRoute
   '/notifications': typeof NotificationsRoute
   '/offline': typeof OfflineRoute
+  '/onboarding': typeof OnboardingRoute
   '/organic-fertilizer': typeof OrganicFertilizerRoute
   '/price-prediction': typeof PricePredictionRouteWithChildren
   '/prices': typeof PricesRoute
@@ -554,6 +563,7 @@ export interface FileRouteTypes {
     | '/moderation'
     | '/notifications'
     | '/offline'
+    | '/onboarding'
     | '/organic-fertilizer'
     | '/price-prediction'
     | '/prices'
@@ -611,6 +621,7 @@ export interface FileRouteTypes {
     | '/moderation'
     | '/notifications'
     | '/offline'
+    | '/onboarding'
     | '/organic-fertilizer'
     | '/price-prediction'
     | '/prices'
@@ -670,6 +681,7 @@ export interface FileRouteTypes {
     | '/moderation'
     | '/notifications'
     | '/offline'
+    | '/onboarding'
     | '/organic-fertilizer'
     | '/price-prediction'
     | '/prices'
@@ -730,6 +742,7 @@ export interface RootRouteChildren {
   ModerationRoute: typeof ModerationRoute
   NotificationsRoute: typeof NotificationsRoute
   OfflineRoute: typeof OfflineRoute
+  OnboardingRoute: typeof OnboardingRoute
   OrganicFertilizerRoute: typeof OrganicFertilizerRoute
   PricePredictionRoute: typeof PricePredictionRouteWithChildren
   PricesRoute: typeof PricesRoute
@@ -874,6 +887,13 @@ declare module '@tanstack/react-router' {
       path: '/offline'
       fullPath: '/offline'
       preLoaderRoute: typeof OfflineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/organic-fertilizer': {
@@ -1259,6 +1279,7 @@ const rootRouteChildren: RootRouteChildren = {
   ModerationRoute: ModerationRoute,
   NotificationsRoute: NotificationsRoute,
   OfflineRoute: OfflineRoute,
+  OnboardingRoute: OnboardingRoute,
   OrganicFertilizerRoute: OrganicFertilizerRoute,
   PricePredictionRoute: PricePredictionRouteWithChildren,
   PricesRoute: PricesRoute,

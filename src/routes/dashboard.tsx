@@ -56,7 +56,19 @@ function Dashboard() {
       navigate({ to: "/login" });
       return;
     }
-    if (!user.district) navigate({ to: "/register" });
+    if (!user.district) { navigate({ to: "/register" }); return; }
+    // First login after sign-up: show the profile completion flow once.
+    let cancelled = false;
+    supabase
+      .from("profile_details")
+      .select("onboarding_completed_at")
+      .eq("user_id", user.id)
+      .maybeSingle()
+      .then(({ data, error }) => {
+        if (cancelled || error) return;
+        if (!data?.onboarding_completed_at) navigate({ to: "/onboarding", replace: true });
+      });
+    return () => { cancelled = true; };
   }, [loading, user, navigate]);
 
   return (
