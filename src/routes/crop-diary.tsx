@@ -9,6 +9,7 @@ import {
   Plus,
   Bell,
   NotebookPen,
+  PenLine,
   Sprout,
   Trash2,
 } from "lucide-react";
@@ -853,16 +854,64 @@ function DiaryForm({
               <option>সমস্যা</option>
             </select>
           </Field>
-          <Field label="নোট">
-            <textarea
-              name="notes"
-              required
-              maxLength={1000}
-              rows={5}
-              placeholder="আজ কী দেখলেন? কী কাজ করলেন?"
-              className="field min-h-28 rounded-xl border border-[#D8E5DB] bg-white px-4 py-3 text-sm font-semibold leading-relaxed text-foreground shadow-sm outline-none transition placeholder:text-[#9AA7A0] focus:border-primary focus:ring-4 focus:ring-primary/10 resize-none"
-            />
-          </Field>
+          <label className="block w-full">
+            <span className="mb-2 flex items-center gap-1.5 text-[13px] font-extrabold tracking-[-0.01em] text-foreground">
+              <PenLine className="h-4 w-4 text-primary" aria-hidden />
+              নোট
+            </span>
+            <div className="relative w-full">
+              {/* paper stack effect */}
+              <div
+                aria-hidden
+                className="absolute inset-0 translate-x-1 translate-y-1 rounded-xl border border-[#E8E2CF] bg-white shadow-sm"
+              />
+              <div className="relative w-full overflow-hidden rounded-xl border border-[#EFDFAF] bg-[#FFFDF0] shadow-[0_6px_18px_-12px_rgba(27,67,50,0.35)]">
+                {/* binder rings */}
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute bottom-0 left-2.5 top-0 z-10 flex flex-col justify-around py-4 opacity-30"
+                >
+                  {[0, 1, 2, 3, 4].map((i) => (
+                    <span
+                      key={i}
+                      className="h-3 w-3 rounded-full border border-slate-500 bg-slate-400 shadow-inner"
+                    />
+                  ))}
+                </div>
+                {/* red margin line */}
+                <div aria-hidden className="absolute bottom-0 left-10 top-0 w-px bg-red-200" />
+                {/* top-right corner fold */}
+                <div aria-hidden className="pointer-events-none absolute right-0 top-0 h-8 w-8">
+                  <div className="absolute right-0 top-0 border-[16px] border-transparent border-l-[#F1F4EE] border-t-[#F1F4EE]" />
+                  <div className="absolute right-0 top-0 border-[16px] border-transparent border-b-[#EFE2B8]/50 border-r-[#EFE2B8]/50" />
+                </div>
+                <textarea
+                  name="notes"
+                  required
+                  maxLength={1000}
+                  rows={6}
+                  placeholder="আজ কী দেখলেন? কী কাজ করলেন?"
+                  className="diary-textarea w-full resize-none bg-transparent pb-5 pl-14 pr-6 pt-8 text-base text-[#3E4A42] outline-none selection:bg-[#DFF3E7] placeholder:text-[#B4A98C]"
+                  style={{
+                    lineHeight: "40px",
+                    backgroundImage:
+                      "linear-gradient(transparent, transparent 39px, #E5E7EB 39px)",
+                    backgroundSize: "100% 40px",
+                    backgroundAttachment: "local",
+                  }}
+                />
+                <div className="flex items-center justify-between border-t border-[#F0E6C8] bg-[#F7FBEF] px-4 py-2">
+                  <span className="text-[10px] font-bold tracking-widest text-[#B08B3E]">
+                    আজকের ডায়েরি
+                  </span>
+                  <div className="flex gap-1" aria-hidden>
+                    <span className="h-2 w-2 rounded-full bg-emerald-400" />
+                    <span className="h-2 w-2 rounded-full bg-emerald-200" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </label>
         </div>
         <button
           disabled={saving}
