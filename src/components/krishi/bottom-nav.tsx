@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   Home,
@@ -37,18 +37,55 @@ const QUICK_ACTIONS = [
   { to: "/connections", label: "সংযোগ অনুরোধ", Icon: UserRoundPlus },
 ] as const;
 
+// Center notch (circle cutout with curved edges flowing into the top & bottom
+// borders) carved out of the bar background via an SVG mask. The 160x64 SVG
+// sits centered at the top; side slabs and a bottom strip fill the rest.
+const NOTCH_SVG =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='64'%3E%3Cpath fill='black' fill-rule='evenodd' d='M0 0h160v64H0ZM46 32a32 32 0 1 0 64 0a32 32 0 1 0 -64 0Z'/%3E%3C/svg%3E";
+const SOLID = "linear-gradient(#000, #000)";
+const notchMaskStyle: CSSProperties = {
+  WebkitMaskImage: `url("${NOTCH_SVG}"), ${SOLID}, ${SOLID}, ${SOLID}`,
+  maskImage: `url("${NOTCH_SVG}"), ${SOLID}, ${SOLID}, ${SOLID}`,
+  WebkitMaskPosition: "center top, left top, right top, center bottom",
+  maskPosition: "center top, left top, right top, center bottom",
+  WebkitMaskSize:
+    "160px 64px, calc(50% - 80px) 100%, calc(50% - 80px) 100%, 160px calc(100% - 64px)",
+  maskSize:
+    "160px 64px, calc(50% - 80px) 100%, calc(50% - 80px) 100%, 160px calc(100% - 64px)",
+  WebkitMaskRepeat: "no-repeat",
+  maskRepeat: "no-repeat",
+};
+
 export function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [open, setOpen] = useState(false);
   const isActive = (to: string) => pathname === to || pathname.startsWith(to + "/");
 
   return (
-    <nav
-      aria-label="মূল মেনু"
-      className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-card/95 backdrop-blur-xl border-t border-border shadow-[0_-4px_16px_-4px_rgba(0,0,0,0.08)]"
-      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
-    >
-      <div className="relative grid grid-cols-5 items-end h-16">
+    <nav aria-label="মূল মেনু" className="md:hidden fixed bottom-0 inset-x-0 z-40">
+      <div className="relative" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
+        <div
+          aria-hidden
+          className="absolute inset-0 border-t border-border bg-card/95 backdrop-blur-xl"
+          style={notchMaskStyle}
+        />
+        <svg
+          aria-hidden
+          className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2"
+          width="160"
+          height="64"
+          viewBox="0 0 160 64"
+        >
+          <circle
+            cx="80"
+            cy="32"
+            r="32.5"
+            fill="none"
+            strokeWidth="1"
+            style={{ stroke: "var(--border)" }}
+          />
+        </svg>
+        <div className="relative grid grid-cols-5 items-end h-16">
         {LEFT.map((t) => (
           <TabBtn key={t.to} tab={t} active={isActive(t.to)} />
         ))}
@@ -79,17 +116,18 @@ export function BottomNav() {
             onClick={() => setOpen((value) => !value)}
             aria-label="দ্রুত কাজের মেনু"
             aria-expanded={open}
-            className={`absolute -top-6 h-16 w-16 rounded-full flex flex-col items-center justify-center text-white shadow-lg transition duration-200 active:scale-95 ${open ? "rotate-45" : ""}`}
+            className={`absolute left-1/2 top-1 h-14 w-14 -translate-x-1/2 rounded-full flex flex-col items-center justify-center text-white shadow-lg transition duration-200 active:scale-95 ${open ? "rotate-45" : ""}`}
             style={{ background: "var(--gradient-brand)" }}
           >
-            <Plus className="h-7 w-7" strokeWidth={2.5} />
-            <span className="text-[10px] font-bold mt-0.5 leading-none">নতুন কাজ</span>
+            <Plus className="h-5 w-5" strokeWidth={2.5} />
+            <span className="text-[9px] font-bold mt-0.5 leading-none">নতুন কাজ</span>
           </button>
         </div>
 
         {RIGHT.map((t) => (
           <TabBtn key={t.to} tab={t} active={isActive(t.to)} />
         ))}
+        </div>
       </div>
     </nav>
   );
