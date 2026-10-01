@@ -1,11 +1,12 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Plus, ChevronRight } from "lucide-react";
+import { ArrowLeft, Plus, ChevronRight, Check, Trash2, RotateCcw } from "lucide-react";
 import { FARMING_STAGES } from "@/data/farming-guide";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/contexts/user-context";
 import { toBn } from "@/lib/bn";
 import { daysSince } from "@/lib/bn-date";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/crop-guide/")({
   component: CropGuideIndex,
@@ -30,6 +31,8 @@ function CropGuideIndex() {
   const { user, loading } = useUser();
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loadingPlans, setLoadingPlans] = useState(true);
+  const [tab, setTab] = useState<"active" | "done">("active");
+  const [busy, setBusy] = useState<string | null>(null);
 
   useEffect(() => {
     if (loading) return;
@@ -39,17 +42,43 @@ function CropGuideIndex() {
     }
     (async () => {
       const { data } = await supabase
-        .from("user_crop_plans" as never)
+        .from("user_crop_plans")
         .select("*")
         .eq("user_id", user.id)
-        .eq("is_active", true)
         .order("created_at", { ascending: false });
       setPlans((data as Plan[]) ?? []);
       setLoadingPlans(false);
     })();
   }, [loading, user, navigate]);
 
+  async function toggleDone(p: Plan) {
+    setBusy(p.id);
+    const next = !p.is_active;
+    const { error } = await supabase.from("user_crop_plans").update({ is_active: next }).eq("id", p.id);
+    setBusy(null);
+    if (error) { toast.error("সংরক্ষণ ব্যর্থ, আবার চেষ্টা করুন"); return; }
+    setPlans((ps) => ps.map((x) => (x.id === p.id ? { ...x, is_active: next } : x)));
+    toast.success(next ? "আবার চলমান তালিকায় আনা হয়েছে" : "চাষ সম্পন্ন হিসেবে চিহ্নিত ✅");
+  }
+
+  async function remove(p: Plan) {
+    if (!confirm(`${p.crop_type} তালিকা থেকে মুছে ফেলবেন?`)) return;
+    setBusy(p.id);
+    // Remove dependent records first, then the plan
+    await supabase.from("crop_task_completions").delete().eq("plan_id", p.id);
+    await supabase.from("crop_reminders").delete().eq("plan_id", p.id);
+    await supabase.from("crop_diary_entries").update({ plan_id: null }).eq("plan_id", p.id);
+    const { error } = await supabase.from("user_crop_plans").delete().eq("id", p.id);
+    setBusy(null);
+    if (error) { toast.error("মুছতে ব্যর্থ, আবার চেষ্টা করুন"); return; }
+    setPlans((ps) => ps.filter((x) => x.id !== p.id));
+    toast.success("মুছে ফেলা হয়েছে");
+  }
+
   const crops = Object.keys(FARMING_STAGES);
+  const activePlans = plans.filter((p) => p.is_active);
+  const donePlans = plans.filter((p) => !p.is_active);
+  const shown = tab === "active" ? activePlans : donePlans;
 
   return (
     <main className="min-h-screen bg-[#F0FFF4] pb-24 md:max-w-[560px] md:mx-auto">
@@ -63,47 +92,82 @@ function CropGuideIndex() {
         <p className="mt-1 text-sm text-white/85">রোপণ থেকে বিক্রি পর্যন্ত সম্পূর্ণ গাইড</p>
       </header>
 
-      {/* My active plans */}
       {!loadingPlans && plans.length > 0 && (
         <section className="px-5 mt-5">
           <h2 className="text-lg font-bold text-gray-900 mb-3">আমার ফসল</h2>
+          <div className="grid grid-cols-2 gap-2 mb-3 bg-white p-1 rounded-xl ring-1 ring-emerald-100">
+            <button
+              onClick={() => setTab("active")}
+              className={`py-2 rounded-lg text-sm font-semibold ${tab === "active" ? "bg-emerald-600 text-white" : "text-gray-600"}`}
+            >
+              চলমান ({toBn(activePlans.length)})
+            </button>
+            <button
+              onClick={() => setTab("done")}
+              className={`py-2 rounded-lg text-sm font-semibold ${tab === "done" ? "bg-emerald-600 text-white" : "text-gray-600"}`}
+            >
+              সম্পন্ন ({toBn(donePlans.length)})
+            </button>
+          </div>
+
+          {shown.length === 0 && (
+            <p className="text-center text-sm text-gray-500 py-6 bg-white rounded-2xl ring-1 ring-gray-100">
+              {tab === "active" ? "কোনো চলমান ফসল নেই" : "এখনো কোনো চাষ সম্পন্ন হয়নি"}
+            </p>
+          )}
+
           <div className="space-y-3">
-            {plans.map((p) => {
+            {shown.map((p) => {
               const guide = FARMING_STAGES[p.crop_type];
               if (!guide) return null;
               const days = Math.max(0, daysSince(p.planting_date));
-              const pct = Math.min(100, Math.round((days / guide.totalDays) * 100));
+              const pct = p.is_active ? Math.min(100, Math.round((days / guide.totalDays) * 100)) : 100;
               const currentStage = guide.stages.find((s) => days >= s.startDay && days < s.endDay) ?? guide.stages[guide.stages.length - 1];
+              const done = !p.is_active;
               return (
-                <Link
-                  key={p.id}
-                  to="/crop-guide/plan/$planId"
-                  params={{ planId: p.id }}
-                  className="block bg-white rounded-2xl p-4 shadow-sm ring-1 ring-emerald-100 active:scale-[0.99] transition"
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <span className="text-2xl">{guide.icon}</span>
-                      <span className="font-bold text-gray-900">{p.crop_type}</span>
+                <div key={p.id} className={`bg-white rounded-2xl p-4 shadow-sm ring-1 ${done ? "ring-emerald-300" : "ring-emerald-100"}`}>
+                  <Link to="/crop-guide/plan/$planId" params={{ planId: p.id }} className="block">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-2xl">{guide.icon}</span>
+                        <span className={`font-bold ${done ? "text-gray-500 line-through" : "text-gray-900"}`}>{p.crop_type}</span>
+                        {done && <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700">চাষ সম্পন্ন ✅</span>}
+                      </div>
+                      <span className="text-xs text-gray-500">{toBn(days)} দিন</span>
                     </div>
-                    <span className="text-xs text-gray-500">{toBn(days)} দিন হয়েছে</span>
+                    {!done && <p className="text-xs text-gray-600 mb-2">{currentStage.icon} {currentStage.name}</p>}
+                    <div className="h-2 bg-emerald-100 rounded-full overflow-hidden">
+                      <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${pct}%` }} />
+                    </div>
+                    <div className="mt-2 flex items-center justify-between">
+                      <span className="text-xs text-gray-500">{toBn(pct)}%</span>
+                      <span className="text-emerald-600 text-sm font-semibold inline-flex items-center gap-1">দেখুন <ChevronRight className="h-4 w-4" /></span>
+                    </div>
+                  </Link>
+                  <div className="mt-3 flex gap-2">
+                    <button
+                      disabled={busy === p.id}
+                      onClick={() => toggleDone(p)}
+                      className={`flex-1 py-2 rounded-lg text-xs font-bold inline-flex items-center justify-center gap-1 disabled:opacity-50 ${done ? "bg-gray-100 text-gray-700" : "bg-emerald-600 text-white"}`}
+                    >
+                      {done ? <><RotateCcw className="h-3.5 w-3.5" /> আবার চলমান করুন</> : <><Check className="h-3.5 w-3.5" /> চাষ সম্পন্ন</>}
+                    </button>
+                    <button
+                      disabled={busy === p.id}
+                      onClick={() => remove(p)}
+                      aria-label="মুছে ফেলুন"
+                      className="px-3 py-2 rounded-lg border border-red-200 text-red-600 text-xs font-bold inline-flex items-center gap-1 disabled:opacity-50"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" /> মুছুন
+                    </button>
                   </div>
-                  <p className="text-xs text-gray-600 mb-2">{currentStage.icon} {currentStage.name}</p>
-                  <div className="h-2 bg-emerald-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${pct}%` }} />
-                  </div>
-                  <div className="mt-2 flex items-center justify-between">
-                    <span className="text-xs text-gray-500">{toBn(pct)}%</span>
-                    <span className="text-emerald-600 text-sm font-semibold inline-flex items-center gap-1">দেখুন <ChevronRight className="h-4 w-4" /></span>
-                  </div>
-                </Link>
+                </div>
               );
             })}
           </div>
         </section>
       )}
 
-      {/* Crop selector */}
       <section className="px-5 mt-6">
         <h2 className="text-lg font-bold text-gray-900 mb-3">
           {plans.length > 0 ? "নতুন ফসল যোগ করুন" : "ফসল নির্বাচন করুন"}
@@ -126,17 +190,6 @@ function CropGuideIndex() {
           })}
         </div>
       </section>
-
-      {plans.length > 0 && (
-        <div className="px-5 mt-6">
-          <button
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="w-full py-3 rounded-xl border-2 border-dashed border-emerald-300 text-emerald-700 font-semibold inline-flex items-center justify-center gap-2"
-          >
-            <Plus className="h-5 w-5" /> নতুন ফসল যোগ করুন
-          </button>
-        </div>
-      )}
     </main>
   );
 }
