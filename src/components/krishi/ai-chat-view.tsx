@@ -490,7 +490,7 @@ export function AiChatView({ sessionId: initialSessionId }: { sessionId?: string
   const savedBadge = isSaved && !dirtySinceSave;
 
   return (
-    <div className="min-h-[100dvh] flex bg-[#F0FFF4]">
+    <div className={`flex min-h-0 overflow-hidden bg-[#F0FFF4] md:h-dvh ${user ? "h-[calc(100dvh-4rem-env(safe-area-inset-bottom))]" : "h-dvh"}`}>
       {/* Desktop sidebar */}
       <div className="hidden md:block shrink-0">{Sidebar}</div>
 
@@ -507,8 +507,8 @@ export function AiChatView({ sessionId: initialSessionId }: { sessionId?: string
       )}
 
       {/* Chat area */}
-      <main className="flex-1 min-w-0 flex flex-col w-full">
-        <header className="px-3 sm:px-4 py-2.5 sm:py-3 bg-white border-b flex items-center gap-2 sticky top-0 z-10">
+      <main className="flex min-h-0 min-w-0 w-full flex-1 flex-col">
+        <header className="z-10 flex shrink-0 items-center gap-2 border-b bg-white px-3 py-2.5 sm:px-4 sm:py-3">
           <button
             onClick={() => setSidebarOpen(true)}
             className="md:hidden h-9 w-9 rounded-full hover:bg-gray-100 flex items-center justify-center"
@@ -548,7 +548,7 @@ export function AiChatView({ sessionId: initialSessionId }: { sessionId?: string
         <div
           ref={viewportRef}
           onScroll={handleViewportScroll}
-          className="flex-1 min-h-0 overscroll-contain overflow-y-auto px-3 sm:px-4 py-3 sm:py-4 space-y-2.5 sm:space-y-3 pb-56 md:pb-40"
+          className="min-h-0 flex-1 space-y-2.5 overflow-y-auto overscroll-contain px-3 py-3 pb-4 sm:space-y-3 sm:px-4 sm:py-4"
         >
           {messages.map((m, i) => (
             <div key={i} className={`flex flex-col ${m.role === "user" ? "items-end" : "items-start"}`}>
@@ -601,8 +601,7 @@ export function AiChatView({ sessionId: initialSessionId }: { sessionId?: string
         </div>
 
         <div
-          className="fixed bottom-[calc(6rem+env(safe-area-inset-bottom))] md:bottom-0 left-0 right-0 md:left-auto md:right-0 bg-white border-t border-gray-200 z-20 md:ml-64"
-          style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+          className="z-20 shrink-0 border-t border-gray-200 bg-white"
         >
           {suggestions.length > 0 && !loading && (
             <div className="px-3 pt-2 pb-1 flex gap-2 overflow-x-auto scrollbar-hide">
