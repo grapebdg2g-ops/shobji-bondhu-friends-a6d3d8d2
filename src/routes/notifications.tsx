@@ -40,7 +40,7 @@ function iconFor(type: string) {
     return { Icon: TrendingDown, color: "text-amber-600", bg: "bg-amber-50" };
   if (type === "connection_request")
     return { Icon: UserPlus, color: "text-emerald-600", bg: "bg-emerald-50" };
-  if (type === "connection_response")
+  if (type === "connection_response" || type === "friend_added")
     return { Icon: Check, color: "text-primary", bg: "bg-primary/10" };
   if (type === "crop_reminder")
     return { Icon: CalendarDays, color: "text-emerald-600", bg: "bg-emerald-50" };
@@ -58,6 +58,7 @@ function NotificationsPage() {
     if (!n.is_read) await markRead(n.id);
     if (n.type === "message" && n.ref_id) navigate({ to: "/messages/$userId", params: { userId: n.ref_id } });
     else if (n.ref_type === "connection") navigate({ to: "/connections" });
+    else if (n.ref_type === "friend" && n.ref_id) navigate({ to: "/u/$userId", params: { userId: n.ref_id } });
     else if (n.ref_type === "post") navigate({ to: "/feed" });
     else if (n.ref_type === "price") navigate({ to: "/prices" });
     else if (n.ref_type === "crop_reminder" || n.ref_type === "crop_plan_task") navigate({ to: "/crop-diary" });
