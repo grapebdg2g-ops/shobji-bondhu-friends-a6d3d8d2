@@ -69,6 +69,22 @@ export function BottomNav() {
           className="absolute inset-0 border-t border-border bg-card/95 backdrop-blur-xl"
           style={notchMaskStyle}
         />
+        <svg
+          aria-hidden
+          className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2"
+          width="160"
+          height="64"
+          viewBox="0 0 160 64"
+        >
+          <circle
+            cx="80"
+            cy="32"
+            r="32.5"
+            fill="none"
+            strokeWidth="1"
+            style={{ stroke: "var(--border)" }}
+          />
+        </svg>
         <div className="relative grid grid-cols-5 items-end h-16">
         {LEFT.map((t) => (
           <TabBtn key={t.to} tab={t} active={isActive(t.to)} />
