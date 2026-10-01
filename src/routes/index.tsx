@@ -6,6 +6,14 @@ import logo from "@/assets/logo.png";
 
 export const Route = createFileRoute("/")({
   component: Index,
+  head: () => ({ meta: [
+    { title: "কৃষক বন্ধু — কৃষকের বিশ্বস্ত সঙ্গী" },
+    { name: "description", content: "কৃষক বন্ধুর বাজারদর, কৃষি পরামর্শ ও কৃষক সম্প্রদায়ে প্রবেশ করুন।" },
+    { property: "og:title", content: "কৃষক বন্ধু — কৃষকের বিশ্বস্ত সঙ্গী" },
+    { property: "og:description", content: "কৃষক বন্ধুর বাজারদর, কৃষি পরামর্শ ও কৃষক সম্প্রদায়ে প্রবেশ করুন।" },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
 });
 
 function Index() {
