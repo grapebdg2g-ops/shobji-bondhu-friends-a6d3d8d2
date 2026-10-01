@@ -222,8 +222,30 @@ function FacebookFriendRow({
   connection: ConnectionRow;
 }) {
   const navigate = useNavigate();
+  const { user } = useUser();
+  const queryClient = useQueryClient();
   const [contactBusy, setContactBusy] = useState(false);
+  const [removeBusy, setRemoveBusy] = useState(false);
+  const [removeOpen, setRemoveOpen] = useState(false);
   const [messageOpen, setMessageOpen] = useState(false);
+
+  const confirmRemove = async () => {
+    if (!connection?.id || removeBusy) return;
+    setRemoveBusy(true);
+    const { error } = await supabase.rpc("unfriend_connection", { connection_id: connection.id });
+    setRemoveBusy(false);
+    if (error) {
+      toast.error("বন্ধু সরানো যায়নি, আবার চেষ্টা করুন");
+      return;
+    }
+    setRemoveOpen(false);
+    toast.success(`${profile.name || "কৃষক"} বন্ধু তালিকা থেকে সরানো হয়েছে`);
+    await queryClient.invalidateQueries({ queryKey: ["friends-page", user?.id] });
+    await queryClient.invalidateQueries({ queryKey: ["connections"] });
+    await queryClient.invalidateQueries({ queryKey: ["friend-connections"] });
+    await queryClient.invalidateQueries({ queryKey: ["friend-requests"] });
+  };
+
   const contact = async (kind: "message" | "call") => {
     if (kind === "message") {
       setMessageOpen(true);
