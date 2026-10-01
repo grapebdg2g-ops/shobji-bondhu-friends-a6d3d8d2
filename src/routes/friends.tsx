@@ -8,6 +8,7 @@ import {
   Phone,
   Search,
   SlidersHorizontal,
+  Sprout,
   Users,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -258,6 +259,24 @@ function FacebookFriendRow({
               ? `${profile.upazila}, ${profile.district}`
               : profile.district || "বাংলাদেশ"}
           </p>
+          {profile.crops && profile.crops.length > 0 && (
+            <div className="mt-1 flex flex-wrap items-center gap-1" aria-label="চাষের ফসল">
+              <Sprout className="h-3 w-3 shrink-0 text-[#18A058]" aria-hidden="true" />
+              {profile.crops.slice(0, 4).map((crop) => (
+                <span
+                  key={crop}
+                  className="rounded bg-[#E7F8EF] px-1.5 py-0.5 text-[10px] font-semibold leading-tight text-[#18A058]"
+                >
+                  {crop}
+                </span>
+              ))}
+              {profile.crops.length > 4 && (
+                <span className="text-[10px] font-semibold text-[#65676B]">
+                  +{profile.crops.length - 4}
+                </span>
+              )}
+            </div>
+          )}
           <p className="mt-1 flex items-center gap-1 text-[10px] font-semibold text-[#65676B]">
             <CalendarDays className="h-3 w-3" /> সংযুক্ত:{" "}
             {formatDate(connection.updated_at || connection.created_at)}
