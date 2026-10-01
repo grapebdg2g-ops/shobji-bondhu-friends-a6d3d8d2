@@ -335,8 +335,40 @@ function FacebookFriendRow({
         >
           <Phone className="h-4 w-4" />
         </button>
+        <button
+          type="button"
+          disabled={removeBusy}
+          onClick={() => setRemoveOpen(true)}
+          aria-label={`${profile.name} কে বন্ধু তালিকা থেকে সরান`}
+          className="flex h-9 w-9 items-center justify-center rounded-full bg-[#FDECEC] text-[#D93025] transition hover:bg-[#FBDCDC] disabled:opacity-50"
+        >
+          <UserX className="h-4 w-4" />
+        </button>
       </div>
       </div>
+      <AlertDialog open={removeOpen} onOpenChange={setRemoveOpen}>
+        <AlertDialogContent className="max-w-sm rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>আপনি কি নিশ্চিত মুছে ফেলতে চান?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {profile.name || "এই কৃষক"} আপনার বন্ধু তালিকা থেকে সরে যাবে। চাইলে পরে আবার সংযোগের অনুরোধ পাঠাতে পারবেন।
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={removeBusy}>বাতিল</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={removeBusy}
+              onClick={(event) => {
+                event.preventDefault();
+                void confirmRemove();
+              }}
+              className="bg-[#D93025] text-white hover:bg-[#B3261E]"
+            >
+              {removeBusy ? "সরানো হচ্ছে..." : "মুছে ফেলুন"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <DirectMessagePopup
         recipient={profile}
         open={messageOpen}
