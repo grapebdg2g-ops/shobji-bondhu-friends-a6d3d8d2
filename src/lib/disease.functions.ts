@@ -99,6 +99,9 @@ export const analyzeDisease = createServerFn({ method: "POST" })
     if (!res.ok) {
       const errText = await res.text().catch(() => "");
       console.error("Kimi API error:", res.status, errText);
+      if (/exceeded_current_quota|insufficient balance|suspended/i.test(errText)) {
+        throw new Error("রোগ শনাক্তকরণ সেবা সাময়িকভাবে বন্ধ আছে, পরে আবার চেষ্টা করুন");
+      }
       if (res.status === 429) {
         throw new Error("অনেক অনুরোধ, কিছুক্ষণ পর আবার চেষ্টা করুন");
       }
