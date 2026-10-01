@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { DISTRICTS, CROPS, getUpazilas } from "@/lib/bd-data";
 import { toast } from "sonner";
+import { useUser } from "@/contexts/user-context";
 
 export const Route = createFileRoute("/register")({
   component: RegisterPage,
@@ -17,6 +18,7 @@ export const Route = createFileRoute("/register")({
 
 function RegisterPage() {
   const navigate = useNavigate();
+  const { refreshUser } = useUser();
   const [name, setName] = useState("");
   const [district, setDistrict] = useState("");
   const [upazila, setUpazila] = useState("");
@@ -43,8 +45,13 @@ function RegisterPage() {
     const { error } = await supabase.from("profiles").upsert({
       id: user.id, name, district, upazila, crops,
     });
+    if (error) {
+      setSaving(false);
+      return toast.error(error.message);
+    }
+    // Refetch the cached profile so the dashboard sees the new district.
+    await refreshUser();
     setSaving(false);
-    if (error) return toast.error(error.message);
     toast.success("স্বাগতম, " + name);
     navigate({ to: "/dashboard" });
   };

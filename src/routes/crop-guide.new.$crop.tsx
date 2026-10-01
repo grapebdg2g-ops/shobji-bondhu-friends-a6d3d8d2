@@ -27,7 +27,7 @@ export const Route = createFileRoute("/crop-guide/new/$crop")({
   errorComponent: ({ error, reset }) => (
     <div className="min-h-screen flex items-center justify-center p-6 text-center">
       <div>
-        <p className="text-gray-700 mb-3">ত্রুটি: {error.message}</p>
+        <p className="text-gray-700 mb-3">ত্রুটি: {(error as Error).message}</p>
         <button onClick={reset} className="text-emerald-600 font-semibold">পুনরায় চেষ্টা</button>
       </div>
     </div>

@@ -28,8 +28,8 @@ function OverviewPage() {
       const [
         farmers, todayUsers, posts, todayPosts, exchanges, prices, disease, todayDisease,
       ] = await Promise.all([
-        supabase.from("profiles").select("*", { count: "exact", head: true }),
-        supabase.from("profiles").select("*", { count: "exact", head: true }).gte("created_at", startToday),
+        supabase.from("profiles").select("id", { count: "exact", head: true }),
+        supabase.from("profiles").select("id", { count: "exact", head: true }).gte("created_at", startToday),
         supabase.from("posts").select("*", { count: "exact", head: true }),
         supabase.from("posts").select("*", { count: "exact", head: true }).gte("created_at", startToday),
         supabase.from("exchanges").select("*", { count: "exact", head: true }).eq("is_active", true),
