@@ -1133,6 +1133,33 @@ export type Database = {
         }
         Relationships: []
       }
+      soil_reports: {
+        Row: {
+          area_label: string | null
+          created_at: string
+          health_score: number | null
+          id: string
+          result_json: Json
+          user_id: string
+        }
+        Insert: {
+          area_label?: string | null
+          created_at?: string
+          health_score?: number | null
+          id?: string
+          result_json: Json
+          user_id: string
+        }
+        Update: {
+          area_label?: string | null
+          created_at?: string
+          health_score?: number | null
+          id?: string
+          result_json?: Json
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_crop_plans: {
         Row: {
           created_at: string
