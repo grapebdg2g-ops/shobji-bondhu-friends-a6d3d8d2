@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
   ArrowLeft,
@@ -12,6 +12,7 @@ import {
   Printer,
   Bell,
   Sparkles,
+  FlaskConical,
 } from "lucide-react";
 import {
   CROPS,
@@ -198,6 +199,23 @@ function StepCrop({
       >
         পরবর্তী <ArrowRight className="h-5 w-5" />
       </button>
+      <Link
+        to="/ai-bondhu/soil"
+        className="flex items-center justify-between gap-3 rounded-2xl border border-emerald-200 bg-white px-4 py-3.5 shadow-sm transition active:bg-emerald-50"
+      >
+        <span className="flex items-center gap-3">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+            <FlaskConical className="h-5 w-5" />
+          </span>
+          <span>
+            <span className="block text-sm font-black text-gray-900">মাটির রিপোর্ট আছে?</span>
+            <span className="mt-0.5 block text-[11px] text-gray-500">
+              মৃত্তিকা বিশ্লেষণে আপনার জমির মাপ অনুযায়ী সঠিক ডোজ জানুন
+            </span>
+          </span>
+        </span>
+        <ArrowRight className="h-4 w-4 shrink-0 text-emerald-600" />
+      </Link>
     </div>
   );
 }
@@ -623,6 +641,12 @@ function StepResult({
           <Printer className="h-4 w-4" /> প্রিন্ট
         </button>
       </div>
+      <Link
+        to="/ai-bondhu/soil"
+        className="flex items-center justify-center gap-2 rounded-xl border-2 border-emerald-600 bg-emerald-50 h-12 font-bold text-emerald-800 transition active:bg-emerald-100 print:hidden"
+      >
+        <FlaskConical className="h-4 w-4" /> মৃত্তিকা বিশ্লেষণ দিয়ে আরও নিখুঁত হিসাব করুন
+      </Link>
     </div>
   );
 }
