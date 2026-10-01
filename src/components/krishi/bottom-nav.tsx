@@ -100,17 +100,18 @@ export function BottomNav() {
             onClick={() => setOpen((value) => !value)}
             aria-label="দ্রুত কাজের মেনু"
             aria-expanded={open}
-            className={`absolute -top-6 h-16 w-16 rounded-full flex flex-col items-center justify-center text-white shadow-lg transition duration-200 active:scale-95 ${open ? "rotate-45" : ""}`}
+            className={`absolute left-1/2 top-1 h-14 w-14 -translate-x-1/2 rounded-full flex flex-col items-center justify-center text-white shadow-lg transition duration-200 active:scale-95 ${open ? "rotate-45" : ""}`}
             style={{ background: "var(--gradient-brand)" }}
           >
-            <Plus className="h-7 w-7" strokeWidth={2.5} />
-            <span className="text-[10px] font-bold mt-0.5 leading-none">নতুন কাজ</span>
+            <Plus className="h-5 w-5" strokeWidth={2.5} />
+            <span className="text-[9px] font-bold mt-0.5 leading-none">নতুন কাজ</span>
           </button>
         </div>
 
         {RIGHT.map((t) => (
           <TabBtn key={t.to} tab={t} active={isActive(t.to)} />
         ))}
+        </div>
       </div>
     </nav>
   );
