@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/contexts/user-context";
-import { optimizeImage } from "@/lib/image-optimizer";
+import { uploadOptimizedImage } from "@/lib/upload-image";
 
 export const Route = createFileRoute("/onboarding")({
   component: OnboardingPage,
@@ -76,21 +76,16 @@ function OnboardingPage() {
 
   const upload = async (file: File | undefined, kind: "avatar" | "cover") => {
     if (!file || !user) return;
-    if (!file.type.startsWith("image/")) return toast.error("শুধু ছবি আপলোড করা যাবে");
     setUploading(kind);
     try {
-      const compressed = await optimizeImage(file, kind === "avatar" ? "profile" : "cover");
-      const path = `${user.id}/${kind}-${Date.now()}.jpg`;
-      const { error: upErr } = await supabase.storage.from("avatars").upload(path, compressed, { contentType: compressed.type, upsert: true });
-      if (upErr) throw upErr;
-      const url = supabase.storage.from("avatars").getPublicUrl(path).data.publicUrl;
+      const url = await uploadOptimizedImage({ file, userId: user.id, bucket: "avatars", prefix: kind, type: kind === "avatar" ? "profile" : "cover" });
       const patch = kind === "avatar" ? { avatar_url: url } : { cover_url: url };
       const { error } = await supabase.from("profiles").update(patch).eq("id", user.id);
       if (error) throw error;
       kind === "avatar" ? setAvatar(url) : setCover(url);
       toast.success(kind === "avatar" ? "প্রোফাইল ছবি যোগ হয়েছে" : "কাভার ছবি যোগ হয়েছে");
-    } catch {
-      toast.error("ছবি আপলোড করা যায়নি");
+    } catch (err) {
+      toast.error(err instanceof Error && /[\u0980-\u09FF]/.test(err.message) ? err.message : "ছবি আপলোড করা যায়নি");
     } finally {
       setUploading(null);
     }
