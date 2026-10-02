@@ -34,6 +34,10 @@ export const Route = createFileRoute("/feed")({
     meta: [
       { title: "সংবাদ ফিড — কৃষক বন্ধু" },
       { name: "description", content: "কৃষকদের সাম্প্রতিক পোস্ট, সাহায্য ও সাফল্যের গল্প।" },
+      { property: "og:title", content: "সংবাদ ফিড — কৃষক বন্ধু" },
+      { property: "og:description", content: "কৃষকদের সাম্প্রতিক পোস্ট, সাহায্য ও সাফল্যের গল্প।" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
 });

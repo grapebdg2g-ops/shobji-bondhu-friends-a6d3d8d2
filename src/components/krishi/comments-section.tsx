@@ -1,12 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { ChevronDown, Reply, Send } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/contexts/user-context";
 import { sanitize } from "@/lib/sanitize";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 type Comment = {
   id: string;
+  user_id: string;
   user_name: string;
   content: string;
   created_at: string;
@@ -38,7 +41,7 @@ export function CommentsSection({ postId, onCommentAdded }: { postId: string; on
     (async () => {
       const { data } = await supabase
         .from("post_comments")
-        .select("id, user_name, content, created_at, parent_id")
+        .select("id, user_id, user_name, content, created_at, parent_id")
         .eq("post_id", postId)
         .order("created_at", { ascending: true })
         .limit(100);
@@ -49,6 +52,28 @@ export function CommentsSection({ postId, onCommentAdded }: { postId: string; on
     })();
     return () => { active = false; };
   }, [postId]);
+
+  const authorIds = useMemo(
+    () => [...new Set([...comments.map((comment) => comment.user_id), ...(user ? [user.id] : [])])].sort(),
+    [comments, user?.id],
+  );
+  const { data: avatars = {} } = useQuery({
+    queryKey: ["comment-author-avatars", authorIds],
+    enabled: authorIds.length > 0,
+    staleTime: 60_000,
+    queryFn: async (): Promise<Record<string, string | null>> => {
+      const { data, error } = await supabase.from("profiles").select("id, avatar_url").in("id", authorIds);
+      if (error) throw error;
+      return Object.fromEntries((data ?? []).map((profile) => [profile.id, profile.avatar_url]));
+    },
+  });
+
+  const authorAvatar = (id: string | undefined, name: string, size: string) => (
+    <Avatar className={`${size} bg-primary/15`}>
+      <AvatarImage src={id ? avatars[id] ?? undefined : undefined} alt={`${name}-এর প্রোফাইল ছবি`} className="object-cover" />
+      <AvatarFallback className="bg-primary/15 text-xs font-bold text-primary">{name.charAt(0) || "ক"}</AvatarFallback>
+    </Avatar>
+  );
 
   const topLevel = useMemo(() => comments.filter((comment) => !comment.parent_id), [comments]);
   const repliesByParent = useMemo(() => {
@@ -71,6 +96,7 @@ export function CommentsSection({ postId, onCommentAdded }: { postId: string; on
     setSending(true);
     const optimistic: Comment = {
       id: `tmp-${Date.now()}`,
+      user_id: user.id,
       user_name: user.name || "আমি",
       content: trimmed,
       created_at: new Date().toISOString(),
@@ -82,7 +108,7 @@ export function CommentsSection({ postId, onCommentAdded }: { postId: string; on
     const { data, error } = await supabase
       .from("post_comments")
       .insert({ post_id: postId, user_id: user.id, user_name: user.name || "আমি", content: trimmed, parent_id: parentId })
-      .select("id, user_name, content, created_at, parent_id")
+      .select("id, user_id, user_name, content, created_at, parent_id")
       .single();
     if (error || !data) {
       setComments((current) => current.filter((comment) => comment.id !== optimistic.id));
@@ -101,7 +127,7 @@ export function CommentsSection({ postId, onCommentAdded }: { postId: string; on
     return (
       <div key={comment.id} className={depth > 0 ? "ml-8 mt-2" : "mt-3"}>
         <div className="flex min-w-0 gap-2">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/15 text-xs font-bold text-primary">{comment.user_name.charAt(0) || "ক"}</div>
+          {authorAvatar(comment.user_id, comment.user_name, "h-8 w-8")}
           <div className="min-w-0 flex-1">
             <div className="rounded-2xl bg-muted/70 px-3 py-2">
               <div className="flex items-center justify-between gap-2">
@@ -119,7 +145,7 @@ export function CommentsSection({ postId, onCommentAdded }: { postId: string; on
             </div>
             {replyTo === comment.id && (
               <div className="mt-2 flex min-w-0 items-center gap-2">
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/15 text-[10px] font-bold text-primary">{(user?.name || "আ").charAt(0)}</div>
+                {authorAvatar(user?.id, user?.name || "আমি", "h-7 w-7")}
                 <input
                   autoFocus
                   value={replyText}
@@ -147,7 +173,7 @@ export function CommentsSection({ postId, onCommentAdded }: { postId: string; on
         </>
       )}
       <div className="flex min-w-0 items-center gap-2 pt-1">
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/15 text-xs font-bold text-primary">{(user?.name || "আ").charAt(0)}</div>
+        {authorAvatar(user?.id, user?.name || "আমি", "h-8 w-8")}
         <input
           value={text}
           onChange={(event) => setText(event.target.value.slice(0, 200))}
