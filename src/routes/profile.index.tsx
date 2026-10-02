@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { optimizeImage } from "@/lib/image-optimizer";
+import { uploadOptimizedImage } from "@/lib/upload-image";
 import {
   ArrowLeft, Camera, Edit3, Trash2, Power, Pencil, LogOut,
   Bell, Globe, Info, Star, HelpCircle, ChevronRight, MapPin, Plus, BellOff, Settings, Users,
@@ -146,28 +146,16 @@ function ProfilePage() {
     const f = e.target.files?.[0];
     e.target.value = "";
     if (!f || !full) return;
-    if (!["image/jpeg", "image/png"].includes(f.type)) {
-      toast.error("শুধু JPG/PNG আপলোড করা যাবে");
-      return;
-    }
     setUploading(true);
     try {
-      const compressed = await optimizeImage(f, "profile");
-      const path = `${full.id}/avatar-${Date.now()}.jpg`;
-      const { error: upErr } = await supabase.storage.from("avatars").upload(path, compressed, {
-        contentType: compressed.type,
-        upsert: true,
-      });
-      if (upErr) throw upErr;
-      const { data } = supabase.storage.from("avatars").getPublicUrl(path);
-      const url = `${data.publicUrl}?v=${Date.now()}`;
+      const url = await uploadOptimizedImage({ file: f, userId: full.id, bucket: "avatars", prefix: "avatar", type: "profile" });
       const { error: dbErr } = await supabase.from("profiles").update({ avatar_url: url }).eq("id", full.id);
       if (dbErr) throw dbErr;
       setFull((p) => (p ? { ...p, avatar_url: url } : p));
       await refreshUser();
       toast.success("ছবি আপডেট হয়েছে");
-    } catch {
-      toast.error("ছবি আপলোড ব্যর্থ");
+    } catch (err) {
+      toast.error(err instanceof Error && /[\u0980-\u09FF]/.test(err.message) ? err.message : "ছবি আপলোড ব্যর্থ");
     } finally {
       setUploading(false);
     }
@@ -177,28 +165,16 @@ function ProfilePage() {
     const f = e.target.files?.[0];
     e.target.value = "";
     if (!f || !full) return;
-    if (!["image/jpeg", "image/png"].includes(f.type)) {
-      toast.error("শুধু JPG/PNG আপলোড করা যাবে");
-      return;
-    }
     setUploadingCover(true);
     try {
-      const compressed = await optimizeImage(f, "cover");
-      const path = `${full.id}/cover-${Date.now()}.jpg`;
-      const { error: upErr } = await supabase.storage.from("avatars").upload(path, compressed, {
-        contentType: compressed.type,
-        upsert: true,
-      });
-      if (upErr) throw upErr;
-      const { data } = supabase.storage.from("avatars").getPublicUrl(path);
-      const url = `${data.publicUrl}?v=${Date.now()}`;
+      const url = await uploadOptimizedImage({ file: f, userId: full.id, bucket: "avatars", prefix: "cover", type: "cover" });
       const { error: dbErr } = await supabase.from("profiles").update({ cover_url: url }).eq("id", full.id);
       if (dbErr) throw dbErr;
       setFull((p) => (p ? { ...p, cover_url: url } : p));
       await refreshUser();
       toast.success("কাভার ফটো আপডেট হয়েছে");
-    } catch {
-      toast.error("কাভার ফটো আপলোড ব্যর্থ");
+    } catch (err) {
+      toast.error(err instanceof Error && /[\u0980-\u09FF]/.test(err.message) ? err.message : "কাভার ফটো আপলোড ব্যর্থ");
     } finally {
       setUploadingCover(false);
     }
@@ -281,7 +257,7 @@ function ProfilePage() {
             <Camera className="h-4 w-4" />
             <span>কাভার পরিবর্তন</span>
           </button>
-          <input ref={coverFileRef} type="file" accept="image/jpeg,image/png" className="hidden" onChange={onPickCover} />
+          <input ref={coverFileRef} type="file" accept="image/*" className="hidden" onChange={onPickCover} />
 
           <button onClick={() => navigate({ to: "/dashboard" })} aria-label="ফিরে যান" className="absolute left-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black/20 text-white backdrop-blur transition hover:bg-black/30">
             <ArrowLeft className="h-5 w-5" />
@@ -299,7 +275,7 @@ function ProfilePage() {
               </div>
               {uploading && <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/45 text-xs font-bold text-white">আপলোড...</div>}
               <button type="button" onClick={() => fileRef.current?.click()} aria-label="ছবি পরিবর্তন" className="absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[#E4E6EB] text-[#1C1E21] shadow-sm transition hover:bg-[#D8DADF]"><Camera className="h-4 w-4" /></button>
-              <input ref={fileRef} type="file" accept="image/jpeg,image/png" className="hidden" onChange={onPickAvatar} />
+              <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onPickAvatar} />
             </div>
             <div className="flex gap-2 pb-1">
               <Link to="/friends" className="flex h-10 items-center gap-1.5 rounded-lg bg-[#1877F2] px-3 text-xs font-extrabold text-white shadow-sm transition hover:bg-[#166FE5]"><Users className="h-4 w-4" /> বন্ধু</Link>

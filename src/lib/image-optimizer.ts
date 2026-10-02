@@ -47,7 +47,7 @@ export async function optimizeImage(file: File, type: ImageType): Promise<File> 
   
   try {
     console.log(`[Optimizer] Optimizing ${type} image. Original size: ${(file.size / 1024).toFixed(2)} KB`);
-    const compressedFile = await imageCompression(file, options);
+    const compressedFile = await imageCompression(file, { ...options, fileType: "image/jpeg" });
     console.log(`[Optimizer] Optimization complete. New size: ${(compressedFile.size / 1024).toFixed(2)} KB`);
     
     // Return the new file with the original name but potentially new extension/blob
