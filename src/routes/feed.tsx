@@ -22,6 +22,8 @@ import { LazyImage } from "@/components/krishi/lazy-image";
 import { PostSocialActions } from "@/components/krishi/post-social-actions";
 import { readSavedPostIds, writeSavedPostIds } from "@/lib/saved-posts";
 import { usePostReactions } from "@/hooks/use-post-reactions";
+import { useAuthorAvatars } from "@/hooks/use-author-avatars";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const feedSearchSchema = z.object({
   filter: fallback(z.enum(["all", "help", "success"]), "all").default("all"),
@@ -112,6 +114,7 @@ function FeedPage() {
     }
     return posts;
   }, [posts, filter]);
+  const { data: authorAvatars = {} } = useAuthorAvatars(displayPosts.map((post) => post.user_id));
 
   // Monthly top farmers (success mode only)
   const { data: leaderboard = [] } = useQuery({
@@ -396,6 +399,7 @@ function FeedPage() {
             <PostCard
               key={p.id}
               post={p}
+              avatarUrl={authorAvatars[p.user_id]}
               visiblePostIds={displayPosts.map((post) => post.id)}
               mode={filter}
               onShare={() => share(p)}
@@ -444,6 +448,7 @@ function PostSkeleton() {
 
 function PostCard({
   post,
+  avatarUrl,
   visiblePostIds,
   mode = "all",
   saved,
@@ -453,6 +458,7 @@ function PostCard({
   onDeleted,
 }: {
   post: Post;
+  avatarUrl?: string | null;
   visiblePostIds: string[];
   mode?: "all" | "help" | "success";
   saved: boolean;
@@ -496,9 +502,12 @@ function PostCard({
       )}
       <div className="p-4">
         <div className="flex items-start gap-3">
-          <div className="h-11 w-11 rounded-full bg-primary/15 text-primary flex items-center justify-center font-bold shrink-0">
-            {post.user_name.charAt(0) || "ক"}
-          </div>
+          <Link to="/u/$userId" params={{ userId: post.user_id }} aria-label={`${post.user_name}-এর প্রোফাইল`}>
+            <Avatar className="h-11 w-11 bg-primary/15">
+              <AvatarImage src={avatarUrl ?? undefined} alt={`${post.user_name}-এর প্রোফাইল ছবি`} className="object-cover" />
+              <AvatarFallback className="bg-primary/15 font-bold text-primary">{post.user_name.charAt(0) || "ক"}</AvatarFallback>
+            </Avatar>
+          </Link>
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between gap-2">
               <Link
