@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/contexts/user-context";
 import { formatBnDate, toIsoDate } from "@/lib/bn-date";
 import { toast } from "sonner";
+import { syncSprayReminders } from "@/lib/spray-schedule";
 
 export const Route = createFileRoute("/crop-guide/new/$crop")({
   component: NewCropPlan,
@@ -55,6 +56,10 @@ function NewCropPlan() {
       return;
     }
     toast.success("ফসল পরিকল্পনা যোগ হয়েছে");
+    try {
+      const n = await syncSprayReminders(user.id, (data as { id: string }).id, crop, toIsoDate(date));
+      if (n > 0) toast.success(`${n}টি স্প্রে রিমাইন্ডার সেট হয়েছে`);
+    } catch { /* plan still saved */ }
     navigate({ to: "/crop-guide/plan/$planId", params: { planId: (data as { id: string }).id } });
   }
 

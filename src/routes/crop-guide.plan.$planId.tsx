@@ -8,6 +8,7 @@ import { toBn } from "@/lib/bn";
 import { formatBnDate, daysSince, addDays } from "@/lib/bn-date";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { toast } from "sonner";
+import { SprayScheduleSection } from "@/components/krishi/spray-schedule-section";
 
 export const Route = createFileRoute("/crop-guide/plan/$planId")({
   component: PlanAdvisory,
@@ -203,6 +204,26 @@ function PlanAdvisory() {
           <ArrowDown className="h-5 w-5 text-sky-600" />
         </button>
       </section>
+
+      {user && (
+        <SprayScheduleSection
+          userId={user.id}
+          planId={planId}
+          cropType={plan.crop_type}
+          plantingDate={plan.planting_date}
+          days={days}
+          completions={completions}
+          onComplete={async (tid) => {
+            if (completions.has(tid)) return;
+            const { error } = await supabase
+              .from("crop_task_completions" as never)
+              .insert({ user_id: user.id, plan_id: planId, task_id: tid } as never);
+            if (error) { toast.error("সংরক্ষণ ব্যর্থ"); return; }
+            setCompletions((p) => new Set(p).add(tid));
+            toast.success("স্প্রে সম্পন্ন হিসেবে চিহ্নিত");
+          }}
+        />
+      )}
 
       {/* Stage timeline */}
       <section className="px-5 mt-5 space-y-3">
