@@ -40,6 +40,8 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Post } from "@/hooks/use-feed";
 import { readSavedPostIds, writeSavedPostIds } from "@/lib/saved-posts";
 import { usePostReactions } from "@/hooks/use-post-reactions";
+import { useAuthorAvatars } from "@/hooks/use-author-avatars";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export const Route = createFileRoute("/dashboard")({
   component: Dashboard,
@@ -456,6 +458,7 @@ function CommunityFeedSection({ userName, onCompose }: { userName: string | null
     },
     staleTime: 60_000,
   });
+  const { data: authorAvatars = {} } = useAuthorAvatars(posts.map((post) => post.user_id));
   useEffect(() => { setSavedIds(readSavedPostIds()); }, []);
 
   const updatePost = (postId: string, patch: Partial<Post>) => {
@@ -503,6 +506,7 @@ function CommunityFeedSection({ userName, onCompose }: { userName: string | null
             <div key={post.id} className="animate-fade-in" style={{ animationDelay: `${i * 80}ms`, animationFillMode: "both" }}>
               <MiniPostCard
                 post={post}
+                avatarUrl={authorAvatars[post.user_id]}
                 visiblePostIds={posts.map((item) => item.id)}
                 saved={savedIds.includes(post.id)}
                 commentsOpen={openComments === post.id}
@@ -522,6 +526,7 @@ function CommunityFeedSection({ userName, onCompose }: { userName: string | null
 
 function MiniPostCard({
   post,
+  avatarUrl,
   visiblePostIds,
   saved,
   commentsOpen,
@@ -531,6 +536,7 @@ function MiniPostCard({
   onCommentAdded,
 }: {
   post: Post;
+  avatarUrl?: string | null;
   visiblePostIds: string[];
   saved: boolean;
   commentsOpen: boolean;
@@ -551,7 +557,12 @@ function MiniPostCard({
     <article className="home-pressable min-w-0 rounded-2xl border border-gray-100 bg-white shadow-sm">
       <div className="p-4">
         <div className="flex min-w-0 items-start gap-3">
-          <Link to="/u/$userId" params={{ userId: post.user_id }} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#2D6A4F]/15 font-bold text-[#2D6A4F]">{post.user_name?.[0] ?? "ক"}</Link>
+          <Link to="/u/$userId" params={{ userId: post.user_id }} aria-label={`${post.user_name}-এর প্রোফাইল`}>
+            <Avatar className="h-10 w-10 bg-primary/15">
+              <AvatarImage src={avatarUrl ?? undefined} alt={`${post.user_name}-এর প্রোফাইল ছবি`} className="object-cover" />
+              <AvatarFallback className="bg-primary/15 font-bold text-primary">{post.user_name?.[0] ?? "ক"}</AvatarFallback>
+            </Avatar>
+          </Link>
           <div className="min-w-0 flex-1">
             <Link to="/u/$userId" params={{ userId: post.user_id }} className="block truncate text-sm font-semibold text-gray-900 hover:underline">{post.user_name}</Link>
             <p className="truncate text-[11px] text-gray-500">{post.upazila ? `${post.upazila}, ${post.district ?? "—"}` : (post.district ?? "—")}</p>
