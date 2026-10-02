@@ -257,7 +257,7 @@ function ProfilePage() {
             <Camera className="h-4 w-4" />
             <span>কাভার পরিবর্তন</span>
           </button>
-          <input ref={coverFileRef} type="file" accept="image/jpeg,image/png" className="hidden" onChange={onPickCover} />
+          <input ref={coverFileRef} type="file" accept="image/*" className="hidden" onChange={onPickCover} />
 
           <button onClick={() => navigate({ to: "/dashboard" })} aria-label="ফিরে যান" className="absolute left-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black/20 text-white backdrop-blur transition hover:bg-black/30">
             <ArrowLeft className="h-5 w-5" />
@@ -275,7 +275,7 @@ function ProfilePage() {
               </div>
               {uploading && <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/45 text-xs font-bold text-white">আপলোড...</div>}
               <button type="button" onClick={() => fileRef.current?.click()} aria-label="ছবি পরিবর্তন" className="absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[#E4E6EB] text-[#1C1E21] shadow-sm transition hover:bg-[#D8DADF]"><Camera className="h-4 w-4" /></button>
-              <input ref={fileRef} type="file" accept="image/jpeg,image/png" className="hidden" onChange={onPickAvatar} />
+              <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onPickAvatar} />
             </div>
             <div className="flex gap-2 pb-1">
               <Link to="/friends" className="flex h-10 items-center gap-1.5 rounded-lg bg-[#1877F2] px-3 text-xs font-extrabold text-white shadow-sm transition hover:bg-[#166FE5]"><Users className="h-4 w-4" /> বন্ধু</Link>
