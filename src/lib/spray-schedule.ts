@@ -21,6 +21,8 @@ export type SprayEvent = {
 
 function matchProblem(title: string, desc: string): Problem | undefined {
   const text = `${title} ${desc}`;
+  const exact = PESTICIDE_GUIDE.find((p) => text.includes(p.name));
+  if (exact) return exact;
   return PESTICIDE_GUIDE.find((p) => {
     const key = p.name.split(/[\s(]/)[0];
     return key.length > 2 && text.includes(key);
