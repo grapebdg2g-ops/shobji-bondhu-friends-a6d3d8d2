@@ -5,6 +5,7 @@ import { FARMING_STAGES } from "@/data/farming-guide";
 import { PESTICIDE_GUIDE, type Problem } from "@/data/pesticide-guide";
 import { supabase } from "@/integrations/supabase/client";
 import { addDays, toIsoDate } from "@/lib/bn-date";
+import { buildTomatoSchedule } from "@/lib/tomato-spray-schedule";
 
 export const SPRAY_REMINDER_PREFIX = "🧪 স্প্রে: ";
 
@@ -13,7 +14,7 @@ export type SprayEvent = {
   day: number;
   title: string;
   desc: string;
-  kind: "pest" | "disease";
+  kind: "pest" | "disease" | "nutrient";
   stageName: string;
   stageIcon: string;
   problem?: Problem;
@@ -29,9 +30,10 @@ function matchProblem(title: string, desc: string): Problem | undefined {
   });
 }
 
-export function buildSpraySchedule(cropType: string): SprayEvent[] {
+export function buildSpraySchedule(cropType: string, plantingDate?: string): SprayEvent[] {
   const guide = FARMING_STAGES[cropType];
   if (!guide) return [];
+  if (cropType === "টমেটো" && plantingDate) return buildTomatoSchedule(plantingDate, guide.totalDays);
   const events: SprayEvent[] = [];
   for (const stage of guide.stages) {
     const sprays = stage.tasks
@@ -57,7 +59,7 @@ export function buildSpraySchedule(cropType: string): SprayEvent[] {
 
 /** Marks the reminder for a completed spray as done so it is no longer notified or listed. */
 export async function markSprayReminderDone(planId: string, cropType: string, plantingDate: string, eventId: string) {
-  const e = buildSpraySchedule(cropType).find((x) => x.id === eventId);
+  const e = buildSpraySchedule(cropType, plantingDate).find((x) => x.id === eventId);
   if (!e) return;
   const { error } = await supabase
     .from("crop_reminders")
@@ -71,7 +73,7 @@ export async function markSprayReminderDone(planId: string, cropType: string, pl
 /** Creates reminders for all upcoming spray dates of a plan (skips existing ones). */
 export async function syncSprayReminders(userId: string, planId: string, cropType: string, plantingDate: string) {
   const today = toIsoDate(new Date());
-  const events = buildSpraySchedule(cropType);
+  const events = buildSpraySchedule(cropType, plantingDate);
   const { data: existing } = await supabase
     .from("crop_reminders")
     .select("title, reminder_date")

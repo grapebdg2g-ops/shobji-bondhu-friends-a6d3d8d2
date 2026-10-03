@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
 import { Bell, Check, SprayCan, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
-import { buildSpraySchedule, syncSprayReminders } from "@/lib/spray-schedule";
+import { buildSpraySchedule, syncSprayReminders, type SprayEvent } from "@/lib/spray-schedule";
+import { TOMATO_SPRAY_NOTES } from "@/lib/tomato-spray-schedule";
 import { addDays, formatBnDate } from "@/lib/bn-date";
 import { toBn } from "@/lib/bn";
 
@@ -16,12 +17,15 @@ type Props = {
 };
 
 export function SprayScheduleSection({ userId, planId, cropType, plantingDate, days, completions, onComplete }: Props) {
-  const events = useMemo(() => buildSpraySchedule(cropType), [cropType]);
+  const events = useMemo(() => buildSpraySchedule(cropType, plantingDate), [cropType, plantingDate]);
+  const main = events.filter((e) => e.kind !== "nutrient");
+  const nutrients = events.filter((e) => e.kind === "nutrient");
+  const [showNutrients, setShowNutrients] = useState(false);
   const [open, setOpen] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   if (events.length === 0) return null;
 
-  const next = events.find((e) => !completions.has(e.id) && e.day >= days - 3);
+  const next = main.find((e) => !completions.has(e.id) && e.day >= days - 3);
 
   async function setReminders() {
     setBusy(true);
@@ -33,6 +37,49 @@ export function SprayScheduleSection({ userId, planId, cropType, plantingDate, d
     } finally {
       setBusy(false);
     }
+  }
+
+  function renderEvent(e: SprayEvent) {
+    const done = completions.has(e.id);
+    const overdue = !done && e.day < days;
+    const isOpen = open === e.id;
+    return (
+      <li key={e.id} className="rounded-xl bg-muted/50">
+        <button onClick={() => setOpen(isOpen ? null : e.id)} className="w-full p-3 flex items-center gap-3 text-left">
+          <span className="text-xl">{e.kind === "nutrient" ? "🌿" : e.kind === "disease" ? "🍂" : "🐛"}</span>
+          <div className="flex-1 min-w-0">
+            <p className={`font-semibold text-sm truncate ${done ? "line-through text-muted-foreground" : "text-foreground"}`}>{e.title}</p>
+            <p className="text-[11px] text-muted-foreground">
+              {formatBnDate(addDays(plantingDate, e.day))} · {e.stageIcon} {e.stageName}
+              {overdue && <span className="text-destructive font-semibold"> · তারিখ পেরিয়েছে</span>}
+            </p>
+          </div>
+          {done ? <Check className="h-5 w-5 text-primary" /> : isOpen ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+        </button>
+        {isOpen && (
+          <div className="px-3 pb-3 space-y-2 text-sm">
+            <p className="text-foreground/80">{e.desc}</p>
+            {e.problem && (
+              <div className="rounded-lg bg-card p-2.5 ring-1 ring-border space-y-1">
+                {e.problem.chemicals.map((c) => (
+                  <p key={c.name} className="text-xs"><strong>{c.name}</strong> — {c.dose} ({c.method})</p>
+                ))}
+                {e.problem.organic[0] && <p className="text-xs text-muted-foreground">জৈব বিকল্প: {e.problem.organic[0]}</p>}
+                {e.problem.phi && <p className="text-xs text-destructive">ফসল তোলার অন্তত {e.problem.phi} আগে স্প্রে বন্ধ করুন</p>}
+              </div>
+            )}
+            <p className="text-[11px] text-muted-foreground">⚠️ লেবেলের নির্দেশনা মেনে, সকাল/বিকেলে বাতাসহীন সময়ে স্প্রে করুন।</p>
+            <button
+              onClick={() => onComplete(e.id)}
+              disabled={done}
+              className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground font-bold text-sm disabled:opacity-50 inline-flex items-center justify-center gap-1.5"
+            >
+              <Check className="h-4 w-4" /> {done ? "স্প্রে সম্পন্ন" : "স্প্রে সম্পন্ন হয়েছে"}
+            </button>
+          </div>
+        )}
+      </li>
+    );
   }
 
   return (
@@ -64,50 +111,27 @@ export function SprayScheduleSection({ userId, planId, cropType, plantingDate, d
           </div>
         )}
 
-        <ol className="px-4 pb-4 space-y-2">
-          {events.map((e) => {
-            const done = completions.has(e.id);
-            const overdue = !done && e.day < days;
-            const isOpen = open === e.id;
-            return (
-              <li key={e.id} className="rounded-xl bg-muted/50">
-                <button onClick={() => setOpen(isOpen ? null : e.id)} className="w-full p-3 flex items-center gap-3 text-left">
-                  <span className="text-xl">{e.kind === "disease" ? "🍂" : "🐛"}</span>
-                  <div className="flex-1 min-w-0">
-                    <p className={`font-semibold text-sm truncate ${done ? "line-through text-muted-foreground" : "text-foreground"}`}>{e.title}</p>
-                    <p className="text-[11px] text-muted-foreground">
-                      {formatBnDate(addDays(plantingDate, e.day))} · {e.stageIcon} {e.stageName}
-                      {overdue && <span className="text-destructive font-semibold"> · তারিখ পেরিয়েছে</span>}
-                    </p>
-                  </div>
-                  {done ? <Check className="h-5 w-5 text-primary" /> : isOpen ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
-                </button>
-                {isOpen && (
-                  <div className="px-3 pb-3 space-y-2 text-sm">
-                    <p className="text-foreground/80">{e.desc}</p>
-                    {e.problem && (
-                      <div className="rounded-lg bg-card p-2.5 ring-1 ring-border space-y-1">
-                        {e.problem.chemicals.map((c) => (
-                          <p key={c.name} className="text-xs"><strong>{c.name}</strong> — {c.dose} ({c.method})</p>
-                        ))}
-                        {e.problem.organic[0] && <p className="text-xs text-muted-foreground">জৈব বিকল্প: {e.problem.organic[0]}</p>}
-                        {e.problem.phi && <p className="text-xs text-destructive">ফসল তোলার অন্তত {e.problem.phi} আগে স্প্রে বন্ধ করুন</p>}
-                      </div>
-                    )}
-                    <p className="text-[11px] text-muted-foreground">⚠️ লেবেলের নির্দেশনা মেনে, সকাল/বিকেলে বাতাসহীন সময়ে স্প্রে করুন।</p>
-                    <button
-                      onClick={() => onComplete(e.id)}
-                      disabled={done}
-                      className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground font-bold text-sm disabled:opacity-50 inline-flex items-center justify-center gap-1.5"
-                    >
-                      <Check className="h-4 w-4" /> {done ? "স্প্রে সম্পন্ন" : "স্প্রে সম্পন্ন হয়েছে"}
-                    </button>
-                  </div>
-                )}
-              </li>
-            );
-          })}
-        </ol>
+        {cropType === "টমেটো" && (
+          <div className="mx-4 mb-3 rounded-xl bg-accent/40 p-3 text-xs text-foreground space-y-1">
+            <p className="font-bold">📝 জরুরি নোট</p>
+            {TOMATO_SPRAY_NOTES.map((n) => <p key={n}>• {n}</p>)}
+          </div>
+        )}
+
+        <ol className="px-4 pb-3 space-y-2">{main.map(renderEvent)}</ol>
+
+        {nutrients.length > 0 && (
+          <div className="px-4 pb-4">
+            <button
+              onClick={() => setShowNutrients((v) => !v)}
+              className="w-full flex items-center justify-between rounded-xl bg-primary/10 px-3 py-2.5 text-sm font-bold text-primary"
+            >
+              <span>🌿 অন্যান্য পুষ্টিজনিত স্প্রে ({toBn(nutrients.length)}টি)</span>
+              {showNutrients ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </button>
+            {showNutrients && <ol className="mt-2 space-y-2">{nutrients.map(renderEvent)}</ol>}
+          </div>
+        )}
       </div>
     </section>
   );
