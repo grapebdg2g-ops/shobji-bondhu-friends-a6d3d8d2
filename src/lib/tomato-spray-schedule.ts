@@ -52,6 +52,15 @@ export function buildTomatoSchedule(plantingDate: string, totalDays: number): Sp
     kind: "disease", stageName: "রোপণ", stageIcon: "🚜",
   });
 
+  // Vegetative-stage disease sprays from the master crop guide (earlier schedule dates).
+  const fixedDay = (key: string, day: number, title: string, desc: string, problemId: string) => {
+    if (!inCrop(day)) return;
+    events.push({ id: `spray::tomato::${key}::${day}`, day, title, desc, kind: "disease", stageName: "গাছের বৃদ্ধি", stageIcon: "🌿", problem: prob(problemId) });
+  };
+  fixedDay("fusarium", 50, "ফিউজেরিয়াম উইল্ট (টমেটো) দমন", "পাতা হলুদ হয়ে শুকায়, কান্ড কালো হয়। গোড়ায় মাটি ভিজিয়ে ও পাতায় স্প্রে — ১৫ দিন পর পর।", "tomato-fusarium");
+  fixedDay("earlyblight", 55, "আর্লি ব্লাইট (টমেটো) দমন", "পাতায় বাদামি গোল দাগ, কেন্দ্রে রিং। পুরো গাছে স্প্রে — ৭-১০ দিন পর পর, বৃষ্টির পর।", "tomato-earlyblight");
+  fixedDay("septoria", 60, "সেপ্টোরিয়া লিফ স্পট (টমেটো) দমন", "পাতায় সাদা কেন্দ্রসহ ছোট দাগ। নিচের পাতা থেকে উপরে স্প্রে — ১০ দিন পর পর।", "tomato-septoria");
+
   const fixed = (key: string, date: Date, title: string, desc: string, kind: "pest" | "disease", problemId?: string) => {
     const day = dayDiff(date, planting);
     if (!inCrop(day)) return;
