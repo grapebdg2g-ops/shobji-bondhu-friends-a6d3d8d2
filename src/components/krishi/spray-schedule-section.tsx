@@ -21,6 +21,7 @@ export function SprayScheduleSection({ userId, planId, cropType, plantingDate, d
   const main = events.filter((e) => e.kind !== "nutrient");
   const nutrients = events.filter((e) => e.kind === "nutrient");
   const [showNutrients, setShowNutrients] = useState(false);
+  const [showMain, setShowMain] = useState(false);
   const [open, setOpen] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   if (events.length === 0) return null;
@@ -118,7 +119,16 @@ export function SprayScheduleSection({ userId, planId, cropType, plantingDate, d
           </div>
         )}
 
-        <ol className="px-4 pb-3 space-y-2">{main.map(renderEvent)}</ol>
+        <div className="px-4 pb-3">
+          <button
+            onClick={() => setShowMain((v) => !v)}
+            className="w-full flex items-center justify-between rounded-xl bg-muted px-3 py-2.5 text-sm font-bold text-foreground"
+          >
+            <span>📋 পুরো স্প্রে শিডিউল ({toBn(main.length)}টি)</span>
+            {showMain ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </button>
+          {showMain && <ol className="mt-2 space-y-2">{main.map(renderEvent)}</ol>}
+        </div>
 
         {nutrients.length > 0 && (
           <div className="px-4 pb-4">
