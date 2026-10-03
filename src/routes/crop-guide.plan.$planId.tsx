@@ -9,6 +9,7 @@ import { formatBnDate, daysSince, addDays } from "@/lib/bn-date";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { toast } from "sonner";
 import { SprayScheduleSection } from "@/components/krishi/spray-schedule-section";
+import { markSprayReminderDone } from "@/lib/spray-schedule";
 
 export const Route = createFileRoute("/crop-guide/plan/$planId")({
   component: PlanAdvisory,
@@ -220,6 +221,7 @@ function PlanAdvisory() {
               .insert({ user_id: user.id, plan_id: planId, task_id: tid } as never);
             if (error) { toast.error("সংরক্ষণ ব্যর্থ"); return; }
             setCompletions((p) => new Set(p).add(tid));
+            await markSprayReminderDone(planId, plan.crop_type, plan.planting_date, tid).catch(() => {});
             toast.success("স্প্রে সম্পন্ন হিসেবে চিহ্নিত");
           }}
         />

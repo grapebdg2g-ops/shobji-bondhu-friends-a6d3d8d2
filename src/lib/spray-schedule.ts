@@ -55,6 +55,19 @@ export function buildSpraySchedule(cropType: string): SprayEvent[] {
   return events.sort((a, b) => a.day - b.day);
 }
 
+/** Marks the reminder for a completed spray as done so it is no longer notified or listed. */
+export async function markSprayReminderDone(planId: string, cropType: string, plantingDate: string, eventId: string) {
+  const e = buildSpraySchedule(cropType).find((x) => x.id === eventId);
+  if (!e) return;
+  const { error } = await supabase
+    .from("crop_reminders")
+    .update({ is_done: true })
+    .eq("plan_id", planId)
+    .eq("title", `${SPRAY_REMINDER_PREFIX}${e.title}`)
+    .eq("reminder_date", toIsoDate(addDays(plantingDate, e.day)));
+  if (error) throw error;
+}
+
 /** Creates reminders for all upcoming spray dates of a plan (skips existing ones). */
 export async function syncSprayReminders(userId: string, planId: string, cropType: string, plantingDate: string) {
   const today = toIsoDate(new Date());
