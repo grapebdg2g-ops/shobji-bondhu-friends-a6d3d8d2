@@ -39,6 +39,49 @@ export function SprayScheduleSection({ userId, planId, cropType, plantingDate, d
     }
   }
 
+  function renderEvent(e: SprayEvent) {
+    const done = completions.has(e.id);
+    const overdue = !done && e.day < days;
+    const isOpen = open === e.id;
+    return (
+      <li key={e.id} className="rounded-xl bg-muted/50">
+        <button onClick={() => setOpen(isOpen ? null : e.id)} className="w-full p-3 flex items-center gap-3 text-left">
+          <span className="text-xl">{e.kind === "nutrient" ? "🌿" : e.kind === "disease" ? "🍂" : "🐛"}</span>
+          <div className="flex-1 min-w-0">
+            <p className={`font-semibold text-sm truncate ${done ? "line-through text-muted-foreground" : "text-foreground"}`}>{e.title}</p>
+            <p className="text-[11px] text-muted-foreground">
+              {formatBnDate(addDays(plantingDate, e.day))} · {e.stageIcon} {e.stageName}
+              {overdue && <span className="text-destructive font-semibold"> · তারিখ পেরিয়েছে</span>}
+            </p>
+          </div>
+          {done ? <Check className="h-5 w-5 text-primary" /> : isOpen ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+        </button>
+        {isOpen && (
+          <div className="px-3 pb-3 space-y-2 text-sm">
+            <p className="text-foreground/80">{e.desc}</p>
+            {e.problem && (
+              <div className="rounded-lg bg-card p-2.5 ring-1 ring-border space-y-1">
+                {e.problem.chemicals.map((c) => (
+                  <p key={c.name} className="text-xs"><strong>{c.name}</strong> — {c.dose} ({c.method})</p>
+                ))}
+                {e.problem.organic[0] && <p className="text-xs text-muted-foreground">জৈব বিকল্প: {e.problem.organic[0]}</p>}
+                {e.problem.phi && <p className="text-xs text-destructive">ফসল তোলার অন্তত {e.problem.phi} আগে স্প্রে বন্ধ করুন</p>}
+              </div>
+            )}
+            <p className="text-[11px] text-muted-foreground">⚠️ লেবেলের নির্দেশনা মেনে, সকাল/বিকেলে বাতাসহীন সময়ে স্প্রে করুন।</p>
+            <button
+              onClick={() => onComplete(e.id)}
+              disabled={done}
+              className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground font-bold text-sm disabled:opacity-50 inline-flex items-center justify-center gap-1.5"
+            >
+              <Check className="h-4 w-4" /> {done ? "স্প্রে সম্পন্ন" : "স্প্রে সম্পন্ন হয়েছে"}
+            </button>
+          </div>
+        )}
+      </li>
+    );
+  }
+
   return (
     <section className="px-5 mt-5">
       <div className="bg-card rounded-2xl shadow-sm ring-1 ring-border overflow-hidden">
