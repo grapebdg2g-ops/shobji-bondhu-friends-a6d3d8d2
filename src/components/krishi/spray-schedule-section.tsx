@@ -21,6 +21,7 @@ export function SprayScheduleSection({ userId, planId, cropType, plantingDate, d
   const main = events.filter((e) => e.kind !== "nutrient");
   const nutrients = events.filter((e) => e.kind === "nutrient");
   const [showNutrients, setShowNutrients] = useState(false);
+  const [showMain, setShowMain] = useState(false);
   const [open, setOpen] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   if (events.length === 0) return null;
