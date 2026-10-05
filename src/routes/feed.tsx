@@ -11,7 +11,7 @@ import { useFeed, type FeedFilters, type Post, type PostType } from "@/hooks/use
 import { useMutedIds } from "@/hooks/use-muted-users";
 import { ContentMenu } from "@/components/krishi/content-menu";
 import { BottomSheet } from "@/components/krishi/bottom-sheet";
-import { CreatePostSheet } from "@/components/krishi/create-post-sheet";
+const CreatePostSheet = lazy(() => import("@/components/krishi/create-post-sheet").then((m) => ({ default: m.CreatePostSheet })));
 import { CommentsSection } from "@/components/krishi/comments-section";
 import { DISTRICTS } from "@/lib/bd-data";
 import { MASTER_CROP_LABELS } from "@/lib/crop-options";
@@ -423,7 +423,7 @@ function FeedPage() {
       </section>
 
       <FilterSheet open={filterOpen} onClose={() => setFilterOpen(false)} value={filters} onApply={(f) => { setFilters(f); setFilterOpen(false); }} />
-      <CreatePostSheet open={createOpen} onClose={() => setCreateOpen(false)} onCreated={prepend} />
+      {createOpen && <Suspense fallback={null}><CreatePostSheet open={createOpen} onClose={() => setCreateOpen(false)} onCreated={prepend} /></Suspense>}
     </main>
   );
 }
