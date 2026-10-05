@@ -133,6 +133,55 @@ const UNVERIFIED_CROP_META = {
   sourceNote: UNVERIFIED_SOURCE_NOTE,
 } as const;
 
+const BIGHA_TO_SHOTOK = 33;
+
+const PRELIM_WARNING =
+  "এটি প্রাথমিক হিসাব — এই ফসলের official BARC/BARI/BRRI dose mapping অ্যাপে এখনো সম্পূর্ণ নয়; মাটি পরীক্ষা ও স্থানীয় কৃষি কর্মকর্তার পরামর্শ ছাড়া চূড়ান্ত dose হিসেবে ব্যবহার করবেন না।";
+
+export type PreliminaryInput = {
+  id: string;
+  label: string;
+  emoji: string;
+  /** kg per bigha from master-crop-data fertilizerGuide.perBigha */
+  perBigha: Record<string, number>;
+  warnings?: string[];
+};
+
+/**
+ * Preliminary estimate for crops without official BARC/BARI/BRRI dose mapping.
+ * Converts master-crop perBigha doses to kg/শতাংশ and always flags verified: false,
+ * so the UI shows it as "প্রাথমিক হিসাব" instead of an official dose.
+ */
+export function buildPreliminaryCropDose(input: PreliminaryInput): CropDose {
+  const per = (key: string) => (input.perBigha[key] ?? 0) / BIGHA_TO_SHOTOK;
+  const missing = (["urea", "tsp", "mop", "gypsum", "zinc"] as const).filter(
+    (k) => input.perBigha[k] === undefined,
+  );
+  return {
+    id: `prelim:${input.id}`,
+    emoji: input.emoji,
+    label: input.label,
+    urea: per("urea"),
+    tsp: per("tsp"),
+    mop: per("mop"),
+    gypsum: per("gypsum"),
+    zinc: per("zinc"),
+    schedule: splitUrea2(),
+    warnings: [
+      ...(input.warnings ?? []),
+      PRELIM_WARNING,
+      ...(missing.length
+        ? [
+            `মাস্টার ডেটায় এই সারের মাত্রা নেই, তাই ০ দেখানো হচ্ছে: ${missing
+              .map((k) => FERT_LABEL[k])
+              .join(", ")}`,
+          ]
+        : []),
+    ],
+    ...UNVERIFIED_CROP_META,
+  };
+}
+
 export const CROPS: CropDose[] = [
   {
     id: "boro",
@@ -503,6 +552,10 @@ const FERT_LABEL = {
 export function calculate(cropId: string, shotok: number, _soil: SoilType): CalcResult | null {
   const crop = CROPS.find((c) => c.id === cropId);
   if (!crop) return null;
+  return calculateForCrop(crop, shotok);
+}
+
+export function calculateForCrop(crop: CropDose, shotok: number): CalcResult | null {
   // Soil multipliers are intentionally not applied: FRG-2024 requires soil-test/AEZ context.
   const total = {
     urea: crop.urea * shotok,
