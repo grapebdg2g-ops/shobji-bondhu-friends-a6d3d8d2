@@ -19,13 +19,16 @@ import {
   SOIL_TYPES,
   UNIT_LABEL,
   UNIT_TO_SHOTOK,
-  calculate,
+  calculateForCrop,
+  buildPreliminaryCropDose,
   type SoilType,
   type Unit,
   type CalcResult,
+  type CropDose,
 } from "@/data/fertilizer-guide";
 import { toBn, fmtBdt } from "@/lib/bn";
 import { CALCULATOR_CROP_OPTIONS } from "@/lib/crop-options";
+import { getAllCrops } from "@/data/master-crop-data";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -57,10 +60,24 @@ function CalculatorPage() {
   const [growthStage, setGrowthStage] = useState<GrowthStage>("vegetative");
 
   const shotok = useMemo(() => (parseFloat(amount) || 0) * UNIT_TO_SHOTOK[unit], [amount, unit]);
-  const crop = CROPS.find((c) => c.id === cropId);
+  const crop: CropDose | undefined = useMemo(() => {
+    if (cropId.startsWith("prelim:")) {
+      const mc = getAllCrops().find((c) => c.id === cropId.slice("prelim:".length));
+      return mc
+        ? buildPreliminaryCropDose({
+            id: mc.id,
+            label: mc.name,
+            emoji: mc.icon,
+            perBigha: mc.fertilizerGuide?.perBigha ?? {},
+            warnings: mc.fertilizerGuide?.warnings,
+          })
+        : undefined;
+    }
+    return CROPS.find((c) => c.id === cropId);
+  }, [cropId]);
   const result: CalcResult | null = useMemo(
-    () => (step === 3 && cropId && shotok > 0 ? calculate(cropId, shotok, soil) : null),
-    [step, cropId, shotok, soil],
+    () => (step === 3 && crop && shotok > 0 ? calculateForCrop(crop, shotok) : null),
+    [step, crop, shotok, soil],
   );
 
   const reset = () => {
