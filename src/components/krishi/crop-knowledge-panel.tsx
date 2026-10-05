@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
-import { Droplets, ShieldAlert, Sprout, ChevronDown, ChevronUp, History } from "lucide-react";
-import { findCrop, getStageAtDay, getIrrigationAdvice, getIpmRules, checkResistance } from "@/data/crop-knowledge";
+import { Droplets, ShieldAlert, Sprout, ChevronDown, ChevronUp, History, Leaf } from "lucide-react";
+import { findCrop, getStageAtDay, getIrrigationAdvice, getIpmRules, checkResistance, BIO_PESTICIDES } from "@/data/crop-knowledge";
 import { buildSpraySchedule } from "@/lib/spray-schedule";
 import { toBn } from "@/lib/bn";
 
@@ -9,6 +9,7 @@ type Props = { cropType: string; plantingDate: string; days: number; completions
 export function CropKnowledgePanel({ cropType, plantingDate, days, completions }: Props) {
   const crop = useMemo(() => findCrop(cropType), [cropType]);
   const [showIpm, setShowIpm] = useState(false);
+  const [showBio, setShowBio] = useState(false);
   const history = useMemo(() => {
     const done = buildSpraySchedule(cropType, plantingDate).filter((e) => completions.has(e.id) && e.problem);
     const names = done.map((e) => e.problem!.chemicals[0]?.name ?? "");
@@ -48,6 +49,25 @@ export function CropKnowledgePanel({ cropType, plantingDate, days, completions }
         ) : history.warnings.map((w) => (
           <p key={w.groupKey} className="text-xs font-semibold text-destructive mt-1">⚠️ {w.label} গ্রুপ পরপর {toBn(w.count)} বার — পরের বার ভিন্ন গ্রুপের ঔষধ নিন, নাহলে পোকা/রোগ সহনশীল হয়ে যাবে।</p>
         ))}
+      </div>
+
+      <div className="rounded-2xl bg-card ring-1 ring-border">
+        <button onClick={() => setShowBio(!showBio)} className="w-full p-4 flex items-center justify-between text-left">
+          <span className="text-sm font-bold text-foreground inline-flex items-center gap-1.5"><Leaf className="h-4 w-4 text-primary" /> জৈব রাসায়নিক ({toBn(BIO_PESTICIDES.length)})</span>
+          {showBio ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+        </button>
+        {showBio && (
+          <ul className="px-4 pb-4 space-y-2">
+            {BIO_PESTICIDES.map((b) => (
+              <li key={b.id} className="rounded-xl bg-muted/50 p-3 text-sm">
+                <p className="font-semibold text-foreground">{b.name} <span className="text-xs text-muted-foreground">({b.kind})</span></p>
+                <p className="text-foreground/80 mt-0.5">মাত্রা: {b.dose}</p>
+                <p className="text-foreground/80">{b.method}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{b.note}</p>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
       <div className="rounded-2xl bg-card ring-1 ring-border">

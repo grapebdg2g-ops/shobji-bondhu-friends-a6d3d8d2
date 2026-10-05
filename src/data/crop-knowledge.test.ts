@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { ACTIVE_INGREDIENTS, checkResistance, getChemicalInfo, getPhiDays, findCrop, getIrrigationAdvice, getIpmRules } from './crop-knowledge';
+import { ACTIVE_INGREDIENTS, BIO_PESTICIDES, checkResistance, getChemicalInfo, getPhiDays, getBioOptions, findCrop, getIrrigationAdvice, getIpmRules } from './crop-knowledge';
 
 describe('crop knowledge', () => {
   it('maps Vertimec to abamectin IRAC 6 with 7-day PHI', () => {
@@ -37,6 +37,20 @@ describe('crop knowledge', () => {
   it('every active ingredient has an organic alternative', () => {
     for (const a of ACTIVE_INGREDIENTS) {
       assert.ok(a.organic.length > 10, a.id);
+    }
+  });
+
+  it('matches bio-pesticides by pest/disease keywords', () => {
+    const borers = getBioOptions('টমেটোতে ফল ছিদ্রকারী পোকা দেখা দিয়েছে');
+    assert.ok(borers.some((b) => b.id === 'bt'), 'bt should match fruit borer');
+    const wilt = getBioOptions('গাছ ঢলে পড়া রোগ');
+    assert.ok(wilt.some((b) => b.id === 'trichoderma'), 'trichoderma should match wilt');
+  });
+
+  it('every bio-pesticide has dose, method and note', () => {
+    for (const b of BIO_PESTICIDES) {
+      assert.ok(b.dose.length > 3 && b.method.length > 3 && b.note.length > 3, b.id);
+      assert.ok(b.targets.length >= 2, b.id);
     }
   });
 });
