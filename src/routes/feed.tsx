@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, SlidersHorizontal, Plus, HelpCircle, Star, CloudRain, ChevronDown, ArrowUp, CheckCircle2, Trophy, ImagePlus, Sparkles } from "lucide-react";
 import { toast } from "sonner";
