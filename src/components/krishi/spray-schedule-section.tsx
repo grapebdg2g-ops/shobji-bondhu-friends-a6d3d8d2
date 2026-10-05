@@ -5,6 +5,7 @@ import { buildSpraySchedule, syncSprayReminders, type SprayEvent } from "@/lib/s
 import { TOMATO_SPRAY_NOTES } from "@/lib/tomato-spray-schedule";
 import { addDays, formatBnDate } from "@/lib/bn-date";
 import { toBn } from "@/lib/bn";
+import { getAllChemicalInfo } from "@/data/crop-knowledge";
 
 type Props = {
   userId: string;
@@ -62,9 +63,20 @@ export function SprayScheduleSection({ userId, planId, cropType, plantingDate, d
             <p className="text-foreground/80">{e.desc}</p>
             {e.problem && (
               <div className="rounded-lg bg-card p-2.5 ring-1 ring-border space-y-1">
-                {e.problem.chemicals.map((c) => (
-                  <p key={c.name} className="text-xs"><strong>{c.name}</strong> — {c.dose} ({c.method})</p>
-                ))}
+                {e.problem.chemicals.map((c) => {
+                  const info = getAllChemicalInfo(c.name);
+                  return (
+                    <div key={c.name} className="text-xs space-y-0.5">
+                      <p><strong>{c.name}</strong> — {c.dose} ({c.method})</p>
+                      {info.map((a) => (
+                        <p key={a.id} className="text-[11px] text-muted-foreground">
+                          <span className="inline-block rounded bg-primary/10 text-primary font-semibold px-1.5 mr-1">{a.system} {a.group}</span>
+                          {a.ingredient} {a.formulation} · ফসল তোলার {toBn(a.phiDays)} দিন আগে বন্ধ · বিষাক্ততা {a.toxicity} · {a.safety}
+                        </p>
+                      ))}
+                    </div>
+                  );
+                })}
                 {e.problem.organic[0] && <p className="text-xs text-muted-foreground">জৈব বিকল্প: {e.problem.organic[0]}</p>}
                 {e.problem.phi && <p className="text-xs text-destructive">ফসল তোলার অন্তত {e.problem.phi} আগে স্প্রে বন্ধ করুন</p>}
               </div>
