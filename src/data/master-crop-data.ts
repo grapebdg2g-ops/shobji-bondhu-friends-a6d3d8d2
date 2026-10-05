@@ -2733,6 +2733,62 @@ export const CROPS: Record<string, CropData> = {
     goodCompanions: [], badCompanions: [], govtSupport: [],
     tips: ['কাঁচা পেঁপে সবজি এবং পাকা পেঁপে ফল হিসেবে বিক্রি করা যায়।', 'খরচ, ফলন ও বাজারদর প্রাথমিক পরিকল্পনার অনুমান—লাইভ বাজারদর বা নিশ্চিত লাভ নয়।', 'চাষের তথ্যসূত্র: BAMIS পেঁপে নির্দেশিকা; জাত, জমি ও এলাকার জন্য স্থানীয় কৃষি কর্মকর্তার পরামর্শ নিন।'],
   },
+  // Watermelon: BARI/DAE cultivation guidance. Budget and yield are preliminary estimates.
+  'watermelon': {
+    id: 'watermelon', name: 'তরমুজ', nameEn: 'Watermelon', icon: '🍉',
+    category: 'সবজি', seasons: ['রবি', 'খরিফ-১'],
+    plantingMonths: [12, 1, 2], harvestMonths: [3, 4, 5],
+    totalDays: 90, soilTypes: ['বেলে-দোআঁশ', 'দোআঁশ', 'বালি'],
+    waterRequirement: 'মাঝারি', irrigationNeeded: true, phRange: { min: 6.0, max: 7.0 },
+    seedCostPerBigha: 4000, fertilizerCost: 6000, pesticideCost: 4000, laborCost: 9000, otherCost: 3000,
+    get totalCost() { return this.seedCostPerBigha + this.fertilizerCost + this.pesticideCost + this.laborCost + this.otherCost },
+    yieldMin: 150, yieldMax: 250, avgMarketPrice: 500,
+    get profitMin() { return this.yieldMin * this.avgMarketPrice - this.totalCost },
+    get profitMax() { return this.yieldMax * this.avgMarketPrice - this.totalCost },
+    get roi() { return Math.round((this.profitMin + this.profitMax) / 2 / this.totalCost * 100) },
+    riskLevel: 'মাঝারি', riskFactors: ['ফিউজেরিয়াম উইল্ট', 'মাছি পোকা ও লাল মাকড়', 'আগাম বৃষ্টি ও শিলাবৃষ্টি'],
+    varieties: [
+      { name: 'গ্লোরি', type: 'হাইব্রিড', daysToHarvest: 85, yieldPerBigha: 220 },
+      { name: 'ড্রাগন', type: 'হাইব্রিড', daysToHarvest: 80, yieldPerBigha: 200 },
+      { name: 'সুগার বেবি', type: 'উফশী', daysToHarvest: 75, yieldPerBigha: 160 },
+    ],
+    stages: [
+      { id: 'planting', name: 'বীজ বপন ও চারা', icon: '🌱', startDay: 0, endDay: 20, tasks: [
+        { title: 'মাদা তৈরি', type: 'preparation', urgency: 'জরুরি', desc: 'বেলে-দোআঁশ উঁচু জমিতে ২×২ মিটার দূরত্বে মাদা তৈরি করে পচা গোবর, TSP, জিপসাম ও বোরন মিশিয়ে ৭–১০ দিন রাখুন।' },
+        { title: 'বীজ বপন', type: 'task', urgency: 'জরুরি', desc: '১২–২৪ ঘণ্টা ভেজানো বীজ মাদায় ২–৩টি বপন করুন; পরে সবল ১–২টি চারা রাখুন।' },
+      ] },
+      { id: 'vine', name: 'লতা বৃদ্ধি', icon: '🌿', startDay: 20, endDay: 45, tasks: [
+        { title: 'ইউরিয়া ও MOP উপরি প্রয়োগ', type: 'fertilizer', urgency: 'জরুরি', desc: 'চারা গজানোর ১৫–২০ দিন পর ও ৩৫–৪০ দিন পর মাদার চারপাশে কিস্তিতে দিন।' },
+        { title: 'খড় বিছানো ও সেচ', type: 'irrigation', urgency: 'জরুরি', desc: 'লতার নিচে শুকনো খড় বিছান; মাটি শুকালে নালায় সেচ দিন, গোড়ায় পানি জমাবেন না।' },
+        { title: 'লাল মাকড় ও জাব পোকা', type: 'pest', urgency: 'জরুরি', desc: 'পাতার নিচে পর্যবেক্ষণ করুন; মাকড় দেখা দিলে এবামেক্টিন (ভার্টিম্যাক) অনুমোদিত মাত্রায় স্প্রে করুন।' },
+      ] },
+      { id: 'flowering', name: 'ফুল ও ফল ধরা', icon: '🌸', startDay: 45, endDay: 65, tasks: [
+        { title: 'হাতে পরাগায়ন', type: 'task', urgency: 'সাধারণ', desc: 'সকালে পুরুষ ফুল দিয়ে স্ত্রী ফুলে পরাগায়ন করলে ফল ধরা বাড়ে।' },
+        { title: 'মাছি পোকা দমন', type: 'pest', urgency: 'জরুরি', desc: 'সেক্স ফেরোমন ফাঁদ বসান; আক্রান্ত ফল তুলে নষ্ট করুন।' },
+        { title: 'ফিউজেরিয়াম উইল্ট পর্যবেক্ষণ', type: 'disease', urgency: 'জরুরি', desc: 'গাছ হঠাৎ ঢলে পড়লে আক্রান্ত গাছ তুলে ফেলুন ও গোড়ায় অনুমোদিত ছত্রাকনাশক দিন; একই জমিতে বারবার তরমুজ চাষ এড়ান।' },
+      ] },
+      { id: 'fruit-growth', name: 'ফল বড় হওয়া', icon: '🍉', startDay: 65, endDay: 80, tasks: [
+        { title: 'ফল সীমিতকরণ', type: 'task', urgency: 'সাধারণ', desc: 'গাছপ্রতি ২–৩টি ভালো ফল রাখুন; ফলের নিচে খড় দিন যাতে পচন না ধরে।' },
+        { title: 'সংগ্রহের আগে সেচ কমান', type: 'irrigation', urgency: 'সাধারণ', desc: 'সংগ্রহের ৭–১০ দিন আগে সেচ বন্ধ করলে মিষ্টতা বাড়ে।' },
+      ] },
+      { id: 'harvest', name: 'সংগ্রহ', icon: '🧺', startDay: 80, endDay: 90, tasks: [
+        { title: 'পাকা তরমুজ সংগ্রহ', type: 'harvest', urgency: 'জরুরি', desc: 'বোঁটার কাছের আকর্ষী শুকালে, মাটির দিকের অংশ হলুদ হলে ও টোকা দিলে ভারী শব্দ হলে সংগ্রহ করুন।' },
+      ] },
+    ],
+    fertilizerGuide: {
+      perBigha: { urea: 25, tsp: 20, mop: 20, gypsum: 12, zinc: 1.5, boron: 1.5 },
+      soilAdjustment: { 'এঁটেল': {}, 'দোআঁশ': {}, 'বালি': {}, 'পলি': {}, 'বেলে-দোআঁশ': {} },
+      schedule: [
+        { timing: 'মাদা তৈরির সময়', items: ['পচা গোবর', 'সব TSP, জিপসাম, জিঙ্ক, বোরন', 'অর্ধেক MOP'], note: 'বপনের ৭–১০ দিন আগে মাদায় মেশান।' },
+        { timing: 'বপনের ১৫–২০ ও ৩৫–৪০ দিন পর', items: ['ইউরিয়া কিস্তিতে', 'বাকি MOP'], note: 'গাছের গোড়া থেকে একটু দূরে প্রয়োগ করুন।' },
+      ],
+      warnings: ['প্রাথমিক হিসাব: official BARC/BARI land-based dose mapping সম্পূর্ণ নয়; মাটি পরীক্ষা অনুযায়ী মাত্রা ঠিক করুন।'],
+    },
+    calendarEvents: [12, 1, 2].map(month => ({ month, type: 'planting' as const, title: 'তরমুজ বীজ বপন', desc: 'বেলে-দোআঁশ উঁচু জমিতে মাদায় বীজ বপন করুন।' })),
+    bestSellingMonths: [3, 4], demandLevel: 'বেশি', exportPotential: false,
+    goodCompanions: [], badCompanions: ['শসা', 'মিষ্টি কুমড়া'], govtSupport: [],
+    tips: ['রমজান ও চৈত্র-বৈশাখে চাহিদা ও দাম বেশি থাকে।', 'খরচ, ফলন ও বাজারদর প্রাথমিক অনুমান—স্থানীয় কৃষি কর্মকর্তার পরামর্শ নিন।'],
+  },
 }
 
 // ══════════════════════════════════════
