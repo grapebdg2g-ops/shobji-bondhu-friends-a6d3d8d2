@@ -1,84 +1,87 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, Stethoscope, MessageSquareText, CalendarDays, FlaskConical, Sprout } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowLeft, Stethoscope, MessageSquareText, CalendarDays, FlaskConical, Sprout, ScanLine, ClipboardList, TrendingUp, ChartNoAxesCombined, BookOpen, NotebookPen, Leaf, CloudSun, Repeat2, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/ai-bondhu/")({
   component: AiBondhuHub,
   head: () => ({
     meta: [
-      { title: "AI কৃষি সমাধান — কৃষক বন্ধু" },
-      { name: "description", content: "রোগ শনাক্ত, ফসল ক্যালেন্ডার, সার ও কীটনাশক — সবকিছু এক জায়গায়।" },
+      { title: "AI কৃষি সমাধান ও সব টুল — কৃষক বন্ধু" },
+      { name: "description", content: "মৃত্তিকা বিশ্লেষণ, ফসল পরিকল্পনা, বাজারদর, দামের পূর্বাভাস, রোগ শনাক্ত ও কৃষি গাইড এক জায়গায়।" },
+      { property: "og:title", content: "AI কৃষি সমাধান ও সব টুল — কৃষক বন্ধু" },
+      { property: "og:description", content: "মৃত্তিকা বিশ্লেষণ, ফসল পরিকল্পনা, বাজারদর, দামের পূর্বাভাস, রোগ শনাক্ত ও কৃষি গাইড এক জায়গায়।" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
 });
 
-type Card = {
-  to: string;
-  Icon: typeof Stethoscope;
-  title: string;
-  desc: string;
-  bg: string;
-  color: string;
-};
-
-const ROW1: Card[] = [
-  { to: "/ai-bondhu/disease", Icon: Stethoscope, title: "গাছের ডাক্তার", desc: "ছবি তুলে রোগ শনাক্ত", bg: "bg-emerald-100", color: "text-emerald-700" },
-  { to: "/ai-bondhu/chat", Icon: MessageSquareText, title: "বলো বন্ধু", desc: "AI-কে প্রশ্ন করুন", bg: "bg-purple-100", color: "text-purple-700" },
-];
-const ROW2: Card[] = [
-  { to: "/ai-bondhu/calendar", Icon: CalendarDays, title: "চাষের ক্যালেন্ডার", desc: "মাস অনুযায়ী সময়সূচি", bg: "bg-orange-100", color: "text-orange-700" },
-  { to: "/ai-bondhu/calculator", Icon: FlaskConical, title: "সার ক্যালকুলেটর", desc: "সঠিক NPK মাত্রা", bg: "bg-blue-100", color: "text-blue-700" },
-];
-const FULL: Card = { to: "/ai-bondhu/pesticide", Icon: Sprout, title: "কীটনাশক গাইড", desc: "নিরাপদ কীটনাশকের তালিকা", bg: "bg-lime-100", color: "text-lime-700" };
-
-function GridCard({ c }: { c: Card }) {
-  return (
-    <Link
-      to={c.to}
-      className="h-[120px] bg-white rounded-2xl p-4 shadow-sm border border-gray-100 active:scale-[0.98] transition-transform flex flex-col justify-between"
-    >
-      <div className={`h-11 w-11 rounded-2xl ${c.bg} flex items-center justify-center`}>
-        <c.Icon className={`h-6 w-6 ${c.color}`} strokeWidth={2.2} />
-      </div>
-      <div>
-        <h3 className="font-bold text-sm text-gray-900 leading-tight">{c.title}</h3>
-        <p className="text-[11px] text-gray-500 mt-0.5 leading-snug">{c.desc}</p>
-      </div>
-    </Link>
-  );
-}
+const TOOL_GROUPS = [
+  {
+    title: "AI কৃষি সমাধান",
+    tone: "bg-secondary text-primary",
+    tools: [
+      { to: "/ai-bondhu/disease", Icon: Stethoscope, title: "গাছের ডাক্তার" },
+      { to: "/ai-bondhu/chat", Icon: MessageSquareText, title: "বলো বন্ধু" },
+      { to: "/ai-bondhu/soil", Icon: ScanLine, title: "মৃত্তিকা বিশ্লেষণ" },
+      { to: "/ai-bondhu/calculator", Icon: FlaskConical, title: "সার ক্যালকুলেটর" },
+      { to: "/price-prediction", Icon: ChartNoAxesCombined, title: "দামের পূর্বাভাস" },
+    ],
+  },
+  {
+    title: "ফসল ও পরিকল্পনা",
+    tone: "bg-chart-2/15 text-chart-2",
+    tools: [
+      { to: "/crop-planner", Icon: ClipboardList, title: "ফসল পরিকল্পনা" },
+      { to: "/crop-guide", Icon: Sprout, title: "ফসল পরামর্শ" },
+      { to: "/crop-diary", Icon: NotebookPen, title: "ফসল ডায়েরি" },
+      { to: "/ai-bondhu/calendar", Icon: CalendarDays, title: "চাষের ক্যালেন্ডার" },
+      { to: "/vegetable-guide", Icon: BookOpen, title: "সবজি চাষের গাইড" },
+    ],
+  },
+  {
+    title: "বাজার ও কৃষি সহায়তা",
+    tone: "bg-chart-1/15 text-chart-1",
+    tools: [
+      { to: "/prices", Icon: TrendingUp, title: "বাজার দর" },
+      { to: "/exchange", Icon: Repeat2, title: "বিনিময়" },
+      { to: "/weather", Icon: CloudSun, title: "আবহাওয়া" },
+      { to: "/ai-bondhu/pesticide", Icon: Sprout, title: "কীটনাশক গাইড" },
+      { to: "/organic-fertilizer", Icon: Leaf, title: "জৈব সার গাইড" },
+    ],
+  },
+] as const;
 
 function AiBondhuHub() {
-  const navigate = useNavigate();
   return (
-    <main className="min-h-screen overflow-x-hidden bg-[#F0FFF4] md:max-w-[560px] md:mx-auto">
-      <header className="px-5 pt-8 pb-10 rounded-b-3xl" style={{ background: "var(--gradient-brand)" }}>
-        <button onClick={() => navigate({ to: "/dashboard" })} className="h-9 w-9 rounded-full bg-white/15 flex items-center justify-center text-white">
-          <ArrowLeft className="h-5 w-5" />
-        </button>
-        <h1 className="mt-4 text-2xl font-bold text-white">AI কৃষি সমাধান</h1>
-        <p className="text-sm text-white/85 mt-1">বুদ্ধিমান AI দিয়ে আপনার চাষের সমস্যা সমাধান</p>
+    <main className="min-h-screen bg-background pb-8 md:mx-auto md:max-w-[560px]">
+      <header className="bg-primary px-5 pb-7 pt-8 text-primary-foreground">
+        <Button asChild variant="ghost" size="icon" className="rounded-full bg-primary-foreground/15 hover:bg-primary-foreground/25 hover:text-primary-foreground">
+          <Link to="/dashboard" aria-label="হোমে ফিরে যান"><ArrowLeft /></Link>
+        </Button>
+        <h1 className="mt-4 text-2xl font-bold">AI কৃষি সমাধান</h1>
       </header>
 
-      <section className="px-4 -mt-6 pb-8 space-y-3">
-        <div className="grid grid-cols-2 gap-3">
-          {ROW1.map((c) => <GridCard key={c.to} c={c} />)}
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          {ROW2.map((c) => <GridCard key={c.to} c={c} />)}
-        </div>
-        <Link
-          to={FULL.to}
-          className="h-[120px] w-full bg-white rounded-2xl p-4 shadow-sm border border-gray-100 active:scale-[0.98] transition-transform flex items-center gap-4"
-        >
-          <div className={`h-14 w-14 rounded-2xl ${FULL.bg} flex items-center justify-center shrink-0`}>
-            <FULL.Icon className={`h-7 w-7 ${FULL.color}`} strokeWidth={2.2} />
-          </div>
-          <div className="flex-1">
-            <h3 className="font-bold text-gray-900">{FULL.title}</h3>
-            <p className="text-xs text-gray-500 mt-0.5">{FULL.desc}</p>
-          </div>
-        </Link>
-      </section>
+      <div className="space-y-6 px-4 pt-5">
+        {TOOL_GROUPS.map((group) => (
+          <section key={group.title} aria-label={group.title}>
+            <h2 className="mb-3 text-base font-bold text-foreground">{group.title}</h2>
+            <div className="grid grid-cols-2 gap-3">
+              {group.tools.map((tool) => (
+                <Button key={tool.to} asChild variant="outline" className="h-auto min-h-[112px] min-w-0 flex-col items-start justify-between gap-3 whitespace-normal rounded-lg border-border bg-card p-4 text-card-foreground shadow-sm hover:bg-muted">
+                  <Link to={tool.to}>
+                    <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${group.tone}`}><tool.Icon className="!size-5" strokeWidth={2.2} /></span>
+                    <span className="flex w-full min-w-0 items-center justify-between gap-1">
+                      <span className="break-words text-sm font-bold leading-snug">{tool.title}</span>
+                      <ChevronRight className="!size-4 shrink-0 text-muted-foreground" />
+                    </span>
+                  </Link>
+                </Button>
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
     </main>
   );
 }
