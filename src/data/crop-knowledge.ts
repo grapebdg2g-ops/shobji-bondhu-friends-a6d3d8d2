@@ -127,6 +127,7 @@ export const IPM_RULES: IpmRule[] = [
   { id: "humid-fungus", condition: "টানা ২-৩ দিন মেঘলা, কুয়াশা বা বৃষ্টি", action: "ছত্রাকের ঝুঁকি বেশি — আগাম ম্যানকোজেব (FRAC M03) প্রতিরোধমূলক স্প্রে দিন; আক্রান্ত পাতা তুলে ফেলুন।" },
   { id: "dry-hot-mite", condition: "গরম ও শুকনো আবহাওয়া (৩২°সে+)", action: "মাকড় ও জাব বাড়ে — পাতার নিচে দেখুন; প্রথমে পানি স্প্রে বা নিম তেল, বেশি হলে মাকড়নাশক দিন।" },
   { id: "threshold-insect", condition: "প্রতি ১০ গাছে ২টির বেশি গাছে পোকা দেখা গেলে", action: "এটাই অর্থনৈতিক ক্ষতির সীমা — শুধুমাত্র তখনই রাসায়নিক স্প্রে করুন, আগে নয়।" },
+  { id: "bio-first", condition: "পোকা বা রোগ প্রথম দেখা দিলে", action: "প্রথমে জৈব রাসায়নিক দিন (বিটি, নিম তেল, ট্রাইকোডার্মা, ফেরোমন ফাঁদ) — নিয়ন্ত্রণ না হলে তবেই রাসায়নিক স্প্রে করুন।" },
   { id: "rotate", condition: "একই পোকার জন্য আবার স্প্রে লাগলে", action: "আগের বার যে IRAC/FRAC গ্রুপ ব্যবহার করেছেন, এবার ভিন্ন গ্রুপের ঔষধ নিন।" },
   { id: "rain-after-spray", condition: "স্প্রের ৬ ঘণ্টার মধ্যে বৃষ্টি", action: "ঔষধ ধুয়ে গেছে ধরে নিন — আবহাওয়া ভালো হলে পুনরায় স্প্রে করুন।" },
   { id: "wilt", condition: "হঠাৎ সুস্থ গাছ দুপুরে ঢলে পড়ে", action: "ঢলে পড়া রোগ — আক্রান্ত গাছ তুলে পুড়িয়ে ফেলুন, গোড়ায় কাসুগামাইসিন/কপার দ্রবণ ঢালুন, সেচ কমান।", categories: ["সবজি", "মসলা", "কন্দাল"] },
@@ -138,4 +139,37 @@ export const IPM_RULES: IpmRule[] = [
 
 export function getIpmRules(crop: CropData): IpmRule[] {
   return IPM_RULES.filter((r) => (!r.crops && !r.categories) || r.crops?.includes(crop.name) || r.categories?.includes(crop.category));
+}
+
+// ── জৈব রাসায়নিক (bio-pesticides) ──────────────────
+export interface BioPesticide {
+  id: string;
+  name: string; // বাংলা নাম
+  english: string;
+  kind: "কীটনাশক" | "ছত্রাকনাশক" | "ফাঁদ/প্রতিরোধ";
+  /** Bengali/English keywords found in pest/disease names this product controls */
+  targets: string[];
+  dose: string;
+  method: string;
+  phiDays: number;
+  note: string;
+}
+
+export const BIO_PESTICIDES: BioPesticide[] = [
+  { id: "neem-oil", name: "নিম তেল (আজাডিরাক্টিন)", english: "Neem oil / Azadirachtin", kind: "কীটনাশক", targets: ["জাব", "সাদা মাছি", "থ্রিপস", "মাকড়", "লিফ মাইনার", "ছিদ্রকারী"], dose: "৩-৫ মিলি/লিটার + ১ মিলি সাবান গুলে", method: "পাতার উপরে-নিচে ভালোভাবে স্প্রে; সন্ধ্যায় দিলে কাজ ভালো হয়", phiDays: 1, note: "গরম-শুকনো দিনে মাকড়ে প্রথমে পানির ঝাপটা, তারপর নিম তেল" },
+  { id: "bt", name: "বিটি (ব্যাসিলাস থুরিনজেনসিস)", english: "Bt (Bacillus thuringiensis)", kind: "কীটনাশক", targets: ["ছিদ্রকারী", "কাটাপোকা", "শাককাটা", "লিফ মাইনার"], dose: "১ গ্রাম/লিটার", method: "বিকেলে স্প্রে — তীব্র রোদে দ্রবণ নষ্ট হয়", phiDays: 0, note: "কুঁড়কিনাকটা ও ছানা পোকায় সবচেয়ে কার্যকর; ৭ দিন পর পর দিন" },
+  { id: "npv", name: "এনপিভি (ভাইরাস জৈব কীটনাশক)", english: "NPV (nuclear polyhedrosis virus)", kind: "কীটনাশক", targets: ["ছিদ্রকারী", "কাটাপোকা", "স্পডপ্টেরা", "হেলিকোভারপা"], dose: "১ মিলি/লিটার", method: "বিকেলে স্প্রে; মরা পোকা সংগ্রহ করে বাটা দিলে আরও ছড়ায়", phiDays: 0, note: "বিটির সাথে পালাক্রমে দিন — একসাথে নয়" },
+  { id: "beauveria", name: "বিউভেরিয়া ব্যাসিয়ানা", english: "Beauveria bassiana", kind: "কীটনাশক", targets: ["জাব", "থ্রিপস", "সাদা মাছি", "ফড়িং"], dose: "৫ গ্রাম/লিটার", method: "সন্ধ্যায় স্প্রে — ছত্রাক, সরাসরি রোদে নয়", phiDays: 0, note: "রাসায়নিক কীটনাশকের সাথে কখনো মেশাবেন না" },
+  { id: "metarhizium", name: "মেটারহিজিয়াম", english: "Metarhizium anisopliae", kind: "কীটনাশক", targets: ["মাকড়", "ফড়িং", "গোড়ার পোকা", "নিমাতোড়"], dose: "৫ গ্রাম/লিটার স্প্রে, বা ২ কেজি/বিঘা মাটিতে", method: "গোড়ায় ঢালা বা সন্ধ্যায় স্প্রে", phiDays: 0, note: "রাসায়নিক কীটনাশকের সাথে মেশাবেন না" },
+  { id: "trichoderma", name: "ট্রাইকোডার্মা (ভিরিডি/হারজিয়ানাম)", english: "Trichoderma", kind: "ছত্রাকনাশক", targets: ["ঢলে পড়া", "গোড়া পচা", "গোড়ার", "ডাম্পিং", "ব্লাইট", "সেপ্টোরিয়া"], dose: "স্প্রে ১০ গ্রাম/লিটার; মাটিতে ২ কেজি/বিঘা পচা গোবরের সাথে", method: "গোড়ায় ঢালা বা স্প্রে; বীজ চিকিৎসায়ও ব্যবহার করা যায়", phiDays: 0, note: "রাসায়নিক ছত্রাকনাশকের সাথে মেশাবেন না — ওই দিন ট্রাইকোডার্মা নয়" },
+  { id: "pseudomonas", name: "সিউডোমোনাস ফ্লুরোসেন্স", english: "Pseudomonas fluorescens", kind: "ছত্রাকনাশক", targets: ["ঢলে পড়া", "ব্লাস্ট", "ব্লাইট", "ধানের"], dose: "স্প্রে ৫ গ্রাম/লিটার; বীজ চিকিৎসা ১০ গ্রাম/কেজি", method: "স্প্রে বা বীজ চিকিৎসা", phiDays: 0, note: "ধানের ব্লাস্ট ও ঢলে পড়ায় নিয়মিত ব্যবহারে ভালো ফল" },
+  { id: "bacillus-subtilis", name: "ব্যাসিলাস সাবটিলিস", english: "Bacillus subtilis", kind: "ছত্রাকনাশক", targets: ["পাউডারি", "ব্লাইট", "লিফ স্পট", "সেপ্টোরিয়া"], dose: "২ মিলি/লিটার", method: "৭ দিন পর পর স্প্রে", phiDays: 0, note: "লক্ষণ শুরুর আগে দিলে সবচেয়ে ভালো" },
+  { id: "feromon", name: "সেক্স ফেরোমন ফাঁদ", english: "Pheromone trap", kind: "ফাঁদ/প্রতিরোধ", targets: ["ছিদ্রকারী", "মাছি পোকা", "কাটাপোকা"], dose: "প্রতি বিঘায় ১০-১২টি", method: "গাছের শীর্ষের উপরে ঝুলিয়ে দিন", phiDays: 0, note: "ফাঁদে বেশি পোকা ধরা পড়লেই স্প্রের সংকেত — হিসাব রাখুন" },
+  { id: "yellow-sticky", name: "হলুদ আঠালো ফাঁদ", english: "Yellow sticky trap", kind: "ফাঁদ/প্রতিরোধ", targets: ["সাদা মাছি", "জাব", "থ্রিপস"], dose: "প্রতি বিঘায় ১৫-২০টি", method: "গাছের উঁচু অংশে হালকা উপরে পুঁতে দিন", phiDays: 0, note: "আঠালো ভাব কমে গেলে বদলে দিন" },
+];
+
+/** Bio-pesticides relevant to the given pest/disease text (title + description + chemical names). */
+export function getBioOptions(problemText: string): BioPesticide[] {
+  const n = problemText.toLowerCase();
+  return BIO_PESTICIDES.filter((b) => b.targets.some((t) => n.includes(t.toLowerCase())));
 }
