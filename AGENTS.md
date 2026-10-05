@@ -6,3 +6,4 @@
 
 - Lazy-load heavy, below-the-fold or on-demand UI (sheets, large crop data widgets) with React.lazy + Suspense, and use .webp for bundled images; keeps first-load bundles small as features grow.
 - Keep crop availability and optional crop imagery in the master catalog, and render crop identity with CropIcon; shared selectors and adapters propagate new crops without duplicate lists.
+- Keep pesticide chemistry (IRAC/FRAC, PHI, safety), stage irrigation and IPM rules in src/data/crop-knowledge.ts layered on the master catalog; one lookup serves spray, plan and history views.

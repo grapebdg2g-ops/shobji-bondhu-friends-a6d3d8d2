@@ -11,6 +11,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { toast } from "sonner";
 import { SprayScheduleSection } from "@/components/krishi/spray-schedule-section";
 import { markSprayReminderDone } from "@/lib/spray-schedule";
+import { CropKnowledgePanel } from "@/components/krishi/crop-knowledge-panel";
 
 export const Route = createFileRoute("/crop-guide/plan/$planId")({
   component: PlanAdvisory,
@@ -211,6 +212,8 @@ function PlanAdvisory() {
           <ArrowDown className="h-5 w-5 text-sky-600" />
         </button>
       </section>
+
+      <CropKnowledgePanel cropType={plan.crop_type} plantingDate={plan.planting_date} days={days} completions={completions} />
 
       {user && (
         <SprayScheduleSection
