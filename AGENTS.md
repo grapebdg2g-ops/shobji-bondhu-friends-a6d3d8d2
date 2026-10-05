@@ -5,3 +5,4 @@
 - Fetch visible post author avatars together for each feed surface; this avoids one database query per post while showing current profile photos.
 
 - Lazy-load heavy, below-the-fold or on-demand UI (sheets, large crop data widgets) with React.lazy + Suspense, and use .webp for bundled images; keeps first-load bundles small as features grow.
+- Keep crop availability and optional crop imagery in the master catalog, and render crop identity with CropIcon; shared selectors and adapters propagate new crops without duplicate lists.
