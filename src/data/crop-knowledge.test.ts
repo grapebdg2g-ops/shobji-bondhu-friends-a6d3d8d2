@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { ACTIVE_INGREDIENTS, checkResistance, getChemicalInfo, getPhiDays, findCrop, getIrrigationAdvice, getIpmRules } from './crop-knowledge';
+import { ACTIVE_INGREDIENTS, BIO_PESTICIDES, checkResistance, getChemicalInfo, getPhiDays, getBioOptions, findCrop, getIrrigationAdvice, getIpmRules } from './crop-knowledge';
 
 describe('crop knowledge', () => {
   it('maps Vertimec to abamectin IRAC 6 with 7-day PHI', () => {

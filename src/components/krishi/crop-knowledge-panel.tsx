@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
-import { Droplets, ShieldAlert, Sprout, ChevronDown, ChevronUp, History } from "lucide-react";
-import { findCrop, getStageAtDay, getIrrigationAdvice, getIpmRules, checkResistance } from "@/data/crop-knowledge";
+import { Droplets, ShieldAlert, Sprout, ChevronDown, ChevronUp, History, Leaf } from "lucide-react";
+import { findCrop, getStageAtDay, getIrrigationAdvice, getIpmRules, checkResistance, BIO_PESTICIDES } from "@/data/crop-knowledge";
 import { buildSpraySchedule } from "@/lib/spray-schedule";
 import { toBn } from "@/lib/bn";
 
