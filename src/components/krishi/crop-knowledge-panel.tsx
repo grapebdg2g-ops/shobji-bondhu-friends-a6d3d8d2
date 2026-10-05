@@ -9,6 +9,7 @@ type Props = { cropType: string; plantingDate: string; days: number; completions
 export function CropKnowledgePanel({ cropType, plantingDate, days, completions }: Props) {
   const crop = useMemo(() => findCrop(cropType), [cropType]);
   const [showIpm, setShowIpm] = useState(false);
+  const [showBio, setShowBio] = useState(false);
   const history = useMemo(() => {
     const done = buildSpraySchedule(cropType, plantingDate).filter((e) => completions.has(e.id) && e.problem);
     const names = done.map((e) => e.problem!.chemicals[0]?.name ?? "");
