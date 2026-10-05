@@ -80,9 +80,10 @@ export function SprayScheduleSection({ userId, planId, cropType, plantingDate, d
                           </p>
                         </div>
                       ))}
-                </div>
-                )}
-                {e.problem && getBioOptions(`${e.title} ${e.desc} ${e.problem.name}`).length > 0 && (
+                    </div>
+                  );
+                })}
+                {getBioOptions(`${e.title} ${e.desc} ${e.problem.name}`).length > 0 && (
                   <div className="rounded-lg bg-primary/5 p-2.5 space-y-1.5">
                     <p className="text-xs font-bold text-primary">🧪 জৈব রাসায়নিক (একই সমস্যায় জৈব অপশন)</p>
                     {getBioOptions(`${e.title} ${e.desc} ${e.problem.name}`).map((b) => (
