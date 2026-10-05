@@ -69,10 +69,16 @@ export function SprayScheduleSection({ userId, planId, cropType, plantingDate, d
                     <div key={c.name} className="text-xs space-y-0.5">
                       <p><strong>{c.name}</strong> — {c.dose} ({c.method})</p>
                       {info.map((a) => (
-                        <p key={a.id} className="text-[11px] text-muted-foreground">
-                          <span className="inline-block rounded bg-primary/10 text-primary font-semibold px-1.5 mr-1">{a.system} {a.group}</span>
-                          {a.ingredient} {a.formulation} · ফসল তোলার {toBn(a.phiDays)} দিন আগে বন্ধ · বিষাক্ততা {a.toxicity} · {a.safety}
-                        </p>
+                        <div key={a.id} className="space-y-0.5">
+                          <p className="text-[11px] text-muted-foreground">
+                            <span className="inline-block rounded bg-primary/10 text-primary font-semibold px-1.5 mr-1">{a.system} {a.group}</span>
+                            {a.ingredient} {a.formulation} · ফসল তোলার {toBn(a.phiDays)} দিন আগে বন্ধ · বিষাক্ততা {a.toxicity} · {a.safety}
+                          </p>
+                          <p className="text-[11px] text-foreground/80">
+                            <span className="inline-block rounded bg-primary/10 text-primary font-semibold px-1.5 mr-1">🌱 জৈব</span>
+                            {a.organic}
+                          </p>
+                        </div>
                       ))}
                     </div>
                   );
