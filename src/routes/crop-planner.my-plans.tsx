@@ -1,3 +1,4 @@
+import { CropIcon } from "@/components/krishi/crop-icon";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ArrowLeft, Plus, ChevronRight, Trash2 } from "lucide-react";
@@ -11,7 +12,12 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/crop-planner/my-plans")({
   component: MyPlansPage,
   head: () => ({
-    meta: [{ title: "আমার ফসল পরিকল্পনা — কৃষক বন্ধু" }],
+    meta: [{ title: "আমার ফসল পরিকল্পনা — কৃষক বন্ধু" },
+      { property: "og:title", content: "আমার ফসল পরিকল্পনা — কৃষক বন্ধু" },
+      { property: "og:description", content: "ফসলের পরিচর্যা ও কৃষি পরিকল্পনা — কৃষক বন্ধু।" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { name: "description", content: "ফসলের পরিচর্যা ও কৃষি পরিকল্পনা — কৃষক বন্ধু।" },],
   }),
 });
 
@@ -94,7 +100,7 @@ function MyPlansPage() {
               <div key={p.id} className="bg-white rounded-2xl p-4 shadow-sm ring-1 ring-emerald-100">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <span className="text-2xl">{icon}</span>
+                    <span className="text-2xl"><CropIcon crop={p.crop_type} fallback={icon} /></span>
                     <div>
                       <div className="font-bold text-gray-900">{p.crop_type}</div>
                       <div className="text-[11px] text-gray-500">রোপণ: {formatBnDate(new Date(p.planting_date))}</div>

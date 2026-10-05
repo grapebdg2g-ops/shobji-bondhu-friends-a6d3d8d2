@@ -1,3 +1,4 @@
+import { CropIcon } from "@/components/krishi/crop-icon";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, Share2, ChevronDown, ChevronUp, Check, Bell, AlertTriangle, ArrowDown } from "lucide-react";
@@ -13,7 +14,12 @@ import { markSprayReminderDone } from "@/lib/spray-schedule";
 
 export const Route = createFileRoute("/crop-guide/plan/$planId")({
   component: PlanAdvisory,
-  head: () => ({ meta: [{ title: "ফসল পরামর্শ — কৃষক বন্ধু" }] }),
+  head: () => ({ meta: [{ title: "ফসল পরামর্শ — কৃষক বন্ধু" },
+      { property: "og:title", content: "ফসল পরামর্শ — কৃষক বন্ধু" },
+      { property: "og:description", content: "ফসলের পরিচর্যা ও কৃষি পরিকল্পনা — কৃষক বন্ধু।" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { name: "description", content: "ফসলের পরিচর্যা ও কৃষি পরিকল্পনা — কৃষক বন্ধু।" },] }),
   errorComponent: ({ error, reset }) => (
     <div className="min-h-screen flex items-center justify-center p-6 text-center">
       <div>
@@ -148,7 +154,7 @@ function PlanAdvisory() {
             <Share2 className="h-4 w-4" /> শেয়ার
           </button>
         </div>
-        <h1 className="text-2xl font-bold inline-flex items-center gap-2">{guide.icon} {plan.crop_type} পরামর্শ</h1>
+        <h1 className="text-2xl font-bold inline-flex items-center gap-2"><CropIcon crop={plan.crop_type} /> {plan.crop_type} পরামর্শ</h1>
 
         {/* Progress */}
         <div className="mt-4">
@@ -180,7 +186,7 @@ function PlanAdvisory() {
       <section className="px-5 mt-5">
         <div className="bg-white rounded-2xl p-4 shadow-sm ring-1 ring-emerald-100 space-y-2 text-sm">
           <div className="flex items-center gap-2">
-            <span className="text-3xl">{guide.icon}</span>
+            <span className="text-3xl"><CropIcon crop={plan.crop_type} /></span>
             <span className="font-bold text-lg text-gray-900">{plan.crop_type}</span>
           </div>
           <p className="text-gray-700"><strong>রোপণের তারিখ:</strong> {formatBnDate(plan.planting_date)}</p>

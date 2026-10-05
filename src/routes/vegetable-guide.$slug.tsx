@@ -1,3 +1,4 @@
+import { CropIcon } from "@/components/krishi/crop-icon";
 import { createFileRoute, Link, useNavigate, notFound } from "@tanstack/react-router";
 import { useState } from "react";
 import {
@@ -18,6 +19,10 @@ export const Route = createFileRoute("/vegetable-guide/$slug")({
   head: ({ loaderData }) => ({
     meta: [
       { title: `${loaderData?.crop.name ?? "ফসল"} চাষ গাইড — কৃষক বন্ধু` },
+      { property: "og:title", content: `${loaderData?.crop.name ?? "ফসল"} চাষ গাইড — কৃষক বন্ধু` },
+      { property: "og:description", content: `${loaderData?.crop.name ?? ""} চাষের পদ্ধতি, খরচ, লাভ, জাত ও বাজার বিশ্লেষণ।` },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "description", content: `${loaderData?.crop.name ?? ""} চাষের পদ্ধতি, খরচ, লাভ, জাত ও বাজার বিশ্লেষণ।` },
     ],
   }),
@@ -74,7 +79,7 @@ function CropDetailPage() {
           </button>
         </div>
         <div className="mt-4 text-center">
-          <div className="text-[80px] leading-none">{crop.icon}</div>
+          <div className="text-[80px] leading-none"><CropIcon crop={crop.id} /></div>
           <h1 className="mt-2 text-[28px] font-bold">{crop.name}</h1>
           <div className="mt-2 inline-block bg-white/20 px-3 py-1 rounded-full text-xs font-semibold">
             {crop.seasons.join(" / ")} মৌসুম

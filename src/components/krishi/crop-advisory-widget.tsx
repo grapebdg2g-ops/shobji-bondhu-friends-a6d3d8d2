@@ -1,3 +1,4 @@
+import { CropIcon } from "@/components/krishi/crop-icon";
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { ChevronRight, ClipboardList } from "lucide-react";
@@ -62,7 +63,7 @@ export function CropAdvisoryWidget() {
               className="block bg-white rounded-2xl p-3.5 shadow-sm ring-1 ring-emerald-100 active:scale-[0.99] transition"
             >
               <div className="flex items-center gap-3">
-                <span className="text-3xl">{guide.icon}</span>
+                <span className="text-3xl"><CropIcon crop={plan.crop_type} /></span>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs text-emerald-700 font-semibold">{plan.crop_type} · {stageName} · {toBn(days)} দিন</p>
                   <p className="text-sm font-bold text-gray-900 truncate">{task.title}</p>

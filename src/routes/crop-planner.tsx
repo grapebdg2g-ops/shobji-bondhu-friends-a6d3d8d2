@@ -1,3 +1,4 @@
+import { CropIcon } from "@/components/krishi/crop-icon";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -16,6 +17,10 @@ export const Route = createFileRoute("/crop-planner")({
   head: () => ({
     meta: [
       { title: "ফসল পরিকল্পনা — কৃষক বন্ধু" },
+      { property: "og:title", content: "ফসল পরিকল্পনা — কৃষক বন্ধু" },
+      { property: "og:description", content: "আপনার জমির জন্য সেরা ফসল খুঁজুন — মাটি, পানি ও লক্ষ্যের ভিত্তিতে।" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "description", content: "আপনার জমির জন্য সেরা ফসল খুঁজুন — মাটি, পানি ও লক্ষ্যের ভিত্তিতে।" },
     ],
   }),
@@ -487,7 +492,7 @@ function HeroCropCard({
       </div>
       <div className="p-5">
         <div className="flex items-center gap-3">
-          <span className="text-5xl">{crop.icon}</span>
+          <span className="text-5xl"><CropIcon crop={crop.id} /></span>
           <div>
             <h2 className="text-2xl font-bold text-gray-900">{crop.name}</h2>
             <p className="text-xs text-gray-500">{crop.seasons.join(", ")} • {toBn(crop.totalDays)} দিন</p>
@@ -592,7 +597,7 @@ function Row({ label, value, bold, tone }: { label: string; value: string; bold?
 function AltCropCard({ crop, bighas, inCompare, onCompare }: { crop: CropData; bighas: number; inCompare: boolean; onCompare: () => void }) {
   return (
     <div className="snap-start shrink-0 w-[180px] bg-white rounded-2xl shadow-sm ring-1 ring-gray-100 p-3">
-      <div className="text-3xl">{crop.icon}</div>
+      <div className="text-3xl"><CropIcon crop={crop.id} /></div>
       <h4 className="font-bold text-gray-900 mt-1">{crop.name}</h4>
       <div className="mt-2 space-y-0.5 text-[11px] text-gray-600">
         <div>ROI: <b className="text-emerald-700">{toBn(crop.roi)}%</b></div>
@@ -641,7 +646,7 @@ function UnsuitableSection({ soil, water, recs }: { soil: SoilType; water: Water
       <div className="space-y-2">
         {bad.map(({ crop, reason }) => (
           <div key={crop.id} className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-center gap-3">
-            <span className="text-2xl">{crop.icon}</span>
+            <span className="text-2xl"><CropIcon crop={crop.id} /></span>
             <div className="flex-1 min-w-0">
               <div className="font-bold text-gray-900 text-sm">{crop.name}</div>
               <div className="text-xs text-gray-600">{reason}</div>
@@ -874,7 +879,7 @@ function LakhpotiPlanSection({
                 {rows.map((row) => (
                   <tr key={row.crop.id} className="border-t border-emerald-50 align-top">
                     <td className="px-3 py-3">
-                      <div className="font-bold text-gray-900">{row.crop.icon} {row.crop.name}</div>
+                      <div className="font-bold text-gray-900"><CropIcon crop={row.crop.id} /> {row.crop.name}</div>
                       <div className="mt-1 text-[9px] text-emerald-700">{toBn(Math.round(row.share * 100))}% জমি • {toBn(Math.round(row.areaBigha * 100) / 100)} বিঘা</div>
                     </td>
                     <td className="px-3 py-3 text-right text-gray-700">{toBn(row.saplings)}</td>
@@ -955,7 +960,7 @@ function CompareModal({ ids, bighas, onClose, onClear }: { ids: string[]; bighas
                 <th className="text-left py-2 font-bold text-gray-600"></th>
                 {crops.map((c) => (
                   <th key={c.id} className="text-center py-2 px-1">
-                    <div className="text-2xl">{c.icon}</div>
+                    <div className="text-2xl"><CropIcon crop={c.id} /></div>
                     <div className="font-bold text-gray-900 text-xs">{c.name}</div>
                   </th>
                 ))}

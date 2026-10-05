@@ -1,3 +1,4 @@
+import { CropIcon } from "@/components/krishi/crop-icon";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
@@ -27,6 +28,10 @@ export const Route = createFileRoute("/price-prediction")({
   head: () => ({
     meta: [
       { title: "দামের পূর্বাভাস — কৃষক বন্ধু" },
+      { property: "og:title", content: "দামের পূর্বাভাস — কৃষক বন্ধু" },
+      { property: "og:description", content: "AI ও বাজার ডেটা বিশ্লেষণ দিয়ে কৃষিপণ্যের দাম পূর্বাভাস।" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "description", content: "AI ও বাজার ডেটা বিশ্লেষণ দিয়ে কৃষিপণ্যের দাম পূর্বাভাস।" },
     ],
   }),
@@ -242,7 +247,7 @@ function SelectorScreen(props: {
                   : "bg-white text-gray-700 border-gray-200"
               }`}
             >
-              {p.icon} {p.name}
+              <CropIcon crop={p.name} /> {p.name}
             </button>
           ))}
         </div>
