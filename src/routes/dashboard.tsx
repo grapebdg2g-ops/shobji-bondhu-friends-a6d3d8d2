@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Bell,
@@ -31,10 +31,10 @@ import { useUser } from "@/contexts/user-context";
 import { WeatherAlertBanner } from "@/components/krishi/weather-alert-banner";
 import { DashboardWeatherWidget } from "@/components/krishi/dashboard-weather-widget";
 import { useSidebar } from "@/components/krishi/app-sidebar";
-import { CreatePostSheet } from "@/components/krishi/create-post-sheet";
+const CreatePostSheet = lazy(() => import("@/components/krishi/create-post-sheet").then((m) => ({ default: m.CreatePostSheet })));
 import { CommentsSection } from "@/components/krishi/comments-section";
 import { PostSocialActions } from "@/components/krishi/post-social-actions";
-import { CropAdvisoryWidget } from "@/components/krishi/crop-advisory-widget";
+const CropAdvisoryWidget = lazy(() => import("@/components/krishi/crop-advisory-widget").then((m) => ({ default: m.CropAdvisoryWidget })));
 import { useMutedIds } from "@/hooks/use-muted-users";
 import { supabase } from "@/integrations/supabase/client";
 import type { Post } from "@/hooks/use-feed";
@@ -170,7 +170,7 @@ function Dashboard() {
       <TodayBrief onCreatePost={() => setCreateOpen(true)} />
 
       {/* Crop Advisory urgent tasks */}
-      <CropAdvisoryWidget />
+      <Suspense fallback={null}><CropAdvisoryWidget /></Suspense>
 
       {/* SECTION 3 — AI কৃষি সমাধান */}
       <AiSolutionsSection />
@@ -182,13 +182,13 @@ function Dashboard() {
       {/* SECTION 5 — Community Feed */}
       <CommunityFeedSection userName={user?.name ?? null} onCompose={() => setCreateOpen(true)} />
 
-      <CreatePostSheet
+      {createOpen && <Suspense fallback={null}><CreatePostSheet
         open={createOpen}
         onClose={() => setCreateOpen(false)}
         onCreated={() => {
           /* refresh handled via query invalidation in sheet */
         }}
-      />
+      /></Suspense>}
     </main>
   );
 }
