@@ -51,6 +51,25 @@ export function CropKnowledgePanel({ cropType, plantingDate, days, completions }
       </div>
 
       <div className="rounded-2xl bg-card ring-1 ring-border">
+        <button onClick={() => setShowBio(!showBio)} className="w-full p-4 flex items-center justify-between text-left">
+          <span className="text-sm font-bold text-foreground inline-flex items-center gap-1.5"><Leaf className="h-4 w-4 text-primary" /> জৈব রাসায়নিক ({toBn(BIO_PESTICIDES.length)})</span>
+          {showBio ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+        </button>
+        {showBio && (
+          <ul className="px-4 pb-4 space-y-2">
+            {BIO_PESTICIDES.map((b) => (
+              <li key={b.id} className="rounded-xl bg-muted/50 p-3 text-sm">
+                <p className="font-semibold text-foreground">{b.name} <span className="text-xs text-muted-foreground">({b.kind})</span></p>
+                <p className="text-foreground/80 mt-0.5">মাত্রা: {b.dose}</p>
+                <p className="text-foreground/80">{b.method}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{b.note}</p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <div className="rounded-2xl bg-card ring-1 ring-border">
         <button onClick={() => setShowIpm(!showIpm)} className="w-full p-4 flex items-center justify-between text-left">
           <span className="text-sm font-bold text-foreground inline-flex items-center gap-1.5"><ShieldAlert className="h-4 w-4 text-primary" /> লক্ষণ দেখা দিলে কী করবেন ({toBn(rules.length)})</span>
           {showIpm ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
