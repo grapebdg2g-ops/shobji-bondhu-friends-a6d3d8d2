@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { checkResistance, getChemicalInfo, getPhiDays, findCrop, getIrrigationAdvice, getIpmRules } from "./crop-knowledge";
+import { ACTIVE_INGREDIENTS, checkResistance, getChemicalInfo, getPhiDays, findCrop, getIrrigationAdvice, getIpmRules } from "./crop-knowledge";
 
 describe("crop knowledge", () => {
   it("maps Vertimec to abamectin IRAC 6 with 7-day PHI", () => {
@@ -31,5 +31,11 @@ describe("crop knowledge", () => {
   it("fruit fly rule applies to watermelon but not rice", () => {
     expect(getIpmRules(findCrop("তরমুজ")!).some((r) => r.id === "fruitfly")).toBe(true);
     expect(getIpmRules(findCrop("বোরো ধান")!).some((r) => r.id === "fruitfly")).toBe(false);
+  });
+
+  it("every active ingredient has an organic alternative", () => {
+    for (const a of ACTIVE_INGREDIENTS) {
+      expect(a.organic.length, a.id).toBeGreaterThan(10);
+    }
   });
 });
