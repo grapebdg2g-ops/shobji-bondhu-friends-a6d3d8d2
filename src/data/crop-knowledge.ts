@@ -15,6 +15,8 @@ export interface ActiveIngredient {
   phiDays: number;
   toxicity: "কম" | "মাঝারি" | "বেশি";
   safety: string;
+  /** Organic/low-toxicity alternative for the same target pest or disease. */
+  organic: string;
 }
 
 export const ACTIVE_INGREDIENTS: ActiveIngredient[] = [
