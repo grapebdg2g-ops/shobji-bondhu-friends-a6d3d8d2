@@ -13,9 +13,9 @@ import { syncSprayReminders } from "@/lib/spray-schedule";
 
 export const Route = createFileRoute("/crop-guide/new/$crop")({
   component: NewCropPlan,
-  head: ({ params }) => ({ meta: [
-    { title: `${params.crop} রোপণ পরিকল্পনা — কৃষক বন্ধু` },
-      { property: "og:title", content: `${params.crop} রোপণ পরিকল্পনা — কৃষক বন্ধু` },
+  head: () => ({ meta: [
+    { title: "নতুন ফসল রোপণ পরিকল্পনা — কৃষক বন্ধু" },
+      { property: "og:title", content: "নতুন ফসল রোপণ পরিকল্পনা — কৃষক বন্ধু" },
       { property: "og:description", content: "রোপণের তারিখ থেকে ফসলের পরিচর্যা পরিকল্পনা তৈরি করুন।" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
