@@ -170,26 +170,24 @@ function StepCrop({
       <div className="bg-white rounded-2xl p-4 shadow-sm">
         <h2 className="font-bold text-gray-900 mb-1">কোন ফসলের সার হিসাব করবেন?</h2>
         <p className="mb-3 text-[11px] leading-relaxed text-gray-500">
-          ফসলের তালিকা master crop data থেকে এসেছে। যেসব ফসলের official BARC/BARI/BRRI dose mapping
-          এখনো সম্পূর্ণ নয়, সেগুলোকে প্রাথমিক হিসাব হিসেবে দেখানো হবে—চূড়ান্ত প্রয়োগের আগে মাটি
-          পরীক্ষা করুন।
+          সব ফসল বাছাই করা যাবে। যেসব ফসলের official BARC/BARI/BRRI dose mapping এখনো সম্পূর্ণ
+          নয়, সেগুলোর হিসাব "প্রাথমিক হিসাব" হিসেবে দেখানো হবে—চূড়ান্ত প্রয়োগের আগে মাটি পরীক্ষা
+          করুন।
         </p>
         <div className="grid grid-cols-3 gap-2.5">
           {CALCULATOR_CROP_OPTIONS.map((c) => {
-            const supported = Boolean(c.calculatorId);
-            const active = cropId === c.calculatorId;
+            const id = c.calculatorId ?? `prelim:${c.id}`;
+            const preliminary = !c.calculatorId;
+            const active = cropId === id;
             return (
               <button
                 key={c.id}
                 type="button"
-                disabled={!supported}
-                onClick={() => c.calculatorId && setCropId(c.calculatorId)}
+                onClick={() => setCropId(id)}
                 className={`relative aspect-square rounded-xl border-2 flex flex-col items-center justify-center gap-1 transition ${
                   active
                     ? "border-emerald-600 bg-emerald-50"
-                    : supported
-                      ? "border-gray-200 bg-gray-50 active:bg-gray-100"
-                      : "border-gray-100 bg-gray-50/70 opacity-60"
+                    : "border-gray-200 bg-gray-50 active:bg-gray-100"
                 }`}
               >
                 {active && (
@@ -201,8 +199,8 @@ function StepCrop({
                 <span className="px-1 text-center text-[11px] font-semibold leading-tight text-gray-800">
                   {c.label}
                 </span>
-                {!supported && (
-                  <span className="text-[9px] font-semibold text-gray-400">শীঘ্রই</span>
+                {preliminary && (
+                  <span className="text-[9px] font-semibold text-amber-600">প্রাথমিক হিসাব</span>
                 )}
               </button>
             );
