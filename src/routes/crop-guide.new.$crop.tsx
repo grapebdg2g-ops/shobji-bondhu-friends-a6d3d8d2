@@ -1,3 +1,4 @@
+import { CropIcon } from "@/components/krishi/crop-icon";
 import { createFileRoute, Link, useNavigate, notFound } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowLeft, CalendarIcon } from "lucide-react";
@@ -12,6 +13,14 @@ import { syncSprayReminders } from "@/lib/spray-schedule";
 
 export const Route = createFileRoute("/crop-guide/new/$crop")({
   component: NewCropPlan,
+  head: () => ({ meta: [
+    { title: "নতুন ফসল রোপণ পরিকল্পনা — কৃষক বন্ধু" },
+      { property: "og:title", content: "নতুন ফসল রোপণ পরিকল্পনা — কৃষক বন্ধু" },
+      { property: "og:description", content: "রোপণের তারিখ থেকে ফসলের পরিচর্যা পরিকল্পনা তৈরি করুন।" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    { name: "description", content: "রোপণের তারিখ থেকে ফসলের পরিচর্যা পরিকল্পনা তৈরি করুন।" },
+  ] }),
   loader: ({ params }) => {
     const guide = FARMING_STAGES[params.crop];
     if (!guide) throw notFound();
@@ -72,7 +81,7 @@ function NewCropPlan() {
           </Link>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-4xl">{guide.icon}</span>
+          <span className="text-4xl"><CropIcon crop={crop} /></span>
           <div>
             <h1 className="text-2xl font-bold">{crop}</h1>
             <p className="text-sm text-white/85">{guide.season}</p>

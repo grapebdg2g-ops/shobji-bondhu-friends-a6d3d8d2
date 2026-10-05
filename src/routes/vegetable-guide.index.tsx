@@ -1,3 +1,4 @@
+import { CropIcon } from "@/components/krishi/crop-icon";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import { ArrowLeft, Search, Flame, TrendingUp } from "lucide-react";
@@ -10,6 +11,10 @@ export const Route = createFileRoute("/vegetable-guide/")({
   head: () => ({
     meta: [
       { title: "ফসল চাষ গাইড — কৃষক বন্ধু" },
+      { property: "og:title", content: "ফসল চাষ গাইড — কৃষক বন্ধু" },
+      { property: "og:description", content: "২৭+ ফসলের পূর্ণাঙ্গ চাষ পদ্ধতি, লাভ, ঝুঁকি ও জাত-পরিচিতি।" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "description", content: "২৭+ ফসলের পূর্ণাঙ্গ চাষ পদ্ধতি, লাভ, ঝুঁকি ও জাত-পরিচিতি।" },
     ],
   }),
@@ -127,7 +132,7 @@ function VegetableGuidePage() {
               className="bg-white rounded-2xl p-4 border border-gray-100 active:scale-[0.98] transition block"
             >
               <div className="flex items-start gap-3">
-                <span className="text-4xl shrink-0">{c.icon}</span>
+                <span className="text-4xl shrink-0"><CropIcon crop={c.id} /></span>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <h3 className="font-bold text-gray-900 text-base truncate">{c.name}</h3>

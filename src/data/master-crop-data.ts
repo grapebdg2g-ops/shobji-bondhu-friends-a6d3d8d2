@@ -2,6 +2,19 @@
 // Source: BRRI, BARI, AIS, DAE Bangladesh
 // Single source of truth for ALL features
 
+import papayaIcon from '@/assets/crops/papaya.webp'
+import cauliflowerIcon from '@/assets/crops/fulkopi.webp'
+import okraIcon from '@/assets/crops/dheros.webp'
+import bitterGourdIcon from '@/assets/crops/korola.webp'
+import bottleGourdIcon from '@/assets/crops/lau.webp'
+import pointedGourdIcon from '@/assets/crops/potol.webp'
+import beanIcon from '@/assets/crops/shim.webp'
+import yardlongBeanIcon from '@/assets/crops/borboti.webp'
+import mustardIcon from '@/assets/crops/shorisha.webp'
+import sesameIcon from '@/assets/crops/til.webp'
+import turmericIcon from '@/assets/crops/holud.webp'
+import wheatIcon from '@/assets/crops/gom.webp'
+
 // ══════════════════════════════════════
 // TYPE DEFINITIONS
 // ══════════════════════════════════════
@@ -63,6 +76,7 @@ export interface CropData {
   name: string
   nameEn: string
   icon: string
+  iconImage?: string
   category: Category
   seasons: Season[]
   plantingMonths: number[]
@@ -454,7 +468,8 @@ export const CROPS: Record<string, CropData> = {
     id: 'gom',
     name: 'গম',
     nameEn: 'Wheat',
-    icon: '🌿',
+    icon: '🌾',
+    iconImage: wheatIcon,
     category: 'ধান্য',
     seasons: ['রবি'],
     plantingMonths: [11, 12],
@@ -793,7 +808,8 @@ export const CROPS: Record<string, CropData> = {
     id: 'fulkopi',
     name: 'ফুলকপি',
     nameEn: 'Cauliflower',
-    icon: '🥦',
+    icon: '🌿',
+    iconImage: cauliflowerIcon,
     category: 'সবজি',
     seasons: ['রবি'],
     plantingMonths: [9, 10, 11],
@@ -1186,7 +1202,8 @@ export const CROPS: Record<string, CropData> = {
     id: 'dheros',
     name: 'ঢেঁড়স',
     nameEn: 'Okra',
-    icon: '🫑',
+    icon: '🌿',
+    iconImage: okraIcon,
     category: 'সবজি',
     seasons: ['খরিফ-১', 'খরিফ-২', 'রবি'],
     plantingMonths: [2, 3, 7, 8],
@@ -1355,7 +1372,8 @@ export const CROPS: Record<string, CropData> = {
     id: 'korola',
     name: 'করলা',
     nameEn: 'Bitter Gourd',
-    icon: '🫑',
+    icon: '🌿',
+    iconImage: bitterGourdIcon,
     category: 'সবজি',
     seasons: ['খরিফ-১', 'রবি'],
     plantingMonths: [1, 2, 7, 8],
@@ -1438,7 +1456,8 @@ export const CROPS: Record<string, CropData> = {
     id: 'lau',
     name: 'লাউ',
     nameEn: 'Bottle Gourd',
-    icon: '🎃',
+    icon: '🌿',
+    iconImage: bottleGourdIcon,
     category: 'সবজি',
     seasons: ['রবি', 'খরিফ-১'],
     plantingMonths: [9, 10, 3, 4],
@@ -1604,7 +1623,8 @@ export const CROPS: Record<string, CropData> = {
     id: 'potol',
     name: 'পটল',
     nameEn: 'Pointed Gourd',
-    icon: '🥒',
+    icon: '🌿',
+    iconImage: pointedGourdIcon,
     category: 'সবজি',
     seasons: ['রবি', 'খরিফ-১'],
     plantingMonths: [10, 11, 1, 2],
@@ -1687,7 +1707,8 @@ export const CROPS: Record<string, CropData> = {
     id: 'shim',
     name: 'শিম',
     nameEn: 'Bean',
-    icon: '🫘',
+    icon: '🌿',
+    iconImage: beanIcon,
     category: 'সবজি',
     seasons: ['রবি'],
     plantingMonths: [8, 9, 10],
@@ -1770,7 +1791,8 @@ export const CROPS: Record<string, CropData> = {
     id: 'borboti',
     name: 'বরবটি',
     nameEn: 'Yard Long Bean',
-    icon: '🫘',
+    icon: '🌿',
+    iconImage: yardlongBeanIcon,
     category: 'সবজি',
     seasons: ['খরিফ-১', 'রবি'],
     plantingMonths: [2, 3, 8, 9],
@@ -1958,7 +1980,8 @@ export const CROPS: Record<string, CropData> = {
     id: 'shorisha',
     name: 'সরিষা',
     nameEn: 'Mustard',
-    icon: '🌻',
+    icon: '🌼',
+    iconImage: mustardIcon,
     category: 'তেল',
     seasons: ['রবি'],
     plantingMonths: [10, 11],
@@ -2121,6 +2144,7 @@ export const CROPS: Record<string, CropData> = {
     name: 'তিল',
     nameEn: 'Sesame',
     icon: '🌿',
+    iconImage: sesameIcon,
     category: 'তেল',
     seasons: ['খরিফ-১'],
     plantingMonths: [3, 4],
@@ -2380,6 +2404,7 @@ export const CROPS: Record<string, CropData> = {
     name: 'হলুদ',
     nameEn: 'Turmeric',
     icon: '🌿',
+    iconImage: turmericIcon,
     category: 'মসলা',
     seasons: ['খরিফ-১'],
     plantingMonths: [3, 4],
@@ -2653,6 +2678,60 @@ export const CROPS: Record<string, CropData> = {
     badCompanions: ['মটরশুটি'],
     govtSupport: ['সার ভর্তুকি', 'মসলা প্রণোদনা'],
     tips: ['বীজ রসুন ব্যয়বহুল — ভালো উৎস থেকে কিনুন', 'শুকিয়ে বিক্রি করলে দাম বেশি'],
+  },
+  // Papaya: cultivation reference https://www.bamis.gov.bd/en/crops/view/67/
+  // Budget, yield and land-based fertilizer mapping are preliminary estimates.
+  'papaya': {
+    id: 'papaya', name: 'পেঁপে', nameEn: 'Papaya', icon: '🌿', iconImage: papayaIcon,
+    category: 'সবজি', seasons: ['সারা বছর'],
+    plantingMonths: [2, 3, 9, 10], harvestMonths: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+    totalDays: 365, soilTypes: ['দোআঁশ', 'বেলে-দোআঁশ'],
+    waterRequirement: 'মাঝারি', irrigationNeeded: true, phRange: { min: 6.0, max: 7.0 },
+    seedCostPerBigha: 6000, fertilizerCost: 10000, pesticideCost: 3000, laborCost: 12000, otherCost: 4000,
+    get totalCost() { return this.seedCostPerBigha + this.fertilizerCost + this.pesticideCost + this.laborCost + this.otherCost },
+    yieldMin: 100, yieldMax: 180, avgMarketPrice: 600,
+    get profitMin() { return this.yieldMin * this.avgMarketPrice - this.totalCost },
+    get profitMax() { return this.yieldMax * this.avgMarketPrice - this.totalCost },
+    get roi() { return Math.round((this.profitMin + this.profitMax) / 2 / this.totalCost * 100) },
+    riskLevel: 'মাঝারি', riskFactors: ['জলাবদ্ধতায় গোড়া পচা', 'রিং স্পট ভাইরাস ও মিলিবাগ', 'ঝড়ে গাছ ভেঙে যাওয়া'],
+    varieties: [{ name: 'বারি পেঁপে-১ (শাহী)', type: 'উফশী', daysToHarvest: 270, yieldPerBigha: 140 }],
+    stages: [
+      { id: 'planting', name: 'চারা রোপণ', icon: '🌱', startDay: 0, endDay: 30, tasks: [
+        { title: 'জমি ও গর্ত প্রস্তুত', type: 'preparation', urgency: 'জরুরি', desc: 'পানি নিষ্কাশনযোগ্য উঁচু জমিতে প্রায় ২×২ মিটার দূরত্বে গর্ত তৈরি করুন। পচা জৈব সার মাটিতে মিশিয়ে রোপণের আগে প্রস্তুত রাখুন।' },
+        { title: 'সুস্থ চারা রোপণ', type: 'task', urgency: 'জরুরি', desc: '৪০–৫০ দিনের সুস্থ চারা লাগান। গোড়ায় পানি জমতে দেবেন না। এই পরিকল্পনায় দিন গণনা মাঠে চারা রোপণ থেকে।' },
+      ] },
+      { id: 'vegetative', name: 'গাছের বৃদ্ধি', icon: '🌿', startDay: 30, endDay: 100, tasks: [
+        { title: 'কিস্তিতে সার প্রয়োগ', type: 'fertilizer', urgency: 'জরুরি', desc: 'গাছের বয়স ও মাটি পরীক্ষার ভিত্তিতে সার ভাগ করে দিন; কাণ্ডের গায়ে সার লাগাবেন না।' },
+        { title: 'মিলিবাগ পর্যবেক্ষণ', type: 'pest', urgency: 'জরুরি', desc: 'পাতার নিচে ও কাণ্ডে সাদা তুলার মতো পোকা দেখুন। আক্রান্ত অংশ সরান ও স্থানীয় কৃষি কর্মকর্তার পরামর্শ নিন।' },
+        { title: 'সেচ ও নালা পরিষ্কার', type: 'irrigation', urgency: 'জরুরি', desc: 'মাটি শুকালে হালকা সেচ দিন; বৃষ্টির পানি দ্রুত বের করুন।' },
+      ] },
+      { id: 'flowering', name: 'ফুল ও ফল ধরা', icon: '🌸', startDay: 100, endDay: 180, tasks: [
+        { title: 'ফুল ও পরাগায়ন পর্যবেক্ষণ', type: 'task', urgency: 'সাধারণ', desc: 'জাত অনুযায়ী পুরুষ ও স্ত্রী গাছ শনাক্ত করুন; পরাগায়নের জন্য প্রয়োজনীয় পুরুষ গাছ রাখুন।' },
+        { title: 'রিং স্পট ভাইরাস পর্যবেক্ষণ', type: 'disease', urgency: 'জরুরি', desc: 'ফলে বলয় দাগ, মোজাইক বা পাতা বিকৃত হলে রোগ নিশ্চিত করুন। ভাইরাসে আক্রান্ত গাছ আলাদা করুন; ভাইরাস সারাতে ছত্রাকনাশক ব্যবহার করবেন না।' },
+      ] },
+      { id: 'fruit-growth', name: 'ফল বড় হওয়া', icon: '🌿', startDay: 180, endDay: 270, tasks: [
+        { title: 'গাছের খুঁটি ও ফল পরিচর্যা', type: 'task', urgency: 'জরুরি', desc: 'ঝড়ের আগে খুঁটি দিন। রোগাক্রান্ত ফল সরান; কাঁচা সবজি হিসেবে উপযুক্ত পূর্ণ আকারের ফল সংগ্রহ করা যায়।' },
+        { title: 'গোড়া পচা পর্যবেক্ষণ', type: 'disease', urgency: 'জরুরি', desc: 'গোড়া নরম বা পাতা ঢলে পড়লে পানি নিষ্কাশন করুন ও রোগ নির্ণয়ের পর ব্যবস্থা নিন।' },
+      ] },
+      { id: 'harvest', name: 'ফল সংগ্রহ ও চলমান পরিচর্যা', icon: '🧺', startDay: 270, endDay: 365, tasks: [
+        { title: 'পাকা পেঁপে সংগ্রহ', type: 'harvest', urgency: 'জরুরি', desc: 'ফলের গায়ে হলুদ রং দেখা দিলে বাজারের দূরত্ব অনুযায়ী সংগ্রহ করুন। সাধারণত রোপণের ৮–৯ মাসে পাকা ফল শুরু; জাত ও আবহাওয়ায় সময় বদলায়।' },
+        { title: 'চলমান সংগ্রহ ও পরিচর্যা', type: 'post-harvest', urgency: 'সাধারণ', desc: 'ফল নরম না করে পরিষ্কার ঝুড়িতে রাখুন। এক বছর এই পরিকল্পনার সময়সীমা; গাছ ফল দেওয়া বন্ধ হওয়ার নির্দিষ্ট সময় নয়।' },
+      ] },
+    ],
+    fertilizerGuide: {
+      // Approx. 330 plants/bigha at 2×2 m spacing. Not an official land-based dose mapping.
+      perBigha: { urea: 148.5, tsp: 165, mop: 156.75, gypsum: 82.5, zinc: 6.6, boron: 6.6 },
+      soilAdjustment: { 'এঁটেল': {}, 'দোআঁশ': {}, 'বালি': {}, 'পলি': {}, 'বেলে-দোআঁশ': {} },
+      schedule: [
+        { timing: 'গর্ত তৈরির সময়', items: ['পচা জৈব সার', 'মাটি পরীক্ষাভিত্তিক ফসফরাস'], note: 'গাছপ্রতি নির্দেশনা ও গাছসংখ্যা অনুযায়ী হিসাব করুন।' },
+        { timing: 'রোপণের পর বৃদ্ধি ও ফলধরা পর্যায়', items: ['ইউরিয়া ও পটাশ কিস্তিতে'], note: 'পুরো পরিমাণ একবারে নয়; গাছের বয়স ও স্থানীয় সুপারিশ অনুযায়ী ভাগ করুন।' },
+      ],
+      warnings: ['প্রাথমিক হিসাব: ২×২ মিটার দূরত্বে বিঘায় প্রায় ৩৩০ গাছ ধরে প্রথম বছরের আনুমানিক পরিমাণ; official BARC/BARI/BRRI land-based dose mapping নয়।', 'গাছসংখ্যা, বয়স ও মাটি পরীক্ষা অনুযায়ী মাত্রা নির্ধারণ করুন। বোরন ও জিঙ্কের মাত্রা কৃষি কর্মকর্তার মাধ্যমে নিশ্চিত করুন।'],
+    },
+    calendarEvents: [2, 3, 9, 10].map(month => ({ month, type: 'planting' as const, title: 'পেঁপের চারা রোপণ', desc: 'পানি নিষ্কাশনযোগ্য জমিতে সুস্থ চারা রোপণ করুন।' })),
+    bestSellingMonths: [3, 4, 5, 6], demandLevel: 'বেশি', exportPotential: false,
+    goodCompanions: [], badCompanions: [], govtSupport: [],
+    tips: ['কাঁচা পেঁপে সবজি এবং পাকা পেঁপে ফল হিসেবে বিক্রি করা যায়।', 'খরচ, ফলন ও বাজারদর প্রাথমিক পরিকল্পনার অনুমান—লাইভ বাজারদর বা নিশ্চিত লাভ নয়।', 'চাষের তথ্যসূত্র: BAMIS পেঁপে নির্দেশিকা; জাত, জমি ও এলাকার জন্য স্থানীয় কৃষি কর্মকর্তার পরামর্শ নিন।'],
   },
 }
 

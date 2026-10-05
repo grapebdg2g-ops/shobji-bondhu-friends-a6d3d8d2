@@ -1,12 +1,18 @@
+import { CropIcon } from "@/components/krishi/crop-icon";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowLeft, Sprout, ChevronRight } from "lucide-react";
+import { ArrowLeft, ChevronRight } from "lucide-react";
 import { getCropsForMonth } from "@/data/master-crop-data";
 import { toBn } from "@/lib/bn";
 
 export const Route = createFileRoute("/ai-bondhu/calendar")({
   component: CalendarPage,
-  head: () => ({ meta: [{ title: "চাষের ক্যালেন্ডার — কৃষক বন্ধু" }] }),
+  head: () => ({ meta: [{ title: "চাষের ক্যালেন্ডার — কৃষক বন্ধু" },
+      { property: "og:title", content: "চাষের ক্যালেন্ডার — কৃষক বন্ধু" },
+      { property: "og:description", content: "ফসলের পরিচর্যা ও কৃষি পরিকল্পনা — কৃষক বন্ধু।" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { name: "description", content: "ফসলের পরিচর্যা ও কৃষি পরিকল্পনা — কৃষক বন্ধু।" },] }),
 });
 
 const MONTHS = [
@@ -56,7 +62,7 @@ function CalendarPage() {
             className="bg-white rounded-2xl p-4 border border-gray-100 flex items-center gap-3 active:scale-[0.99] transition"
           >
             <div className="h-12 w-12 rounded-xl bg-emerald-100 flex items-center justify-center text-2xl">
-              {c.icon || <Sprout className="h-6 w-6 text-emerald-700" />}
+              <CropIcon crop={c.id} />
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="font-bold text-gray-900">{c.name}</h3>

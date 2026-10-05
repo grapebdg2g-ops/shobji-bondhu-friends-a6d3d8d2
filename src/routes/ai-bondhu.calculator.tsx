@@ -1,3 +1,4 @@
+import { CropIcon } from "@/components/krishi/crop-icon";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
@@ -34,7 +35,12 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/ai-bondhu/calculator")({
   component: CalculatorPage,
-  head: () => ({ meta: [{ title: "সার ক্যালকুলেটর — কৃষক বন্ধু" }] }),
+  head: () => ({ meta: [{ title: "সার ক্যালকুলেটর — কৃষক বন্ধু" },
+      { property: "og:title", content: "সার ক্যালকুলেটর — কৃষক বন্ধু" },
+      { property: "og:description", content: "ফসলের পরিচর্যা ও কৃষি পরিকল্পনা — কৃষক বন্ধু।" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { name: "description", content: "ফসলের পরিচর্যা ও কৃষি পরিকল্পনা — কৃষক বন্ধু।" },] }),
 });
 
 function bn1(n: number) {
@@ -195,7 +201,7 @@ function StepCrop({
                     <Check className="h-3 w-3 text-white" />
                   </span>
                 )}
-                <span className="text-2xl">{c.icon}</span>
+                <span className="text-2xl"><CropIcon crop={c.id} /></span>
                 <span className="px-1 text-center text-[11px] font-semibold leading-tight text-gray-800">
                   {c.label}
                 </span>
@@ -456,7 +462,7 @@ function StepResult({
         <div className="flex items-start justify-between gap-3">
           <div>
             <h2 className="font-bold text-gray-900 text-lg">
-              {crop.emoji} {crop.label} — {toBn(amount)} {UNIT_LABEL[unit]}
+              <CropIcon crop={crop.label} fallback={crop.emoji} /> {crop.label} — {toBn(amount)} {UNIT_LABEL[unit]}
             </h2>
             <p className="text-xs text-gray-500 mt-0.5">
               {bn1(shotok)} শতাংশ • {soilLabel} • {stage.label}

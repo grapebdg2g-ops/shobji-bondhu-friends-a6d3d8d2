@@ -1,3 +1,4 @@
+import { CropIcon } from "@/components/krishi/crop-icon";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ArrowLeft, Plus, ChevronRight, Check, Trash2, RotateCcw } from "lucide-react";
@@ -22,6 +23,10 @@ export const Route = createFileRoute("/crop-guide/")({
   head: () => ({
     meta: [
       { title: "ফসল পরামর্শ — কৃষক বন্ধু" },
+      { property: "og:title", content: "ফসল পরামর্শ — কৃষক বন্ধু" },
+      { property: "og:description", content: "রোপণ থেকে বিক্রি পর্যন্ত সম্পূর্ণ ফসল চাষ গাইড।" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "description", content: "রোপণ থেকে বিক্রি পর্যন্ত সম্পূর্ণ ফসল চাষ গাইড।" },
     ],
   }),
@@ -138,7 +143,7 @@ function CropGuideIndex() {
                   <Link to="/crop-guide/plan/$planId" params={{ planId: p.id }} className="block">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        <span className="text-2xl">{guide.icon}</span>
+                        <span className="text-2xl"><CropIcon crop={p.crop_type} /></span>
                         <span className={`font-bold ${done ? "text-gray-500 line-through" : "text-gray-900"}`}>{p.crop_type}</span>
                         {done && <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700">চাষ সম্পন্ন ✅</span>}
                       </div>
@@ -191,7 +196,7 @@ function CropGuideIndex() {
                 params={{ crop }}
                 className="bg-white rounded-2xl p-4 shadow-sm ring-1 ring-gray-100 flex flex-col items-center text-center active:scale-95 transition"
               >
-                <span className="text-4xl mb-2">{g.icon}</span>
+                <span className="text-4xl mb-2"><CropIcon crop={crop} /></span>
                 <span className="font-bold text-gray-900 text-sm">{crop}</span>
                 <span className="text-[11px] text-gray-500 mt-1 line-clamp-1">{g.season}</span>
               </Link>

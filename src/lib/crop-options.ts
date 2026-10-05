@@ -48,6 +48,7 @@ export const POPULAR_CROP_OPTIONS = [
   "রসুন",
   "ভুট্টা",
   "বেগুন",
+  "পেঁপে",
 ]
   .map((label) => getCropOptionByLabel(label))
   .filter((crop): crop is CropOption => Boolean(crop));
