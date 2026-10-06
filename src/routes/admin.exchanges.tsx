@@ -70,10 +70,6 @@ function ExchangesPage() {
       toast.success("আপডেট হয়েছে");
       qc.invalidateQueries({ queryKey: ["admin", "exchanges"] });
     },
-    onError: (_error, _value, context) => {
-      qc.setQueryData(["admin", "exchanges"], context?.previous);
-      toast.error("আপডেট ব্যর্থ");
-    },
   });
 
   return (
