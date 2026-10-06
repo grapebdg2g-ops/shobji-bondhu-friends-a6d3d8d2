@@ -8,7 +8,7 @@ export const cropCompletionsKey = (userId: string | null) => ["crop-task-complet
 
 export function useCropCompletions(userId: string | null) {
   const queryClient = useQueryClient();
-  const queryKey = cropCompletionsKey(userId);
+  const queryKey = useMemo(() => cropCompletionsKey(userId), [userId]);
   const query = useQuery({
     queryKey,
     enabled: !!userId,

@@ -101,6 +101,32 @@ export function useFeed(
     load(true);
   }, [load]);
 
+  useEffect(() => {
+    const channel = supabase
+      .channel(`shared-feed-${filters.districtMode}-${filters.district ?? "none"}-${myDistrict ?? "none"}-${myUpazila ?? "none"}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "posts" }, (payload) => {
+        if (payload.eventType === "DELETE") {
+          removeById((payload.old as { id: string }).id);
+          return;
+        }
+        const incoming = payload.new as Post;
+        if (mutedIds.includes(incoming.user_id)) return;
+        const districtMatches = filters.districtMode === "all"
+          || (filters.districtMode === "myDistrict" && incoming.district === myDistrict)
+          || (filters.districtMode === "myUpazila" && incoming.district === myDistrict && incoming.upazila === myUpazila)
+          || (filters.districtMode === "specific" && incoming.district === filters.district);
+        const cropMatches = !filters.crop || incoming.crop_tag === filters.crop;
+        const typeMatches = filters.types.length === 0 || filters.types.includes(incoming.type);
+        if (!districtMatches || !cropMatches || !typeMatches) return;
+        setPosts((current) => {
+          const exists = current.some((post) => post.id === incoming.id);
+          return exists ? current.map((post) => post.id === incoming.id ? incoming : post) : [incoming, ...current];
+        });
+      })
+      .subscribe();
+    return () => { void supabase.removeChannel(channel); };
+  }, [filters, mutedIds, myDistrict, myUpazila, removeById]);
+
   const loadMore = useCallback(() => {
     if (loading || loadingMore || !hasMore) return;
     load(false);

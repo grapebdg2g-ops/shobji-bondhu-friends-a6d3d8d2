@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/contexts/user-context";
@@ -71,6 +71,18 @@ export function usePostReactions(postId: string, visiblePostIds: string[] = [pos
     },
     staleTime: 30_000,
   });
+
+  useEffect(() => {
+    if (postIds.length === 0) return;
+    const channel = supabase
+      .channel(`post-reactions-${postIdsKey}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "post_reactions" }, (payload) => {
+        const changed = (payload.new as Partial<PostReaction>).post_id ?? (payload.old as Partial<PostReaction>).post_id;
+        if (changed && postIds.includes(changed)) void queryClient.invalidateQueries({ queryKey });
+      })
+      .subscribe();
+    return () => { void supabase.removeChannel(channel); };
+  }, [postIds, postIdsKey, queryClient, queryKey]);
 
   const state = useMemo<ReactionState>(() => {
     const counts = emptyReactionCounts();

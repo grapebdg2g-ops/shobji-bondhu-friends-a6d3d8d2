@@ -7,6 +7,7 @@ import { useUser } from "@/contexts/user-context";
 import { FARMING_STAGES, type FarmingTask } from "@/data/farming-guide";
 import { daysSince } from "@/lib/bn-date";
 import { toBn } from "@/lib/bn";
+import { useCropCompletions } from "@/hooks/use-crop-completions";
 
 type Plan = { id: string; crop_type: string; planting_date: string };
 
@@ -16,6 +17,7 @@ export function CropAdvisoryWidget() {
   const { user } = useUser();
   const [items, setItems] = useState<UrgentItem[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const { keys: completions } = useCropCompletions(user?.id ?? null);
 
   useEffect(() => {
     if (!user) return;
@@ -33,13 +35,14 @@ export function CropAdvisoryWidget() {
         const days = Math.max(0, daysSince(p.planting_date));
         const stage = guide.stages.find((s) => days >= s.startDay && days < s.endDay);
         if (!stage || stage.tasks.length === 0) continue;
-        urgent.push({ plan: p, task: stage.tasks[0], stageName: stage.name });
+        const pendingIndex = stage.tasks.findIndex((_task, index) => !completions.has(`${p.id}::${stage.id}::${index}`));
+        if (pendingIndex >= 0) urgent.push({ plan: p, task: stage.tasks[pendingIndex], stageName: stage.name });
         if (urgent.length >= 2) break;
       }
       setItems(urgent);
       setLoaded(true);
     })();
-  }, [user]);
+  }, [completions, user]);
 
   if (!loaded || items.length === 0) return null;
 

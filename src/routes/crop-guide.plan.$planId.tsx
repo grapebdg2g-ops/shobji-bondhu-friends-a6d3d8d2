@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { SprayScheduleSection } from "@/components/krishi/spray-schedule-section";
 import { markSprayReminderDone } from "@/lib/spray-schedule";
 import { CropKnowledgePanel } from "@/components/krishi/crop-knowledge-panel";
+import { useCropCompletions } from "@/hooks/use-crop-completions";
 
 export const Route = createFileRoute("/crop-guide/plan/$planId")({
   component: PlanAdvisory,
@@ -46,7 +47,7 @@ function PlanAdvisory() {
   const navigate = useNavigate();
   const { user, loading } = useUser();
   const [plan, setPlan] = useState<Plan | null>(null);
-  const [completions, setCompletions] = useState<Set<string>>(new Set());
+  const { keys: allCompletions, complete } = useCropCompletions(user?.id ?? null);
   const [openStages, setOpenStages] = useState<Set<string>>(new Set());
   const [activeTask, setActiveTask] = useState<{ task: FarmingTask; stage: FarmingStage; idx: number } | null>(null);
   const [loaded, setLoaded] = useState(false);
@@ -62,16 +63,15 @@ function PlanAdvisory() {
         .eq("id", planId)
         .maybeSingle();
       setPlan((p as Plan | null) ?? null);
-      const { data: c } = await supabase
-        .from("crop_task_completions" as never)
-        .select("task_id")
-        .eq("plan_id", planId);
-      setCompletions(new Set((c as { task_id: string }[] | null)?.map((r) => r.task_id) ?? []));
       setLoaded(true);
     })();
   }, [loading, user, planId, navigate]);
 
   const guide = plan ? FARMING_STAGES[plan.crop_type] : null;
+  const completions = useMemo(
+    () => new Set([...allCompletions].filter((key) => key.startsWith(`${planId}::`)).map((key) => key.slice(planId.length + 2))),
+    [allCompletions, planId],
+  );
   const days = plan ? Math.max(0, daysSince(plan.planting_date)) : 0;
   const currentStage = useMemo(() => {
     if (!guide) return null;
@@ -121,14 +121,12 @@ function PlanAdvisory() {
     if (!user) return;
     const tid = taskId(stageId, idx);
     if (completions.has(tid)) return;
-    const { error } = await supabase
-      .from("crop_task_completions" as never)
-      .insert({ user_id: user.id, plan_id: planId, task_id: tid } as never);
-    if (error) {
+    try {
+      await complete.mutateAsync({ planId, taskId: tid });
+    } catch {
       toast.error("সংরক্ষণ ব্যর্থ");
       return;
     }
-    setCompletions((p) => new Set(p).add(tid));
     toast.success("কাজ সম্পন্ন হিসেবে চিহ্নিত");
   }
 
@@ -225,11 +223,9 @@ function PlanAdvisory() {
           completions={completions}
           onComplete={async (tid) => {
             if (completions.has(tid)) return;
-            const { error } = await supabase
-              .from("crop_task_completions" as never)
-              .insert({ user_id: user.id, plan_id: planId, task_id: tid } as never);
-            if (error) { toast.error("সংরক্ষণ ব্যর্থ"); return; }
-            setCompletions((p) => new Set(p).add(tid));
+            try {
+              await complete.mutateAsync({ planId, taskId: tid });
+            } catch { toast.error("সংরক্ষণ ব্যর্থ"); return; }
             await markSprayReminderDone(planId, plan.crop_type, plan.planting_date, tid).catch(() => {});
             toast.success("স্প্রে সম্পন্ন হিসেবে চিহ্নিত");
           }}

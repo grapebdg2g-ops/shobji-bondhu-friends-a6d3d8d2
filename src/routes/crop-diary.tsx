@@ -21,6 +21,7 @@ import { MASTER_CROP_LABELS } from "@/lib/crop-options";
 import { FARMING_STAGES, type FarmingTask } from "@/data/farming-guide";
 import { daysSince } from "@/lib/bn-date";
 import { toBn } from "@/lib/bn";
+import { useCropCompletions } from "@/hooks/use-crop-completions";
 
 export const Route = createFileRoute("/crop-diary")({
   component: CropDiaryPage,
@@ -72,7 +73,7 @@ function CropDiaryPage() {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [entries, setEntries] = useState<DiaryEntry[]>([]);
   const [reminders, setReminders] = useState<Reminder[]>([]);
-  const [completions, setCompletions] = useState<Set<string>>(new Set());
+  const { keys: completions, complete } = useCropCompletions(user?.id ?? null);
   const [loading, setLoading] = useState(true);
   const [diaryOpen, setDiaryOpen] = useState(false);
   const [reminderOpen, setReminderOpen] = useState(false);
@@ -107,23 +108,6 @@ function CropDiaryPage() {
       setPlans(nextPlans);
       setEntries((diaryRows as DiaryEntry[] | null) ?? []);
       setReminders((reminderRows as Reminder[] | null) ?? []);
-      if (nextPlans.length > 0) {
-        const { data: completionRows } = await supabase
-          .from("crop_task_completions" as never)
-          .select("plan_id, task_id")
-          .eq("user_id", user.id)
-          .in(
-            "plan_id",
-            nextPlans.map((p) => p.id),
-          );
-        setCompletions(
-          new Set(
-            ((completionRows as { plan_id: string; task_id: string }[] | null) ?? []).map(
-              (r) => `${r.plan_id}::${r.task_id}`,
-            ),
-          ),
-        );
-      }
       setLoading(false);
     })();
   }, [user]);
@@ -155,14 +139,12 @@ function CropDiaryPage() {
   async function toggleTask(item: TodayTask) {
     if (!user || completions.has(`${item.plan.id}::${item.taskId}`)) return;
     const key = `${item.plan.id}::${item.taskId}`;
-    const { error } = await supabase
-      .from("crop_task_completions" as never)
-      .insert({ user_id: user.id, plan_id: item.plan.id, task_id: item.taskId } as never);
-    if (error) {
+    try {
+      await complete.mutateAsync({ planId: item.plan.id, taskId: item.taskId });
+    } catch {
       toast.error("কাজ সম্পন্ন করা যায়নি");
       return;
     }
-    setCompletions((current) => new Set(current).add(key));
     toast.success("আজকের কাজ সম্পন্ন হয়েছে");
   }
 
