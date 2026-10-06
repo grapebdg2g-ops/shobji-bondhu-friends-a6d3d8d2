@@ -10,16 +10,17 @@ import {
 import { UNIT_LABEL, UNIT_TO_SHOTOK, type Unit } from "@/data/fertilizer-guide";
 import { MASTER_CROP_LABELS } from "@/lib/crop-options";
 import { toBn } from "@/lib/bn";
+import { useOrganicGuideVideos } from "@/hooks/use-organic-guide-videos";
 
 export const Route = createFileRoute("/organic-fertilizer")({
   component: OrganicFertilizerPage,
   head: () => ({
     meta: [
-      { title: "জৈব সার গাইড — সবজি বন্ধু" },
+      { title: "জৈব কর্নার — কৃষক বন্ধু" },
       {
         name: "description",
         content:
-          "গোবর, কম্পোস্ট, ভার্মি কম্পোস্ট, সবুজ সার ও জৈব বালাইনাশক তৈরির সম্পূর্ণ বাংলা গাইড।",
+          "নিজে জমির জৈব সার নিজেই উৎপাদন করুন—গোবর, কম্পোস্ট, ভার্মি কম্পোস্ট ও জৈব বালাইনাশকের বাংলা গাইড।",
       },
     ],
   }),
@@ -59,6 +60,11 @@ function OrganicFertilizerPage() {
   const navigate = useNavigate();
   const [active, setActive] = useState<OrganicFertilizerKey>("goborSar");
   const item = ORGANIC_FERTILIZER_GUIDE[active] as any;
+  const { data: managedVideos = [] } = useOrganicGuideVideos();
+  const activeVideos = managedVideos.filter((video) => video.guide_key === active);
+  const videos = activeVideos.length > 0
+    ? activeVideos.map((video) => ({ title: video.title, url: video.youtube_url, source: video.source, duration: video.duration }))
+    : (item.videoLinks ?? []);
 
   return (
     <main className="min-h-screen bg-[#F0FFF4] md:max-w-[560px] md:mx-auto pb-20">
@@ -74,8 +80,8 @@ function OrganicFertilizerPage() {
         >
           <ArrowLeft className="h-5 w-5" />
         </button>
-        <h1 className="mt-4 text-2xl font-bold text-white">🌿 জৈব সার</h1>
-        <p className="text-sm text-white/85 mt-1">প্রকৃতির সেরা উপহার</p>
+        <h1 className="mt-4 text-2xl font-bold text-white">🌿 জৈব কর্নার</h1>
+        <p className="text-sm text-white/85 mt-1">নিজে জমির জৈব সার নিজেই উৎপাদন করুন</p>
       </header>
 
       {/* Tabs */}
@@ -166,10 +172,10 @@ function OrganicFertilizerPage() {
         )}
 
         {/* SECTION 5 — Videos */}
-        {item.videoLinks && (
+        {videos.length > 0 && (
           <Card title="ভিডিও গাইড 📹">
             <ul className="space-y-2">
-              {item.videoLinks.map((v: any) => (
+              {videos.map((v: any) => (
                 <li key={v.url}>
                   <button
                     onClick={() => window.open(v.url, "_blank", "noopener,noreferrer")}
