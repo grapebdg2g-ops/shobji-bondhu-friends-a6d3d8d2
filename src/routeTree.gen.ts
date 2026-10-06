@@ -39,6 +39,7 @@ import { Route as AdminContentRouteImport } from './routes/admin.content'
 import { Route as AdminDiseasesRouteImport } from './routes/admin.diseases'
 import { Route as AdminExchangesRouteImport } from './routes/admin.exchanges'
 import { Route as AdminNotifyRouteImport } from './routes/admin.notify'
+import { Route as AdminOrganicVideosRouteImport } from './routes/admin.organic-videos'
 import { Route as AdminPricesRouteImport } from './routes/admin.prices'
 import { Route as AdminProRouteImport } from './routes/admin.pro'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
@@ -218,6 +219,11 @@ const AdminNotifyRoute = AdminNotifyRouteImport.update({
   path: '/notify',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminOrganicVideosRoute = AdminOrganicVideosRouteImport.update({
+  id: '/organic-videos',
+  path: '/organic-videos',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminPricesRoute = AdminPricesRouteImport.update({
   id: '/prices',
   path: '/prices',
@@ -394,6 +400,7 @@ export interface FileRoutesByFullPath {
   '/admin/diseases': typeof AdminDiseasesRoute
   '/admin/exchanges': typeof AdminExchangesRoute
   '/admin/notify': typeof AdminNotifyRoute
+  '/admin/organic-videos': typeof AdminOrganicVideosRoute
   '/admin/prices': typeof AdminPricesRoute
   '/admin/pro': typeof AdminProRoute
   '/admin/reports': typeof AdminReportsRoute
@@ -452,6 +459,7 @@ export interface FileRoutesByTo {
   '/admin/diseases': typeof AdminDiseasesRoute
   '/admin/exchanges': typeof AdminExchangesRoute
   '/admin/notify': typeof AdminNotifyRoute
+  '/admin/organic-videos': typeof AdminOrganicVideosRoute
   '/admin/prices': typeof AdminPricesRoute
   '/admin/pro': typeof AdminProRoute
   '/admin/reports': typeof AdminReportsRoute
@@ -513,6 +521,7 @@ export interface FileRoutesById {
   '/admin/diseases': typeof AdminDiseasesRoute
   '/admin/exchanges': typeof AdminExchangesRoute
   '/admin/notify': typeof AdminNotifyRoute
+  '/admin/organic-videos': typeof AdminOrganicVideosRoute
   '/admin/prices': typeof AdminPricesRoute
   '/admin/pro': typeof AdminProRoute
   '/admin/reports': typeof AdminReportsRoute
@@ -575,6 +584,7 @@ export interface FileRouteTypes {
     | '/admin/diseases'
     | '/admin/exchanges'
     | '/admin/notify'
+    | '/admin/organic-videos'
     | '/admin/prices'
     | '/admin/pro'
     | '/admin/reports'
@@ -633,6 +643,7 @@ export interface FileRouteTypes {
     | '/admin/diseases'
     | '/admin/exchanges'
     | '/admin/notify'
+    | '/admin/organic-videos'
     | '/admin/prices'
     | '/admin/pro'
     | '/admin/reports'
@@ -693,6 +704,7 @@ export interface FileRouteTypes {
     | '/admin/diseases'
     | '/admin/exchanges'
     | '/admin/notify'
+    | '/admin/organic-videos'
     | '/admin/prices'
     | '/admin/pro'
     | '/admin/reports'
@@ -980,6 +992,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminNotifyRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/organic-videos': {
+      id: '/admin/organic-videos'
+      path: '/organic-videos'
+      fullPath: '/admin/organic-videos'
+      preLoaderRoute: typeof AdminOrganicVideosRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/prices': {
       id: '/admin/prices'
       path: '/prices'
@@ -1186,6 +1205,7 @@ interface AdminRouteChildren {
   AdminDiseasesRoute: typeof AdminDiseasesRoute
   AdminExchangesRoute: typeof AdminExchangesRoute
   AdminNotifyRoute: typeof AdminNotifyRoute
+  AdminOrganicVideosRoute: typeof AdminOrganicVideosRoute
   AdminPricesRoute: typeof AdminPricesRoute
   AdminProRoute: typeof AdminProRoute
   AdminReportsRoute: typeof AdminReportsRoute
@@ -1200,6 +1220,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminDiseasesRoute: AdminDiseasesRoute,
   AdminExchangesRoute: AdminExchangesRoute,
   AdminNotifyRoute: AdminNotifyRoute,
+  AdminOrganicVideosRoute: AdminOrganicVideosRoute,
   AdminPricesRoute: AdminPricesRoute,
   AdminProRoute: AdminProRoute,
   AdminReportsRoute: AdminReportsRoute,

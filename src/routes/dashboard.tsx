@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Bell,
@@ -21,6 +21,7 @@ import {
   CloudRain,
   ArrowUpRight,
   Activity,
+  Recycle,
   UserCheck,
   UserPlus,
   X,
@@ -221,20 +222,12 @@ const AI_CARDS = [
     iconColor: "text-orange-700",
   },
   {
-    href: "/ai-bondhu/calculator",
-    Icon: FlaskConical,
-    title: "সার ক্যালকুলেটর",
-    desc: "জমির জন্য প্রয়োজনীয় সার হিসাব করুন",
-    iconBg: "bg-teal-100",
-    iconColor: "text-teal-700",
-  },
-  {
-    href: "/ai-bondhu/pesticide",
-    Icon: Leaf,
-    title: "কীটনাশক গাইড",
-    desc: "পোকা ও রোগ দমনের নিরাপদ পদ্ধতি",
-    iconBg: "bg-red-100",
-    iconColor: "text-red-700",
+    href: "/crop-planner",
+    Icon: Sparkles,
+    title: "ফসল পরিকল্পনা",
+    desc: "মাটি ও লক্ষ্য অনুযায়ী সেরা ফসল সুপারিশ",
+    iconBg: "bg-yellow-100",
+    iconColor: "text-yellow-700",
   },
   {
     href: "/ai-bondhu/soil",
@@ -245,12 +238,28 @@ const AI_CARDS = [
     iconColor: "text-blue-700",
   },
   {
-    href: "/crop-planner",
-    Icon: Sparkles,
-    title: "ফসল পরিকল্পনা",
-    desc: "মাটি ও লক্ষ্য অনুযায়ী সেরা ফসল সুপারিশ",
-    iconBg: "bg-yellow-100",
-    iconColor: "text-yellow-700",
+    href: "/ai-bondhu/calculator",
+    Icon: FlaskConical,
+    title: "সার ক্যালকুলেটর",
+    desc: "জমির জন্য প্রয়োজনীয় সার হিসাব করুন",
+    iconBg: "bg-teal-100",
+    iconColor: "text-teal-700",
+  },
+  {
+    href: "/organic-fertilizer",
+    Icon: Recycle,
+    title: "জৈব কর্নার",
+    desc: "নিজে জমির জৈব সার নিজেই উৎপাদন করুন",
+    iconBg: "bg-lime-100",
+    iconColor: "text-lime-700",
+  },
+  {
+    href: "/ai-bondhu/pesticide",
+    Icon: Leaf,
+    title: "কীটনাশক গাইড",
+    desc: "পোকা ও রোগ দমনের নিরাপদ পদ্ধতি",
+    iconBg: "bg-red-100",
+    iconColor: "text-red-700",
   },
 ];
 
@@ -445,7 +454,7 @@ function TodayBrief({ onCreatePost }: { onCreatePost: () => void }) {
 function CommunityFeedSection({ userName, onCompose }: { userName: string | null; onCompose: () => void }) {
   const { data: mutedIds = [] } = useMutedIds();
   const queryClient = useQueryClient();
-  const feedKey = ["dashboard-feed", mutedIds.join(",")];
+  const feedKey = useMemo(() => ["dashboard-feed", mutedIds.join(",")], [mutedIds]);
   const [savedIds, setSavedIds] = useState<string[]>([]);
   const [openComments, setOpenComments] = useState<string | null>(null);
   const { data: posts = [], isLoading } = useQuery({
@@ -460,6 +469,23 @@ function CommunityFeedSection({ userName, onCompose }: { userName: string | null
   });
   const { data: authorAvatars = {} } = useAuthorAvatars(posts.map((post) => post.user_id));
   useEffect(() => { setSavedIds(readSavedPostIds()); }, []);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("dashboard-community-feed")
+      .on("postgres_changes", { event: "*", schema: "public", table: "posts" }, (payload) => {
+        queryClient.setQueryData<Post[]>(feedKey, (current = []) => {
+          if (payload.eventType === "DELETE") return current.filter((post) => post.id !== (payload.old as { id: string }).id);
+          const incoming = payload.new as Post;
+          if (mutedIds.includes(incoming.user_id)) return current;
+          const exists = current.some((post) => post.id === incoming.id);
+          const next = exists ? current.map((post) => post.id === incoming.id ? incoming : post) : [incoming, ...current];
+          return next.slice(0, 5);
+        });
+      })
+      .subscribe();
+    return () => { void supabase.removeChannel(channel); };
+  }, [feedKey, mutedIds, queryClient]);
 
   const updatePost = (postId: string, patch: Partial<Post>) => {
     queryClient.setQueryData<Post[]>(feedKey, (current) => (current ?? []).map((post) => post.id === postId ? { ...post, ...patch } : post));

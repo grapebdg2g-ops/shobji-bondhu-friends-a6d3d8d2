@@ -53,6 +53,24 @@ export function CommentsSection({ postId, onCommentAdded }: { postId: string; on
     return () => { active = false; };
   }, [postId]);
 
+  useEffect(() => {
+    const channel = supabase
+      .channel(`post-comments-${postId}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "post_comments", filter: `post_id=eq.${postId}` }, (payload) => {
+        if (payload.eventType === "DELETE") {
+          setComments((current) => current.filter((comment) => comment.id !== (payload.old as { id: string }).id));
+          return;
+        }
+        const incoming = payload.new as Comment;
+        setComments((current) => {
+          if (current.some((comment) => comment.id === incoming.id)) return current.map((comment) => comment.id === incoming.id ? incoming : comment);
+          return [...current, incoming];
+        });
+      })
+      .subscribe();
+    return () => { void supabase.removeChannel(channel); };
+  }, [postId]);
+
   const authorIds = useMemo(
     () => [...new Set([...comments.map((comment) => comment.user_id), ...(user ? [user.id] : [])])].sort(),
     [comments, user?.id],
@@ -116,7 +134,12 @@ export function CommentsSection({ postId, onCommentAdded }: { postId: string; on
       setSending(false);
       return;
     }
-    setComments((current) => current.map((comment) => comment.id === optimistic.id ? data as Comment : comment));
+    setComments((current) => {
+      const withoutTemporary = current.filter((comment) => comment.id !== optimistic.id);
+      return withoutTemporary.some((comment) => comment.id === data.id)
+        ? withoutTemporary
+        : [...withoutTemporary, data as Comment];
+    });
     await supabase.rpc("increment_comments", { post_id: postId });
     onCommentAdded();
     setSending(false);

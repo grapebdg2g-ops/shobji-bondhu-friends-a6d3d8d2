@@ -605,6 +605,48 @@ export type Database = {
         }
         Relationships: []
       }
+      organic_guide_videos: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          duration: string | null
+          guide_key: string
+          id: string
+          is_active: boolean
+          sort_order: number
+          source: string
+          title: string
+          updated_at: string
+          youtube_url: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          duration?: string | null
+          guide_key: string
+          id?: string
+          is_active?: boolean
+          sort_order?: number
+          source?: string
+          title: string
+          updated_at?: string
+          youtube_url: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          duration?: string | null
+          guide_key?: string
+          id?: string
+          is_active?: boolean
+          sort_order?: number
+          source?: string
+          title?: string
+          updated_at?: string
+          youtube_url?: string
+        }
+        Relationships: []
+      }
       post_comments: {
         Row: {
           content: string

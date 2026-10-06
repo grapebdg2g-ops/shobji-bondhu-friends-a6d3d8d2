@@ -60,6 +60,12 @@ function ExchangesPage() {
       const { error } = await supabase.from("exchanges").update({ is_active: val }).eq("id", id);
       if (error) throw error;
     },
+    onMutate: async ({ id, val }) => {
+      await qc.cancelQueries({ queryKey: ["admin", "exchanges"] });
+      const previous = qc.getQueryData<any[]>(["admin", "exchanges"]);
+      qc.setQueryData<any[]>(["admin", "exchanges"], (current = []) => current.map((item) => item.id === id ? { ...item, is_active: val } : item));
+      return { previous };
+    },
     onSuccess: () => {
       toast.success("আপডেট হয়েছে");
       qc.invalidateQueries({ queryKey: ["admin", "exchanges"] });

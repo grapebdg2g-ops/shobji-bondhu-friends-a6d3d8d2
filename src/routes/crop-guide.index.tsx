@@ -69,10 +69,14 @@ function CropGuideIndex() {
   async function toggleDone(p: Plan) {
     setBusy(p.id);
     const next = !p.is_active;
+    setPlans((ps) => ps.map((x) => (x.id === p.id ? { ...x, is_active: next } : x)));
     const { error } = await supabase.from("user_crop_plans").update({ is_active: next }).eq("id", p.id);
     setBusy(null);
-    if (error) { toast.error("সংরক্ষণ ব্যর্থ, আবার চেষ্টা করুন"); return; }
-    setPlans((ps) => ps.map((x) => (x.id === p.id ? { ...x, is_active: next } : x)));
+    if (error) {
+      setPlans((ps) => ps.map((x) => (x.id === p.id ? { ...x, is_active: p.is_active } : x)));
+      toast.error("সংরক্ষণ ব্যর্থ, আবার চেষ্টা করুন");
+      return;
+    }
     toast.success(next ? "আবার চলমান তালিকায় আনা হয়েছে" : "চাষ সম্পন্ন হিসেবে চিহ্নিত ✅");
   }
 
