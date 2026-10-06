@@ -50,6 +50,13 @@
       "when": 1791312551993,
       "tag": "0006_create_organic_guide_videos",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1791312817488,
+      "tag": "0007_enable_live_status_updates",
+      "breakpoints": true
     }
   ]
 }
