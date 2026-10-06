@@ -22,6 +22,9 @@ import {
   ArrowUpRight,
   Activity,
   Recycle,
+  Carrot,
+  TrendingUp,
+  ArrowLeftRight,
   UserCheck,
   UserPlus,
   X,
@@ -222,6 +225,14 @@ const AI_CARDS = [
     iconColor: "text-orange-700",
   },
   {
+    href: "/vegetable-guide",
+    Icon: Carrot,
+    title: "সবজি চাষ গাইড",
+    desc: "সবজি চাষের পূর্ব প্রস্তুতি হিসেবে সকল সবজি সম্পর্কে জানুন",
+    iconBg: "bg-green-100",
+    iconColor: "text-green-700",
+  },
+  {
     href: "/crop-planner",
     Icon: Sparkles,
     title: "ফসল পরিকল্পনা",
@@ -261,6 +272,30 @@ const AI_CARDS = [
     iconBg: "bg-red-100",
     iconColor: "text-red-700",
   },
+  {
+    href: "/price-prediction",
+    Icon: TrendingUp,
+    title: "দামের পূর্বাভাস",
+    desc: "আপনার চাষকৃত সবজির বাজার মূল্য কেমন হতে পারে যাচাই করুন",
+    iconBg: "bg-indigo-100",
+    iconColor: "text-indigo-700",
+  },
+  {
+    href: "/prices",
+    Icon: ShoppingBasket,
+    title: "বাজার দর দেখুন",
+    desc: "আজকের বাজার দর কত দেখুন",
+    iconBg: "bg-amber-100",
+    iconColor: "text-amber-700",
+  },
+  {
+    href: "/exchange",
+    Icon: ArrowLeftRight,
+    title: "বিনিময়",
+    desc: "কৃষকদের মাঝে আপনার দেশি বীজ ছড়িয়ে দিন অথবা নিজেদের মধ্যে ফসল, কৃষি পণ্য ও যন্ত্রপাতি বিনিময় করুন",
+    iconBg: "bg-cyan-100",
+    iconColor: "text-cyan-700",
+  },
 ];
 
 function AiSolutionsSection() {
@@ -299,10 +334,10 @@ function AiSolutionsSection() {
                 </span>
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/65">কৃষি সহায়ক</p>
-                  <h2 className="text-lg font-black">AI বন্ধু এখন online</h2>
+                  <h2 className="text-lg font-black">আপনার নিজস্ব AI কৃষি সহকারী</h2>
                 </div>
               </div>
-              <p className="mt-3 max-w-xs text-xs leading-relaxed text-white/75">আপনার ফসলের যেকোনো প্রশ্ন করুন—ভয়েস বা টেক্সটে সহজ উত্তর পান।</p>
+              <p className="mt-3 max-w-md text-xs leading-relaxed text-white/75">আপনার কৃষি বিষয়ক সকল সহায়তার জন্য AI কৃষি সহকারী প্রস্তুত — কৃষি বিষয়ক যেকোনো প্রশ্ন করুন অথবা নিচের মেনু থেকে সাহায্য নিন।</p>
             </div>
             <ChevronRight className="mt-1 h-5 w-5 shrink-0 text-white/80" strokeWidth={2.5} />
           </button>
