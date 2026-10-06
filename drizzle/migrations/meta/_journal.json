@@ -43,6 +43,13 @@
       "when": 1790880224314,
       "tag": "0005_friend_added_notifications",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791312551993,
+      "tag": "0006_create_organic_guide_videos",
+      "breakpoints": true
     }
   ]
 }
