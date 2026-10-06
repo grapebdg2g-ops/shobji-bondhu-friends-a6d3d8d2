@@ -134,7 +134,12 @@ export function CommentsSection({ postId, onCommentAdded }: { postId: string; on
       setSending(false);
       return;
     }
-    setComments((current) => current.map((comment) => comment.id === optimistic.id ? data as Comment : comment));
+    setComments((current) => {
+      const withoutTemporary = current.filter((comment) => comment.id !== optimistic.id);
+      return withoutTemporary.some((comment) => comment.id === data.id)
+        ? withoutTemporary
+        : [...withoutTemporary, data as Comment];
+    });
     await supabase.rpc("increment_comments", { post_id: postId });
     onCommentAdded();
     setSending(false);

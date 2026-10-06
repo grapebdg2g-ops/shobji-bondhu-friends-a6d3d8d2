@@ -97,6 +97,8 @@ export function useFeed(
     setError(null);
   }, [buildQuery]);
 
+  const removeById = useCallback((id: string) => setPosts((prev) => prev.filter((x) => x.id !== id)), []);
+
   useEffect(() => {
     load(true);
   }, [load]);
@@ -133,7 +135,6 @@ export function useFeed(
   }, [load, loading, loadingMore, hasMore]);
 
   const prepend = useCallback((p: Post) => setPosts((prev) => [p, ...prev]), []);
-  const removeById = useCallback((id: string) => setPosts((prev) => prev.filter((x) => x.id !== id)), []);
   const updateById = useCallback((id: string, patch: Partial<Post>) => {
     setPosts((prev) => prev.map((x) => (x.id === id ? { ...x, ...patch } : x)));
   }, []);

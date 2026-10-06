@@ -47,7 +47,7 @@ const TOOL_GROUPS = [
       { to: "/exchange", Icon: Repeat2, title: "বিনিময়" },
       { to: "/weather", Icon: CloudSun, title: "আবহাওয়া" },
       { to: "/ai-bondhu/pesticide", Icon: Sprout, title: "কীটনাশক গাইড" },
-      { to: "/organic-fertilizer", Icon: Leaf, title: "জৈব সার গাইড" },
+      { to: "/organic-fertilizer", Icon: Leaf, title: "জৈব কর্নার" },
     ],
   },
 ] as const;

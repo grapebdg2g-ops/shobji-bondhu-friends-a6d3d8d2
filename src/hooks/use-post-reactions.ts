@@ -75,14 +75,13 @@ export function usePostReactions(postId: string, visiblePostIds: string[] = [pos
   useEffect(() => {
     if (postIds.length === 0) return;
     const channel = supabase
-      .channel(`post-reactions-${postIdsKey}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "post_reactions" }, (payload) => {
-        const changed = (payload.new as Partial<PostReaction>).post_id ?? (payload.old as Partial<PostReaction>).post_id;
-        if (changed && postIds.includes(changed)) void queryClient.invalidateQueries({ queryKey });
+      .channel(`post-reaction-${postId}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "post_reactions", filter: `post_id=eq.${postId}` }, () => {
+        void queryClient.invalidateQueries({ queryKey });
       })
       .subscribe();
     return () => { void supabase.removeChannel(channel); };
-  }, [postIds, postIdsKey, queryClient, queryKey]);
+  }, [postId, postIds.length, queryClient, queryKey]);
 
   const state = useMemo<ReactionState>(() => {
     const counts = emptyReactionCounts();

@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Bell,
@@ -454,7 +454,7 @@ function TodayBrief({ onCreatePost }: { onCreatePost: () => void }) {
 function CommunityFeedSection({ userName, onCompose }: { userName: string | null; onCompose: () => void }) {
   const { data: mutedIds = [] } = useMutedIds();
   const queryClient = useQueryClient();
-  const feedKey = ["dashboard-feed", mutedIds.join(",")];
+  const feedKey = useMemo(() => ["dashboard-feed", mutedIds.join(",")], [mutedIds]);
   const [savedIds, setSavedIds] = useState<string[]>([]);
   const [openComments, setOpenComments] = useState<string | null>(null);
   const { data: posts = [], isLoading } = useQuery({
