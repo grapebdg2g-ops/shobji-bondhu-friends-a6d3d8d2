@@ -1,46 +1,26 @@
+# তাৎক্ষণিক স্ট্যাটাস, কৃষি সহায়ক ক্রম ও জৈব কর্নার ভিডিও
 
-## লক্ষ্য
+## যা পরিবর্তন হবে
+- কমিউনিটি পোস্ট, মন্তব্য, রিঅ্যাকশন ও সংশ্লিষ্ট কাউন্টার পরিবর্তনের সঙ্গে সঙ্গে হোম ও কমিউনিটি ফিডে দেখাবে; রিফ্রেশ লাগবে না।
+- অন্যান্য স্ট্যাটাস পরিবর্তনের বর্তমান নিয়ন্ত্রণগুলোতে তাৎক্ষণিক স্থানীয় আপডেট ও প্রয়োজনীয় ডেটা রিফ্রেশ একসাথে করা হবে।
+- হোমের কৃষি সহায়ক কার্ডে ফসল ক্যালেন্ডারের পর এই ক্রম থাকবে: ফসল পরিকল্পনা, মৃত্তিকা বিশ্লেষণ, সার ক্যালকুলেটর, জৈব কর্নার, কীটনাশক গাইড।
+- জৈব কর্নারের নিচে লেখা থাকবে: “নিজে জমির জৈব সার নিজেই উৎপাদন করুন।”
+- জৈব সার পেজের নাম ও পরিচিতি “জৈব কর্নার” অনুযায়ী বদলাবে।
 
-আপলোডকৃত `master-crop-data.ts` (২৭টি ফসল, ২৭২১ লাইন) কে প্রজেক্টের **একমাত্র crop data source** বানানো। বর্তমানে ৪টি আলাদা ফাইলে ফসলের ডাটা ছড়িয়ে আছে — সব এক জায়গায় আনব।
+## অ্যাডমিন ভিডিও ব্যবস্থাপনা
+- জৈব কর্নারের প্রতিটি গাইডের জন্য ভিডিও শিরোনাম ও YouTube লিংক সংরক্ষণের নিরাপদ ডেটা টেবিল যোগ হবে।
+- শুধু অ্যাডমিন ভিডিও যোগ, সম্পাদনা, সক্রিয়/নিষ্ক্রিয় এবং মুছতে পারবেন।
+- অ্যাডমিন প্যানেলে আলাদা “জৈব কর্নার ভিডিও” পেজ থাকবে।
+- জৈব কর্নারের যেসব অংশে ভিডিও গাইড আছে, সেগুলো অ্যাডমিনের সক্রিয় লিংক দেখাবে; ডেটা না থাকলে বর্তমান গাইডগুলো fallback হিসেবে থাকবে।
+- শুধু বৈধ YouTube ভিডিও লিংক গ্রহণ করা হবে।
 
-## ধাপ ১ — Master data file যোগ
+## যাচাই
+- কমিউনিটি পোস্ট/মন্তব্য/রিঅ্যাকশনের তাৎক্ষণিক পরিবর্তন যাচাই করা হবে।
+- হোমের কার্ডের ক্রম, নাম ও বর্ণনা মোবাইলে যাচাই করা হবে।
+- অ্যাডমিন থেকে ভিডিও যোগ/সম্পাদনা করে জৈব কর্নারে সঙ্গে সঙ্গে দেখা যাচ্ছে কি না যাচাই করা হবে।
+- ডেটা অনুমতি, প্রয়োজনীয় পরীক্ষা এবং বর্তমান build যাচাই করা হবে।
 
-- `src/data/master-crop-data.ts` তৈরি (আপলোডকৃত ফাইলের পুরো কন্টেন্ট)
-- Helper functions এক্সপোর্ট: `getCropById`, `getCropsBySeason(month)`, `getCropsByCategory`, `getActiveStage(cropId, daysSincePlanting)`, `getFertilizerSchedule(cropId, soilType)`, `getCalendarEvents(cropId)`, `calcTotalCost`, `calcProfit`, `calcROI`
-
-## ধাপ ২ — Feature wiring (৮টি page)
-
-| ফিচার | Route | পরিবর্তন |
-|---|---|---|
-| Crop Planner | `/crop-planner` (নতুন) | নতুন route, master data থেকে season/soil filter |
-| Crop Guide | `/crop-guide`, `/crop-guide/new/$crop`, `/crop-guide/plan/$planId` | `FARMING_STAGES` → `master-crop-data` |
-| Fertilizer Calculator | `/ai-bondhu/calculator` | `getFertilizerSchedule()` ব্যবহার, soil adjustment সহ |
-| Calendar | `/ai-bondhu/calendar` | `getCalendarEvents()` থেকে মাস ভিত্তিক ইভেন্ট |
-| Price Prediction | `/price-prediction` | `avgMarketPrice` + `yieldMin/Max` লিঙ্ক |
-| Vegetable Guide | `/vegetable-guide/$slug` | `vegetable-economics.ts` → master data |
-| Dashboard Widget | `/dashboard` | আজকের active stage tasks |
-| Notifications | বিদ্যমান সিস্টেম | active plan-এর urgent task থেকে notify |
-
-## ধাপ ৩ — পুরাতন ফাইল cleanup
-
-Deprecate (delete বা re-export wrapper):
-- `src/data/farming-guide.ts`
-- `src/data/vegetable-economics.ts`
-- `src/data/vegetable-guide.ts` (অথবা master থেকে derive)
-- `src/data/fertilizer-guide.ts`
-
-## প্রযুক্তিগত বিবরণ
-
-- Type-safe: master file-এ ইতিমধ্যে `CropData` interface আছে
-- Backward-compat shim: `farming-guide.ts` থেকে `FARMING_STAGES` কে master data থেকে generate করব যাতে existing `crop-advisory-widget.tsx` না ভাঙে
-- `user_crop_plans` table-এ `crop_type` string match হবে master data-র `name` (বাংলা) এর সাথে — migration লাগবে না
-- কোনো DB schema change নেই, শুধু client-side data layer
-
-## ঝুঁকি
-
-- ২৭২১ লাইনের ফাইল — single edit batch-এ লিখতে হবে
-- ৮টি feature touch — প্রতিটিতে UI ভাঙার সম্ভাবনা; ধাপে ধাপে wire করব, প্রতি ধাপের পর typecheck
-
-## প্রশ্ন
-
-পুরো ৩ ধাপ একবারে করব, নাকি **ধাপ ১ (master file + helpers) + ধাপ ২-এর crop-guide wiring** আগে দিয়ে বাকিগুলো আলাদা টার্নে?
+## কারিগরি বিবরণ
+- বর্তমান React Query cache ও live database events একই shared feed keys-এ সমন্বয় করা হবে।
+- নতুন ভিডিও টেবিলে authenticated read, admin-only write policy, প্রয়োজনীয় GRANT ও role-ভিত্তিক নিরাপত্তা থাকবে।
+- নতুন অ্যাডমিন পেজের আলাদা URL ও নিজস্ব metadata থাকবে।
