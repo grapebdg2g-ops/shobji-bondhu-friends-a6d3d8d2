@@ -221,17 +221,20 @@ function CropDiaryPage() {
 
   async function completeReminder(reminder: Reminder) {
     const next = !reminder.is_done;
+    setReminders((current) =>
+      current.map((r) => (r.id === reminder.id ? { ...r, is_done: next } : r)),
+    );
     const { error } = await supabase
       .from("crop_reminders" as never)
       .update({ is_done: next } as never)
       .eq("id", reminder.id);
     if (error) {
+      setReminders((current) =>
+        current.map((r) => (r.id === reminder.id ? { ...r, is_done: reminder.is_done } : r)),
+      );
       toast.error("রিমাইন্ডার আপডেট করা যায়নি");
       return;
     }
-    setReminders((current) =>
-      current.map((r) => (r.id === reminder.id ? { ...r, is_done: next } : r)),
-    );
     toast.success(next ? "রিমাইন্ডার সম্পন্ন হয়েছে" : "রিমাইন্ডার আবার চালু হয়েছে");
   }
 
