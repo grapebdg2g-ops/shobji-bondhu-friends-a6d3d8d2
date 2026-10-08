@@ -71,6 +71,13 @@
       "when": 1791429097345,
       "tag": "0009_group_chats",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1791429160281,
+      "tag": "0010_reports_allow_group_chat",
+      "breakpoints": true
     }
   ]
 }
