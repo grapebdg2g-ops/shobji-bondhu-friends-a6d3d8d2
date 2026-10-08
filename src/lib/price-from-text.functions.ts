@@ -42,20 +42,61 @@ export const capturePricesFromContent = createServerFn({ method: "POST" })
 
 লেখা: """${row.content.slice(0, 1000)}"""`;
 
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const schema = {
+      type: "object",
+      additionalProperties: false,
+      required: ["prices"],
+      properties: {
+        prices: {
+          type: "array",
+          items: {
+            type: "object",
+            additionalProperties: false,
+            required: ["product_name", "price", "unit", "price_type", "category"],
+            properties: {
+              product_name: { type: "string" },
+              price: { type: "number" },
+              unit: { type: "string", enum: ["কেজি", "মণ", "পিস", "হালি"] },
+              price_type: { type: "string", enum: ["retail", "wholesale", "growers"] },
+              category: { type: "string" },
+            },
+          },
+        },
+      },
+    };
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
       method: "POST",
-      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      headers: { "Lovable-API-Key": apiKey, "Content-Type": "application/json", "X-Lovable-AIG-SDK": "fetch" },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: [{ role: "user", content: prompt }],
-        response_format: { type: "json_object" },
+        model: "openai/gpt-6-astra",
+        input: prompt,
+        stream: true,
+        store: false,
+        reasoning: { effort: "low" },
+        text: { format: { type: "json_schema", name: "prices", strict: true, schema } },
       }),
     });
-    if (!res.ok) return { added: 0 };
-    const json = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
+    if (!res.ok || !res.body) return { added: 0 };
+    let raw = "";
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buf = "";
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buf += decoder.decode(value, { stream: true });
+      const lines = buf.split("\n");
+      buf = lines.pop() ?? "";
+      for (const line of lines) {
+        if (!line.startsWith("data:")) continue;
+        try {
+          const ev = JSON.parse(line.slice(5).trim()) as { type?: string; delta?: string };
+          if (ev.type === "response.output_text.delta" && ev.delta) raw += ev.delta;
+        } catch { /* ignore keep-alives */ }
+      }
+    }
     let parsed: z.infer<typeof extractedSchema>;
     try {
-      const raw = (json.choices?.[0]?.message?.content ?? "").replace(/```json|```/g, "").trim();
       parsed = extractedSchema.parse(JSON.parse(raw));
     } catch {
       return { added: 0 };
