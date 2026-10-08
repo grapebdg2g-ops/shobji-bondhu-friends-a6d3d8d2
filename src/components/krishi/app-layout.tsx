@@ -10,7 +10,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const { user } = useUser();
   const { collapsed, setCollapsed, isMobile } = useSidebar();
 
-  const hide = HIDDEN_ON.has(pathname) || !user;
+  const hide = HIDDEN_ON.has(pathname) || pathname.startsWith("/groups/") || !user;
 
   if (hide) return <>{children}</>;
 
