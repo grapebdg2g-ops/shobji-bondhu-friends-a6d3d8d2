@@ -10,10 +10,13 @@ import {
   TrendingUp,
   UserRoundPlus,
   Users,
+  MessageCircle,
 } from "lucide-react";
+import { useDirectThreads } from "@/hooks/use-direct-messages";
+import { useGroupThreads } from "@/hooks/use-group-chats";
 
 type Tab = {
-  to: "/dashboard" | "/prices" | "/feed" | "/profile";
+  to: "/dashboard" | "/prices" | "/messages" | "/profile";
   label: string;
   Icon: typeof Home;
 };
@@ -24,7 +27,7 @@ const LEFT: Tab[] = [
 ];
 
 const RIGHT: Tab[] = [
-  { to: "/feed", label: "কমিউনিটি", Icon: Newspaper },
+  { to: "/messages", label: "মেসেজ", Icon: MessageCircle },
   { to: "/profile", label: "প্রোফাইল", Icon: User },
 ];
 
@@ -33,8 +36,7 @@ const QUICK_ACTIONS = [
   { to: "/ai-bondhu/chat", label: "AI বন্ধুকে জিজ্ঞেস করুন", Icon: MessageSquareText },
   { to: "/feed", label: "কমিউনিটিতে যান", Icon: Newspaper },
   { to: "/farmers", label: "সকল কৃষক", Icon: Users },
-  { to: "/messages", label: "মেসেজ", Icon: MessageSquareText },
-  { to: "/connections", label: "সংযোগ অনুরোধ", Icon: UserRoundPlus },
+    { to: "/connections", label: "সংযোগ অনুরোধ", Icon: UserRoundPlus },
 ] as const;
 
 // Center notch (circle cutout with curved edges flowing into the top & bottom
@@ -59,6 +61,9 @@ const notchMaskStyle: CSSProperties = {
 export function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [open, setOpen] = useState(false);
+  const { unreadCount: dmUnread } = useDirectThreads();
+  const { unreadCount: groupUnread } = useGroupThreads();
+  const msgUnread = dmUnread + groupUnread;
   const isActive = (to: string) => pathname === to || pathname.startsWith(to + "/");
 
   return (
@@ -125,7 +130,7 @@ export function BottomNav() {
         </div>
 
         {RIGHT.map((t) => (
-          <TabBtn key={t.to} tab={t} active={isActive(t.to)} />
+          <TabBtn key={t.to} tab={t} active={isActive(t.to) || (t.to === "/messages" && pathname.startsWith("/groups/"))} badge={t.to === "/messages" ? msgUnread : 0} />
         ))}
         </div>
       </div>
@@ -133,7 +138,7 @@ export function BottomNav() {
   );
 }
 
-function TabBtn({ tab, active }: { tab: Tab; active: boolean }) {
+function TabBtn({ tab, active, badge = 0 }: { tab: Tab; active: boolean; badge?: number }) {
   return (
     <Link
       to={tab.to}
@@ -141,7 +146,14 @@ function TabBtn({ tab, active }: { tab: Tab; active: boolean }) {
         active ? "text-primary" : "text-muted-foreground"
       }`}
     >
-      <tab.Icon className="h-5 w-5" strokeWidth={active ? 2.6 : 2} />
+      <span className="relative">
+        <tab.Icon className="h-5 w-5" strokeWidth={active ? 2.6 : 2} />
+        {badge > 0 && (
+          <span className="absolute -right-2.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[9px] font-black leading-none text-destructive-foreground">
+            {badge > 99 ? "৯৯+" : badge.toLocaleString("bn-BD")}
+          </span>
+        )}
+      </span>
       <span>{tab.label}</span>
     </Link>
   );

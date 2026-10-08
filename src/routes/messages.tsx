@@ -1,5 +1,12 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, ChevronRight, MessageCircle, Search, Users } from "lucide-react";
+import { ArrowLeft, ChevronRight, MessageCircle, Plus, Search, Users } from "lucide-react";
+import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useUser } from "@/contexts/user-context";
+import { useGroupThreads, useMyFriends, groupThreadsKey, type GroupThread } from "@/hooks/use-group-chats";
+import { BottomSheet } from "@/components/krishi/bottom-sheet";
+import { FriendPicker } from "@/components/krishi/group-chat-parts";
 import { useMemo, useState } from "react";
 import { DirectMessagePopup } from "@/components/krishi/direct-message-popup";
 import { LazyImage } from "@/components/krishi/lazy-image";
@@ -7,7 +14,16 @@ import { useDirectThreads, type DirectThread } from "@/hooks/use-direct-messages
 
 export const Route = createFileRoute("/messages")({
   component: MessagesPage,
-  head: () => ({ meta: [{ title: "মেসেজ — কৃষক বন্ধু" }] }),
+  head: () => ({
+    meta: [
+      { title: "মেসেজ ও গ্রুপ চ্যাট — কৃষক বন্ধু" },
+      { name: "description", content: "কৃষক বন্ধুদের সাথে ব্যক্তিগত ও গ্রুপ মেসেজ" },
+      { property: "og:title", content: "মেসেজ ও গ্রুপ চ্যাট — কৃষক বন্ধু" },
+      { property: "og:description", content: "কৃষক বন্ধুদের সাথে ব্যক্তিগত ও গ্রুপ মেসেজ" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
 });
 
 function formatThreadTime(value: string) {
@@ -20,7 +36,11 @@ function formatThreadTime(value: string) {
 
 function MessagesPage() {
   const navigate = useNavigate();
-  const { threads, loading, unreadCount, error, refresh } = useDirectThreads();
+  const { threads, loading, unreadCount: dmUnread, error, refresh } = useDirectThreads();
+  const groups = useGroupThreads();
+  const unreadCount = dmUnread + groups.unreadCount;
+  const [tab, setTab] = useState<"all" | "direct" | "groups">("all");
+  const [createOpen, setCreateOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [selectedThread, setSelectedThread] = useState<DirectThread | null>(null);
   const filtered = useMemo(() => {
@@ -32,6 +52,13 @@ function MessagesPage() {
         .includes(value),
     );
   }, [query, threads]);
+  const filteredGroups = useMemo(() => {
+    const value = query.trim().toLocaleLowerCase("bn-BD");
+    if (!value) return groups.threads;
+    return groups.threads.filter((g) => `${g.name} ${g.topic ?? ""}`.toLocaleLowerCase("bn-BD").includes(value));
+  }, [query, groups.threads]);
+  const showDirect = tab !== "groups";
+  const showGroups = tab !== "direct";
 
   return (
     <main className="min-h-[calc(100dvh-4rem)] bg-[#F0FFF4] px-3 pb-6 sm:px-5">
@@ -46,13 +73,20 @@ function MessagesPage() {
         </button>
         <div className="min-w-0 flex-1">
           <h1 className="text-xl font-black text-[#1C1E21]">মেসেজ</h1>
-          <p className="text-xs text-[#65676B]">সংযুক্ত কৃষকদের সঙ্গে সরাসরি কথা বলুন</p>
+          <p className="text-xs text-[#65676B]">বন্ধু ও গ্রুপের সঙ্গে কথা বলুন</p>
         </div>
         {unreadCount > 0 && (
           <span className="rounded-full bg-[#1877F2] px-2.5 py-1 text-xs font-black text-white">
             {unreadCount > 99 ? "৯৯+" : unreadCount}
           </span>
         )}
+        <button
+          type="button"
+          onClick={() => setCreateOpen(true)}
+          className="flex items-center gap-1 rounded-full bg-[#1877F2] px-3 py-2 text-xs font-bold text-white"
+        >
+          <Plus className="h-4 w-4" /> নতুন গ্রুপ
+        </button>
       </header>
 
       <section className="mx-auto mt-4 max-w-2xl rounded-2xl border border-[#E4E6EB] bg-white p-3 shadow-sm">
@@ -65,8 +99,41 @@ function MessagesPage() {
             className="h-11 w-full rounded-full bg-[#F0F2F5] pl-10 pr-4 text-sm outline-none focus:ring-2 focus:ring-[#1877F2]/30"
           />
         </label>
+        <div className="mt-3 flex gap-2">
+          {([["all", "সব"], ["direct", "ব্যক্তিগত"], ["groups", "গ্রুপ"]] as const).map(([k, l]) => (
+            <button
+              key={k}
+              type="button"
+              onClick={() => setTab(k)}
+              className={`rounded-full px-4 py-1.5 text-xs font-bold ${tab === k ? "bg-[#1877F2] text-white" : "bg-[#F0F2F5] text-[#1C1E21]"}`}
+            >
+              {l}
+            </button>
+          ))}
+        </div>
       </section>
 
+      {showGroups && filteredGroups.length > 0 && (
+        <section className="mx-auto mt-3 max-w-2xl overflow-hidden rounded-2xl border border-[#E4E6EB] bg-white shadow-sm">
+          <p className="px-4 pt-3 text-xs font-black text-[#65676B]">গ্রুপ চ্যাট</p>
+          <div className="divide-y divide-[#E4E6EB]">
+            {filteredGroups.map((g) => (
+              <GroupRow key={g.group_id} group={g} />
+            ))}
+          </div>
+        </section>
+      )}
+      {tab === "groups" && filteredGroups.length === 0 && !groups.loading && (
+        <section className="mx-auto mt-3 max-w-2xl rounded-2xl border border-[#E4E6EB] bg-white px-6 py-12 text-center shadow-sm">
+          <Users className="mx-auto h-8 w-8 text-[#1877F2]" />
+          <p className="mt-3 text-sm font-bold text-[#1C1E21]">এখনো কোনো গ্রুপ নেই</p>
+          <button type="button" onClick={() => setCreateOpen(true)} className="mt-3 rounded-full bg-[#1877F2] px-4 py-2 text-sm font-bold text-white">
+            নতুন গ্রুপ খুলুন
+          </button>
+        </section>
+      )}
+
+      {showDirect && (
       <section className="mx-auto mt-3 max-w-2xl overflow-hidden rounded-2xl border border-[#E4E6EB] bg-white shadow-sm">
         {error ? (
           <div className="px-6 py-14 text-center">
@@ -127,6 +194,8 @@ function MessagesPage() {
           </div>
         )}
       </section>
+      )}
+      <CreateGroupSheet open={createOpen} onClose={() => setCreateOpen(false)} />
       {selectedThread && (
         <DirectMessagePopup
           recipient={{
@@ -202,5 +271,75 @@ function ThreadRow({ thread, onOpen }: { thread: DirectThread; onOpen: () => voi
         <MessageCircle className="h-5 w-5" />
       </span>
     </button>
+  );
+}
+
+function GroupRow({ group }: { group: GroupThread }) {
+  const unread = Number(group.unread_count ?? 0);
+  return (
+    <Link
+      to="/groups/$groupId"
+      params={{ groupId: group.group_id }}
+      className="flex w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-[#F0F2F5]"
+    >
+      <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#E7F3FF] text-[#1877F2]">
+        <Users className="h-6 w-6" />
+      </span>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center justify-between gap-2">
+          <h2 className={`truncate text-sm text-[#1C1E21] ${unread ? "font-black" : "font-bold"}`}>{group.name}</h2>
+          <span className="shrink-0 text-[10px] text-[#65676B]">{formatThreadTime(group.last_message_at)}</span>
+        </div>
+        <div className="mt-1 flex items-center gap-2">
+          <p className={`truncate text-xs ${unread ? "font-bold text-[#1C1E21]" : "text-[#65676B]"}`}>
+            {group.last_body ? `${group.last_sender_name ?? "কৃষক"}: ${group.last_body}` : group.topic || `${group.member_count} জন সদস্য`}
+          </p>
+          {unread > 0 && (
+            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#1877F2] px-1 text-[10px] font-black text-white">
+              {unread > 9 ? "৯+" : unread}
+            </span>
+          )}
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+function CreateGroupSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const navigate = useNavigate();
+  const qc = useQueryClient();
+  const { user } = useUser();
+  const friends = useMyFriends();
+  const [name, setName] = useState("");
+  const [topic, setTopic] = useState("");
+  const [picked, setPicked] = useState<string[]>([]);
+  const [saving, setSaving] = useState(false);
+
+  const create = async () => {
+    if (!name.trim()) return toast.error("গ্রুপের নাম দিন");
+    setSaving(true);
+    const { data, error } = await supabase.rpc("create_group_chat", { _name: name.trim(), _topic: topic.trim(), _member_ids: picked });
+    setSaving(false);
+    if (error || !data) return toast.error("গ্রুপ খোলা যায়নি");
+    qc.invalidateQueries({ queryKey: groupThreadsKey(user?.id ?? null) });
+    setName("");
+    setTopic("");
+    setPicked([]);
+    onClose();
+    navigate({ to: "/groups/$groupId", params: { groupId: data } });
+  };
+
+  return (
+    <BottomSheet open={open} onClose={onClose} title="নতুন গ্রুপ চ্যাট">
+      <div className="space-y-3 pb-2">
+        <input value={name} onChange={(e) => setName(e.target.value)} maxLength={60} placeholder="গ্রুপের নাম (যেমন: টমেটো চাষি ভাইরা)" className="h-11 w-full rounded-xl bg-muted px-4 text-sm outline-none focus:ring-2 focus:ring-primary/30" />
+        <textarea value={topic} onChange={(e) => setTopic(e.target.value)} maxLength={300} rows={2} placeholder="আলোচনার বিষয় (ঐচ্ছিক)" className="w-full resize-none rounded-xl bg-muted px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/30" />
+        <p className="text-xs font-bold text-muted-foreground">বন্ধু তালিকা থেকে সদস্য বেছে নিন</p>
+        <FriendPicker friends={friends.data ?? []} picked={picked} setPicked={setPicked} />
+        <button type="button" disabled={saving || !name.trim()} onClick={() => void create()} className="w-full rounded-xl bg-primary py-3 text-sm font-bold text-primary-foreground disabled:opacity-40">
+          {saving ? "খোলা হচ্ছে..." : `গ্রুপ খুলুন${picked.length ? ` (${picked.length} জন)` : ""}`}
+        </button>
+      </div>
+    </BottomSheet>
   );
 }
