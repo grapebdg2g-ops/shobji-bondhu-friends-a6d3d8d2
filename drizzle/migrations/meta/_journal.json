@@ -57,6 +57,13 @@
       "when": 1791312817488,
       "tag": "0007_enable_live_status_updates",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1791424651833,
+      "tag": "0008_prices_from_posts_comments",
+      "breakpoints": true
     }
   ]
 }
