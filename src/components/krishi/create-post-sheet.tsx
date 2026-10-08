@@ -1,5 +1,6 @@
 import { useReducer, useRef, useState } from "react";
 import { toast } from "sonner";
+import { capturePricesFromContent } from "@/lib/price-from-text.functions";
 import { optimizeImage } from "@/lib/image-optimizer";
 import { Camera, X, FileText, HelpCircle, Star, CloudRain } from "lucide-react";
 import { BottomSheet } from "@/components/krishi/bottom-sheet";
@@ -35,6 +36,12 @@ const initial: State = { step: 1, type: null, content: "", crop: "সব ফস�
 function reducer(s: State, a: Action): State {
   if (a.type === "reset") return initial;
   return { ...s, ...a.patch };
+}
+
+function reportPrices(kind: "post" | "comment", id: string) {
+  void capturePricesFromContent({ data: { kind, id } })
+    .then((r) => { if (r.added > 0) toast.success(`আপনার জানানো দাম বাজারদরে যোগ হয়েছে: ${(r.products ?? []).join(", ")}`); })
+    .catch(() => {});
 }
 
 export function CreatePostSheet({
@@ -105,6 +112,7 @@ export function CreatePostSheet({
       return;
     }
     onCreated(data as Post);
+    reportPrices("post", data.id);
     toast.success("পোস্ট প্রকাশিত");
     setSubmitting(false);
     close();
