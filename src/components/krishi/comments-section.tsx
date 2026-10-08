@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronDown, Reply, Send } from "lucide-react";
 import { toast } from "sonner";
+import { capturePricesFromContent } from "@/lib/price-from-text.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/contexts/user-context";
 import { sanitize } from "@/lib/sanitize";
@@ -24,6 +25,12 @@ function timeAgo(iso: string) {
   const h = Math.floor(m / 60);
   if (h < 24) return `${h} ঘ আগে`;
   return `${Math.floor(h / 24)} দিন আগে`;
+}
+
+function reportPrices(kind: "post" | "comment", id: string) {
+  void capturePricesFromContent({ data: { kind, id } })
+    .then((r) => { if (r.added > 0) toast.success(`আপনার জানানো দাম বাজারদরে যোগ হয়েছে: ${(r.products ?? []).join(", ")}`); })
+    .catch(() => {});
 }
 
 export function CommentsSection({ postId, onCommentAdded }: { postId: string; onCommentAdded: () => void }) {
@@ -141,6 +148,7 @@ export function CommentsSection({ postId, onCommentAdded }: { postId: string; on
         : [...withoutTemporary, data as Comment];
     });
     await supabase.rpc("increment_comments", { post_id: postId });
+    reportPrices("comment", data.id);
     onCommentAdded();
     setSending(false);
   };

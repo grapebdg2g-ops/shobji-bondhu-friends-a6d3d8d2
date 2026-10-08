@@ -889,6 +889,8 @@ export type Database = {
           district: string
           id: string
           market_name: string
+          origin_id: string | null
+          origin_type: string | null
           previous_price: number | null
           price: number
           price_type: string
@@ -905,6 +907,8 @@ export type Database = {
           district: string
           id?: string
           market_name: string
+          origin_id?: string | null
+          origin_type?: string | null
           previous_price?: number | null
           price: number
           price_type?: string
@@ -921,6 +925,8 @@ export type Database = {
           district?: string
           id?: string
           market_name?: string
+          origin_id?: string | null
+          origin_type?: string | null
           previous_price?: number | null
           price?: number
           price_type?: string
