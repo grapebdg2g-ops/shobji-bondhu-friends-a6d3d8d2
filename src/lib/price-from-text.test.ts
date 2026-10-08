@@ -1,20 +1,21 @@
-import { test, expect } from "bun:test";
+import { it } from "node:test";
+import assert from "node:assert/strict";
 import { mentionsPrice, normalizePrice, isPlausible } from "./price-from-text";
 
-test("৮০০ টাকা মণ = ২০ টাকা কেজি", () => {
-  expect(normalizePrice({ product_name: "টমেটো", price: 800, unit: "মণ", price_type: "wholesale" })).toEqual({ price: 20, unit: "কেজি" });
+it("৮০০ টাকা মণ = ২০ টাকা কেজি", () => {
+  assert.deepEqual(normalizePrice({ product_name: "টমেটো", price: 800, unit: "মণ", price_type: "wholesale" }), { price: 20, unit: "কেজি" });
 });
 
-test("কেজির দাম অপরিবর্তিত থাকে", () => {
-  expect(normalizePrice({ product_name: "টমেটো", price: 20, unit: "কেজি", price_type: "wholesale" })).toEqual({ price: 20, unit: "কেজি" });
+it("কেজির দাম অপরিবর্তিত থাকে", () => {
+  assert.deepEqual(normalizePrice({ product_name: "টমেটো", price: 20, unit: "কেজি", price_type: "wholesale" }), { price: 20, unit: "কেজি" });
 });
 
-test("বাংলা সংখ্যা ও টাকা থাকলে দাম শনাক্ত হয়", () => {
-  expect(mentionsPrice("আজকে আমার এখানে টমেটো পাইকারী ২০ টাকা কেজি")).toBe(true);
-  expect(mentionsPrice("আজকে বৃষ্টি হচ্ছে")).toBe(false);
+it("বাংলা সংখ্যা ও টাকা থাকলে দাম শনাক্ত হয়", () => {
+  assert.equal(mentionsPrice("আজকে আমার এখানে টমেটো পাইকারী ২০ টাকা কেজি"), true);
+  assert.equal(mentionsPrice("আজকে বৃষ্টি হচ্ছে"), false);
 });
 
-test("অসম্ভব দাম বাতিল", () => {
-  expect(isPlausible(0)).toBe(false);
-  expect(isPlausible(20)).toBe(true);
+it("অসম্ভব দাম বাতিল", () => {
+  assert.equal(isPlausible(0), false);
+  assert.equal(isPlausible(20), true);
 });
