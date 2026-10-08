@@ -52,6 +52,7 @@ import { Route as AiBondhuPesticideRouteImport } from './routes/ai-bondhu.pestic
 import { Route as AiBondhuSoilRouteImport } from './routes/ai-bondhu.soil'
 import { Route as CropGuideIndexRouteImport } from './routes/crop-guide.index'
 import { Route as CropPlannerMyPlansRouteImport } from './routes/crop-planner.my-plans'
+import { Route as GroupsGroupIdRouteImport } from './routes/groups.$groupId'
 import { Route as MessagesUserIdRouteImport } from './routes/messages.$userId'
 import { Route as PricePredictionHistoryRouteImport } from './routes/price-prediction.history'
 import { Route as ProfileIndexRouteImport } from './routes/profile.index'
@@ -284,6 +285,11 @@ const CropPlannerMyPlansRoute = CropPlannerMyPlansRouteImport.update({
   path: '/my-plans',
   getParentRoute: () => CropPlannerRoute,
 } as any)
+const GroupsGroupIdRoute = GroupsGroupIdRouteImport.update({
+  id: '/groups/$groupId',
+  path: '/groups/$groupId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MessagesUserIdRoute = MessagesUserIdRouteImport.update({
   id: '/$userId',
   path: '/$userId',
@@ -411,6 +417,7 @@ export interface FileRoutesByFullPath {
   '/ai-bondhu/pesticide': typeof AiBondhuPesticideRoute
   '/ai-bondhu/soil': typeof AiBondhuSoilRoute
   '/crop-planner/my-plans': typeof CropPlannerMyPlansRoute
+  '/groups/$groupId': typeof GroupsGroupIdRoute
   '/messages/$userId': typeof MessagesUserIdRoute
   '/price-prediction/history': typeof PricePredictionHistoryRoute
   '/profile/disease-history': typeof ProfileDiseaseHistoryRoute
@@ -470,6 +477,7 @@ export interface FileRoutesByTo {
   '/ai-bondhu/pesticide': typeof AiBondhuPesticideRoute
   '/ai-bondhu/soil': typeof AiBondhuSoilRoute
   '/crop-planner/my-plans': typeof CropPlannerMyPlansRoute
+  '/groups/$groupId': typeof GroupsGroupIdRoute
   '/messages/$userId': typeof MessagesUserIdRoute
   '/price-prediction/history': typeof PricePredictionHistoryRoute
   '/profile/disease-history': typeof ProfileDiseaseHistoryRoute
@@ -532,6 +540,7 @@ export interface FileRoutesById {
   '/ai-bondhu/pesticide': typeof AiBondhuPesticideRoute
   '/ai-bondhu/soil': typeof AiBondhuSoilRoute
   '/crop-planner/my-plans': typeof CropPlannerMyPlansRoute
+  '/groups/$groupId': typeof GroupsGroupIdRoute
   '/messages/$userId': typeof MessagesUserIdRoute
   '/price-prediction/history': typeof PricePredictionHistoryRoute
   '/profile/disease-history': typeof ProfileDiseaseHistoryRoute
@@ -595,6 +604,7 @@ export interface FileRouteTypes {
     | '/ai-bondhu/pesticide'
     | '/ai-bondhu/soil'
     | '/crop-planner/my-plans'
+    | '/groups/$groupId'
     | '/messages/$userId'
     | '/price-prediction/history'
     | '/profile/disease-history'
@@ -654,6 +664,7 @@ export interface FileRouteTypes {
     | '/ai-bondhu/pesticide'
     | '/ai-bondhu/soil'
     | '/crop-planner/my-plans'
+    | '/groups/$groupId'
     | '/messages/$userId'
     | '/price-prediction/history'
     | '/profile/disease-history'
@@ -715,6 +726,7 @@ export interface FileRouteTypes {
     | '/ai-bondhu/pesticide'
     | '/ai-bondhu/soil'
     | '/crop-planner/my-plans'
+    | '/groups/$groupId'
     | '/messages/$userId'
     | '/price-prediction/history'
     | '/profile/disease-history'
@@ -765,6 +777,7 @@ export interface RootRouteChildren {
   AiBondhuDiseaseRoute: typeof AiBondhuDiseaseRoute
   AiBondhuPesticideRoute: typeof AiBondhuPesticideRoute
   AiBondhuSoilRoute: typeof AiBondhuSoilRoute
+  GroupsGroupIdRoute: typeof GroupsGroupIdRoute
   ProfileDiseaseHistoryRoute: typeof ProfileDiseaseHistoryRoute
   UUserIdRoute: typeof UUserIdRoute
   VegetableGuideSlugRoute: typeof VegetableGuideSlugRoute
@@ -1083,6 +1096,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CropPlannerMyPlansRouteImport
       parentRoute: typeof CropPlannerRoute
     }
+    '/groups/$groupId': {
+      id: '/groups/$groupId'
+      path: '/groups/$groupId'
+      fullPath: '/groups/$groupId'
+      preLoaderRoute: typeof GroupsGroupIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/messages/$userId': {
       id: '/messages/$userId'
       path: '/$userId'
@@ -1311,6 +1331,7 @@ const rootRouteChildren: RootRouteChildren = {
   AiBondhuDiseaseRoute: AiBondhuDiseaseRoute,
   AiBondhuPesticideRoute: AiBondhuPesticideRoute,
   AiBondhuSoilRoute: AiBondhuSoilRoute,
+  GroupsGroupIdRoute: GroupsGroupIdRoute,
   ProfileDiseaseHistoryRoute: ProfileDiseaseHistoryRoute,
   UUserIdRoute: UUserIdRoute,
   VegetableGuideSlugRoute: VegetableGuideSlugRoute,
