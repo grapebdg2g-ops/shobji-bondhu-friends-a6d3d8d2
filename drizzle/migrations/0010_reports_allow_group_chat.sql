@@ -1,0 +1,2 @@
+ALTER TABLE public.user_reports DROP CONSTRAINT IF EXISTS user_reports_content_type_check;
+ALTER TABLE public.user_reports ADD CONSTRAINT user_reports_content_type_check CHECK (content_type IN ('post','exchange','price','comment','user','group_chat'));

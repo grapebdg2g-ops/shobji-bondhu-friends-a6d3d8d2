@@ -57,6 +57,7 @@ function NotificationsPage() {
   const open = async (n: Notification) => {
     if (!n.is_read) await markRead(n.id);
     if (n.type === "message" && n.ref_id) navigate({ to: "/messages/$userId", params: { userId: n.ref_id } });
+    else if (n.ref_type === "group_chat" && n.ref_id) navigate({ to: "/groups/$groupId", params: { groupId: n.ref_id } });
     else if (n.ref_type === "connection") navigate({ to: "/connections" });
     else if (n.ref_type === "friend" && n.ref_id) navigate({ to: "/u/$userId", params: { userId: n.ref_id } });
     else if (n.ref_type === "post") navigate({ to: "/feed" });

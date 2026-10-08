@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -74,7 +74,7 @@ function ReportsPage() {
     mutationFn: async (r: any) => {
       if (r.content_id && r.content_type) {
         const tableMap: Record<string, string> = {
-          post: "posts", exchange: "exchanges", price: "prices", comment: "post_comments",
+          post: "posts", exchange: "exchanges", price: "prices", comment: "post_comments", group_chat: "group_chats",
         };
         const tbl = tableMap[r.content_type];
         if (tbl) await supabase.from(tbl as any).delete().eq("id", r.content_id);
@@ -126,13 +126,13 @@ function ReportsPage() {
 
       <div className="bg-white rounded-xl border border-gray-200 p-3 flex gap-2 items-center flex-wrap">
         <span className="text-xs font-semibold text-gray-600">ধরন:</span>
-        {["all", "post", "exchange", "price", "comment"].map((t) => (
+        {["all", "post", "exchange", "price", "comment", "group_chat"].map((t) => (
           <button
             key={t}
             onClick={() => setType(t)}
             className={`px-3 py-1 rounded-full text-xs font-semibold ${type === t ? "bg-purple-600 text-white" : "bg-gray-100 text-gray-700"}`}
           >
-            {t === "all" ? "সব" : t === "post" ? "পোস্ট" : t === "exchange" ? "বিনিময়" : t === "price" ? "দাম" : "মন্তব্য"}
+            {t === "all" ? "সব" : t === "post" ? "পোস্ট" : t === "exchange" ? "বিনিময়" : t === "price" ? "দাম" : t === "group_chat" ? "গ্রুপ চ্যাট" : "মন্তব্য"}
           </button>
         ))}
       </div>
@@ -166,6 +166,11 @@ function ReportsPage() {
                 <p className="mt-1 text-sm font-semibold text-gray-900">কারণ: {r.reason}</p>
                 {r.description && <p className="text-xs text-gray-600 mt-0.5">{r.description}</p>}
                 <p className="text-[11px] text-gray-400 mt-1">Content ID: {r.content_id || "—"}</p>
+                {r.content_type === "group_chat" && r.content_id && (
+                  <Link to="/groups/$groupId" params={{ groupId: r.content_id }} className="mt-1 inline-block text-xs font-bold text-purple-700 underline">
+                    গ্রুপ চ্যাট ও সব মেসেজ দেখুন →
+                  </Link>
+                )}
               </div>
               {r.status === "pending" && (
                 <div className="flex flex-col gap-1 shrink-0">

@@ -7,7 +7,7 @@ import { useUser } from "@/contexts/user-context";
 import { toast } from "sonner";
 import { Loader2, Flag } from "lucide-react";
 
-export type ReportContentType = "post" | "exchange" | "price" | "comment" | "user";
+export type ReportContentType = "post" | "exchange" | "price" | "comment" | "user" | "group_chat";
 
 const REASONS: Array<{ value: string; label: string; icon: string }> = [
   { value: "spam", label: "স্প্যাম বা বিজ্ঞাপন", icon: "🗑️" },

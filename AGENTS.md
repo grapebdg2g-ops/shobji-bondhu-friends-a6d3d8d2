@@ -9,3 +9,4 @@
 - Keep pesticide chemistry (IRAC/FRAC, PHI, safety), stage irrigation and IPM rules in src/data/crop-knowledge.ts layered on the master catalog; one lookup serves spray, plan and history views.
 
 - Prices mentioned in posts/comments are captured as community price reports tagged with origin_type/origin_id; one AI extraction per saved post/comment, only for the author.
+- Group chat membership changes go through security-definer RPCs (create_group_chat/add_group_members/remove_group_member) that only allow accepted friends; clients never write group_chat_members directly.

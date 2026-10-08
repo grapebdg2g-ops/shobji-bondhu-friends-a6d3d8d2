@@ -482,6 +482,97 @@ export type Database = {
         }
         Relationships: []
       }
+      group_chat_members: {
+        Row: {
+          group_id: string
+          joined_at: string
+          last_read_at: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          group_id: string
+          joined_at?: string
+          last_read_at?: string
+          role?: string
+          user_id: string
+        }
+        Update: {
+          group_id?: string
+          joined_at?: string
+          last_read_at?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_chat_members_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "group_chats"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      group_chat_messages: {
+        Row: {
+          body: string
+          created_at: string
+          group_id: string
+          id: string
+          sender_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          group_id: string
+          id?: string
+          sender_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          group_id?: string
+          id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_chat_messages_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "group_chats"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      group_chats: {
+        Row: {
+          created_at: string
+          creator_id: string
+          id: string
+          last_message_at: string
+          name: string
+          topic: string | null
+        }
+        Insert: {
+          created_at?: string
+          creator_id: string
+          id?: string
+          last_message_at?: string
+          name: string
+          topic?: string | null
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string
+          id?: string
+          last_message_at?: string
+          name?: string
+          topic?: string | null
+        }
+        Relationships: []
+      }
       internal_secrets: {
         Row: {
           name: string
@@ -1369,6 +1460,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_group_members: {
+        Args: { _group_id: string; _member_ids: string[] }
+        Returns: number
+      }
       admin_find_user_by_phone: { Args: { _phone: string }; Returns: string }
       admin_get_phones: {
         Args: { _ids: string[] }
@@ -1377,6 +1472,7 @@ export type Database = {
           phone: string
         }[]
       }
+      are_friends: { Args: { _a: string; _b: string }; Returns: boolean }
       cancel_connection: {
         Args: { connection_id: string }
         Returns: {
@@ -1395,6 +1491,10 @@ export type Database = {
         }
       }
       cleanup_ai_chat_cache: { Args: never; Returns: undefined }
+      create_group_chat: {
+        Args: { _member_ids: string[]; _name: string; _topic: string }
+        Returns: string
+      }
       decrement_likes: { Args: { post_id: string }; Returns: undefined }
       get_connected_farmer_phone: {
         Args: { target_user_id: string }
@@ -1417,6 +1517,20 @@ export type Database = {
         }[]
       }
       get_exchange_phone: { Args: { _id: string }; Returns: string }
+      get_group_threads: {
+        Args: never
+        Returns: {
+          group_id: string
+          last_body: string
+          last_message_at: string
+          last_sender_name: string
+          member_count: number
+          my_role: string
+          name: string
+          topic: string
+          unread_count: number
+        }[]
+      }
       get_my_phone: { Args: never; Returns: string }
       get_price_history: {
         Args: { p_days?: number; p_district: string; p_product: string }
@@ -1462,12 +1576,25 @@ export type Database = {
       increment_likes: { Args: { post_id: string }; Returns: undefined }
       invoke_cron_hook: { Args: { _path: string }; Returns: number }
       is_active_user: { Args: { _user_id: string }; Returns: boolean }
+      is_group_admin: {
+        Args: { _group_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_group_member: {
+        Args: { _group_id: string; _user_id: string }
+        Returns: boolean
+      }
       mark_direct_messages_read: {
         Args: { peer_user_id: string }
         Returns: number
       }
+      mark_group_read: { Args: { _group_id: string }; Returns: undefined }
       record_cache_feedback: {
         Args: { _helpful: boolean; _id: string }
+        Returns: undefined
+      }
+      remove_group_member: {
+        Args: { _group_id: string; _user_id: string }
         Returns: undefined
       }
       request_connection: {
