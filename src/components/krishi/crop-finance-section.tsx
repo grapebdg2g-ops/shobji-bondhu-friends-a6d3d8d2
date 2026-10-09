@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Plus, Trash2, Printer, Wallet } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-react-query-placeholder";
+import { Plus, Trash2, Printer, Wallet, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { fmtBdt, toBn } from "@/lib/bn";
@@ -17,6 +17,12 @@ const DEFAULTS: Array<[EntryType, string]> = [
   ["expense", "জমি লিজ/ভাড়া"], ["expense", "পরিবহন"],
   ["income", "ফসল বিক্রি"],
 ];
+const SUGGESTIONS: Record<EntryType, string[]> = {
+  capital: ["নিজস্ব মূলধন", "ঋণ/ধার"],
+  expense: ["জমি চাষ/হালচাষ", "বীজ/চারা", "সার", "কীটনাশক/বালাইনাশক", "সেচ", "শ্রমিক মজুরি", "জমি লিজ/ভাড়া", "পরিবহন", "মাচা/সাপোর্ট", "বীজতলা তৈরি"],
+  income: ["ফসল বিক্রি", "পাশাপাশি ফসল বিক্রি", "বীজ/চারা বিক্রি"],
+};
+const CUSTOM = "__custom";
 
 export function CropFinanceSection({ userId, planId, cropType }: { userId: string; planId: string; cropType: string }) {
   const qc = useQueryClient();
@@ -30,7 +36,11 @@ export function CropFinanceSection({ userId, planId, cropType }: { userId: strin
     },
   });
   const [seeded, setSeeded] = useState(false);
-  const [form, setForm] = useState<{ type: EntryType; title: string; amount: string }>({ type: "expense", title: "", amount: "" });
+  const [open, setOpen] = useState(false);
+  const [tab, setTab] = useState<EntryType>("expense");
+  const [pick, setPick] = useState("");
+  const [customTitle, setCustomTitle] = useState("");
+  const [amount, setAmount] = useState("");
 
   useEffect(() => {
     if (isLoading || seeded || rows.length) return;
@@ -45,21 +55,23 @@ export function CropFinanceSection({ userId, planId, cropType }: { userId: strin
     return t;
   }, [rows]);
   const profit = totals.income - totals.expense;
+  const tabRows = rows.filter((r) => r.entry_type === tab);
 
   async function updateAmount(r: Entry, v: string) {
-    const amount = Math.max(0, Number(v) || 0);
-    if (amount === Number(r.amount)) return;
-    const { error } = await supabase.from("crop_plan_finances").update({ amount }).eq("id", r.id);
+    const amt = Math.max(0, Number(v) || 0);
+    if (amt === Number(r.amount)) return;
+    const { error } = await supabase.from("crop_plan_finances").update({ amount: amt }).eq("id", r.id);
     if (error) return toast.error("সংরক্ষণ ব্যর্থ");
     qc.invalidateQueries({ queryKey: key });
   }
   async function add() {
-    const title = form.title.trim();
-    if (!title) return toast.error("আইটেমের নাম লিখুন");
-    const { error } = await supabase.from("crop_plan_finances").insert({ user_id: userId, plan_id: planId, entry_type: form.type, title: title.slice(0, 80), amount: Math.max(0, Number(form.amount) || 0) });
+    const title = (pick === CUSTOM ? customTitle : pick).trim();
+    if (!title) return toast.error("তালিকা থেকে নির্বাচন করুন বা নিজের নাম লিখুন");
+    const { error } = await supabase.from("crop_plan_finances").insert({ user_id: userId, plan_id: planId, entry_type: tab, title: title.slice(0, 80), amount: Math.max(0, Number(amount) || 0) });
     if (error) return toast.error("যোগ করা যায়নি");
-    setForm({ ...form, title: "", amount: "" });
+    setPick(""); setCustomTitle(""); setAmount("");
     qc.invalidateQueries({ queryKey: key });
+    toast.success("যোগ হয়েছে");
   }
   async function remove(id: string) {
     if (!confirm("আপনি কি নিশ্চিত মুছে ফেলতে চান?")) return;
@@ -81,25 +93,45 @@ ${table("capital")}${table("expense")}${table("income")}
   }
 
   return (
-    <section className="px-5 mt-5">
-      <div className="bg-white rounded-2xl p-4 shadow-sm ring-1 ring-emerald-100">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-bold text-gray-900 inline-flex items-center gap-2"><Wallet className="h-5 w-5 text-emerald-600" /> আয়-ব্যয়ের খাতা</h2>
-          <button onClick={printReport} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold ring-1 ring-emerald-200">
-            <Printer className="h-4 w-4" /> প্রিন্ট / PDF
-          </button>
-        </div>
-        <div className="grid grid-cols-2 gap-2 text-xs mb-4">
-          <div className="rounded-xl bg-sky-50 p-2">মূলধন<br /><b className="text-base">{fmtBdt(totals.capital)}</b></div>
-          <div className="rounded-xl bg-rose-50 p-2">মোট ব্যয়<br /><b className="text-base">{fmtBdt(totals.expense)}</b></div>
-          <div className="rounded-xl bg-emerald-50 p-2">মোট আয়<br /><b className="text-base">{fmtBdt(totals.income)}</b></div>
-          <div className={`rounded-xl p-2 ${profit >= 0 ? "bg-emerald-100" : "bg-rose-100"}`}>নীট {profit >= 0 ? "লাভ" : "ক্ষতি"}<br /><b className="text-base">{fmtBdt(Math.abs(profit))}</b></div>
-        </div>
-        {isLoading ? <p className="text-sm text-gray-500">লোড হচ্ছে…</p> : (["capital", "expense", "income"] as EntryType[]).map((t) => (
-          <div key={t} className="mb-3">
-            <p className="text-sm font-bold text-gray-800 mb-1">{LABEL[t]} ({toBn(rows.filter((r) => r.entry_type === t).length)})</p>
-            {rows.filter((r) => r.entry_type === t).map((r) => (
-              <div key={r.id} className="flex items-center gap-2 py-1 border-b border-gray-100">
+    <section className="px-5 mt-5 sticky top-0 z-30">
+      <div className="bg-white rounded-2xl shadow-md ring-1 ring-emerald-100 overflow-hidden">
+        {/* Always-visible collapsed bar */}
+        <button onClick={() => setOpen((o) => !o)} className="w-full px-4 py-3 flex items-center justify-between gap-2 text-left">
+          <span className="inline-flex items-center gap-2 text-base font-bold text-gray-900 min-w-0">
+            <Wallet className="h-5 w-5 text-emerald-600 shrink-0" />
+            <span className="truncate">এই ফসলের আয়ব্যয় রাখুন</span>
+          </span>
+          <span className="inline-flex items-center gap-2 shrink-0">
+            <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${profit >= 0 ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"}`}>
+              নীট {profit >= 0 ? "লাভ" : "ক্ষতি"} {fmtBdt(Math.abs(profit))}
+            </span>
+            {open ? <ChevronUp className="h-5 w-5 text-gray-400" /> : <ChevronDown className="h-5 w-5 text-gray-400" />}
+          </span>
+        </button>
+
+        {open && (
+          <div className="px-4 pb-4">
+            <div className="grid grid-cols-2 gap-2 text-xs mb-3">
+              <div className="rounded-xl bg-sky-50 p-2">মূলধন<br /><b className="text-base">{fmtBdt(totals.capital)}</b></div>
+              <div className="rounded-xl bg-rose-50 p-2">মোট ব্যয়<br /><b className="text-base">{fmtBdt(totals.expense)}</b></div>
+              <div className="rounded-xl bg-emerald-50 p-2">মোট আয়<br /><b className="text-base">{fmtBdt(totals.income)}</b></div>
+              <div className={`rounded-xl p-2 ${profit >= 0 ? "bg-emerald-100" : "bg-rose-100"}`}>নীট {profit >= 0 ? "লাভ" : "ক্ষতি"}<br /><b className="text-base">{fmtBdt(Math.abs(profit))}</b></div>
+            </div>
+
+            {/* Type tabs */}
+            <div className="flex gap-2 mb-3">
+              {(["capital", "expense", "income"] as EntryType[]).map((t) => (
+                <button key={t} onClick={() => { setTab(t); setPick(""); setCustomTitle(""); }}
+                  className={`flex-1 py-1.5 rounded-full text-xs font-bold ring-1 transition ${tab === t ? "bg-emerald-600 text-white ring-emerald-600" : "bg-gray-50 text-gray-700 ring-gray-200"}`}>
+                  {LABEL[t]} ({toBn(rows.filter((r) => r.entry_type === t).length)})
+                </button>
+              ))}
+            </div>
+
+            {isLoading ? <p className="text-sm text-gray-500">লোড হচ্ছে…</p> : tabRows.length === 0 ? (
+              <p className="text-sm text-gray-500 py-2">এই খাতে এখনো কিছু নেই — নিচ থেকে যোগ করুন।</p>
+            ) : tabRows.map((r) => (
+              <div key={r.id} className="flex items-center gap-2 py-1.5 border-b border-gray-100">
                 <span className="flex-1 text-sm text-gray-700 truncate">{r.title}</span>
                 <input type="number" min={0} defaultValue={Number(r.amount) || ""} placeholder="৳ ০"
                   onBlur={(e) => updateAmount(r, e.target.value)}
@@ -107,21 +139,29 @@ ${table("capital")}${table("expense")}${table("income")}
                 <button onClick={() => remove(r.id)} aria-label="মুছুন" className="text-gray-400 hover:text-rose-600"><Trash2 className="h-4 w-4" /></button>
               </div>
             ))}
+
+            {/* Add item: dropdown select or custom name */}
+            <div className="mt-3 rounded-xl bg-gray-50 p-3 space-y-2">
+              <p className="text-sm font-semibold text-gray-800">নতুন {LABEL[tab]} যোগ করুন</p>
+              <select value={pick} onChange={(e) => setPick(e.target.value)} className="w-full rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-sm">
+                <option value="">— তালিকা থেকে নির্বাচন করুন —</option>
+                {SUGGESTIONS[tab].map((s) => <option key={s} value={s}>{s}</option>)}
+                <option value={CUSTOM}>অন্য কিছু (নিজে নাম লিখুন)</option>
+              </select>
+              {pick === CUSTOM && (
+                <input value={customTitle} onChange={(e) => setCustomTitle(e.target.value)} maxLength={80} placeholder="আইটেমের নাম" className="w-full rounded-lg border border-gray-200 px-2 py-1.5 text-sm" />
+              )}
+              <div className="flex gap-2">
+                <input type="number" min={0} value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="টাকা" className="flex-1 min-w-0 rounded-lg border border-gray-200 px-2 py-1.5 text-sm" />
+                <button onClick={add} className="inline-flex items-center gap-1 px-4 rounded-lg bg-emerald-600 text-white text-sm font-bold shrink-0"><Plus className="h-4 w-4" /> যোগ</button>
+              </div>
+            </div>
+
+            <button onClick={printReport} className="mt-3 w-full inline-flex items-center justify-center gap-1 py-2 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold ring-1 ring-emerald-200">
+              <Printer className="h-4 w-4" /> প্রিন্ট / PDF
+            </button>
           </div>
-        ))}
-        <div className="mt-3 rounded-xl bg-gray-50 p-3 space-y-2">
-          <p className="text-sm font-semibold text-gray-800">নতুন আইটেম যোগ করুন</p>
-          <div className="flex gap-2">
-            <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value as EntryType })} className="rounded-lg border border-gray-200 px-2 py-1.5 text-sm">
-              <option value="expense">ব্যয়</option><option value="income">আয়</option><option value="capital">মূলধন</option>
-            </select>
-            <input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} maxLength={80} placeholder="আইটেমের নাম" className="flex-1 min-w-0 rounded-lg border border-gray-200 px-2 py-1.5 text-sm" />
-          </div>
-          <div className="flex gap-2">
-            <input type="number" min={0} value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} placeholder="টাকা" className="flex-1 rounded-lg border border-gray-200 px-2 py-1.5 text-sm" />
-            <button onClick={add} className="inline-flex items-center gap-1 px-4 rounded-lg bg-emerald-600 text-white text-sm font-bold"><Plus className="h-4 w-4" /> যোগ</button>
-          </div>
-        </div>
+        )}
       </div>
     </section>
   );
