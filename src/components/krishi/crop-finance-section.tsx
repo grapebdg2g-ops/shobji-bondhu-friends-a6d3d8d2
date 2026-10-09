@@ -128,7 +128,7 @@ ${table("capital")}${table("expense")}${table("income")}
                 <input type="number" min={0} defaultValue={Number(r.amount) || ""} placeholder="৳ ০"
                   onBlur={(e) => updateAmount(r, e.target.value)}
                   className="w-24 rounded-lg border border-gray-200 px-2 py-1 text-sm text-right" />
-                <button onClick={() => remove(r.id)} aria-label="মুছুন" className="text-gray-400 hover:text-rose-600"><Trash2 className="h-4 w-4" /></button>
+                <button onClick={() => setDelTarget(r)} aria-label="মুছুন" className="text-gray-400 hover:text-rose-600"><Trash2 className="h-4 w-4" /></button>
               </div>
             ))}
 
