@@ -135,8 +135,25 @@ ${table("capital")}${table("expense")}${table("income")}
               ))}
             </div>
 
+            {/* Add item: dropdown select or custom name */}
+            <div className="mb-3 rounded-xl bg-gray-50 p-3 space-y-2">
+              <p className="text-sm font-semibold text-gray-800">নতুন {LABEL[tab]} যোগ করুন</p>
+              <select value={pick} onChange={(e) => setPick(e.target.value)} className="w-full rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-sm">
+                <option value="">— তালিকা থেকে নির্বাচন করুন —</option>
+                {SUGGESTIONS[tab].map((s) => <option key={s} value={s}>{s}</option>)}
+                <option value={CUSTOM}>অন্য কিছু (নিজে নাম লিখুন)</option>
+              </select>
+              {pick === CUSTOM && (
+                <input value={customTitle} onChange={(e) => setCustomTitle(e.target.value)} maxLength={80} placeholder="আইটেমের নাম" className="w-full rounded-lg border border-gray-200 px-2 py-1.5 text-sm" />
+              )}
+              <div className="flex gap-2">
+                <input type="number" min={0} value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="টাকা" className="flex-[2] min-w-0 rounded-lg border border-gray-200 px-2 py-1.5 text-sm />
+                <input type="date" value={entryDate} onChange={(e) => setEntryDate(e.target.value)} className="w-[6.5rem] shrink-0 rounded-lg border-gray-200 px-1 py-1.5 text-xs" data-x=" border border-gray-200 px-2 py-1.5 text-sm" />
+                <button onClick={add} className="inline-flex items-center gap-1 px-3 rounded-lg bg-emerald-600 text-white text-sm font-bold shrink-0"><Plus className="h-4 w-4" /> যোগ</button>
+              </div>
+            </div>
             {isLoading ? <p className="text-sm text-gray-500">লোড হচ্ছে…</p> : tabRows.length === 0 ? (
-              <p className="text-sm text-gray-500 py-2">এই খাতে এখনো কিছু নেই — নিচ থেকে যোগ করুন।</p>
+              <p className="text-sm text-gray-500 py-2">এই খাতে এখনো কিছু নেই — উপর থেকে যোগ করুন।</p>
             ) : (
               <>
                 {visibleRows.map((r) => (
@@ -174,23 +191,6 @@ ${table("capital")}${table("expense")}${table("income")}
               </>
             )}
 
-            {/* Add item: dropdown select or custom name */}
-            <div className="mt-3 rounded-xl bg-gray-50 p-3 space-y-2">
-              <p className="text-sm font-semibold text-gray-800">নতুন {LABEL[tab]} যোগ করুন</p>
-              <select value={pick} onChange={(e) => setPick(e.target.value)} className="w-full rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-sm">
-                <option value="">— তালিকা থেকে নির্বাচন করুন —</option>
-                {SUGGESTIONS[tab].map((s) => <option key={s} value={s}>{s}</option>)}
-                <option value={CUSTOM}>অন্য কিছু (নিজে নাম লিখুন)</option>
-              </select>
-              {pick === CUSTOM && (
-                <input value={customTitle} onChange={(e) => setCustomTitle(e.target.value)} maxLength={80} placeholder="আইটেমের নাম" className="w-full rounded-lg border border-gray-200 px-2 py-1.5 text-sm" />
-              )}
-              <div className="flex gap-2">
-                <input type="number" min={0} value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="টাকা" className="flex-1 min-w-0 rounded-lg border border-gray-200 px-2 py-1.5 text-sm" />
-                <input type="date" value={entryDate} onChange={(e) => setEntryDate(e.target.value)} className="w-32 rounded-lg border border-gray-200 px-2 py-1.5 text-sm" />
-                <button onClick={add} className="inline-flex items-center gap-1 px-4 rounded-lg bg-emerald-600 text-white text-sm font-bold shrink-0"><Plus className="h-4 w-4" /> যোগ</button>
-              </div>
-            </div>
 
             <button onClick={printReport} className="mt-3 w-full inline-flex items-center justify-center gap-1 py-2 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold ring-1 ring-emerald-200">
               <Printer className="h-4 w-4" /> প্রিন্ট / PDF
