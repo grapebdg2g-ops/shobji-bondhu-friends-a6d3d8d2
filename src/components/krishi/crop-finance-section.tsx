@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Plus, Trash2, Printer, Wallet, ChevronDown, ChevronUp } from "lucide-react";
+import { Plus, Trash2, Printer, Wallet, ChevronDown, ChevronUp, Pencil, Check, X } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { fmtBdt, toBn } from "@/lib/bn";
@@ -20,6 +20,12 @@ const SUGGESTIONS: Record<EntryType, string[]> = {
   income: ["ফসল বিক্রি", "পাশাপাশি ফসল বিক্রি", "বীজ/চারা বিক্রি"],
 };
 const CUSTOM = "__custom";
+const PAGE = 5;
+
+function todayIso() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
 
 export function CropFinanceSection({ userId, planId, cropType }: { userId: string; planId: string; cropType: string }) {
   const qc = useQueryClient();
@@ -37,7 +43,12 @@ export function CropFinanceSection({ userId, planId, cropType }: { userId: strin
   const [pick, setPick] = useState("");
   const [customTitle, setCustomTitle] = useState("");
   const [amount, setAmount] = useState("");
+  const [entryDate, setEntryDate] = useState(todayIso());
   const [delTarget, setDelTarget] = useState<Entry | null>(null);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [editAmount, setEditAmount] = useState("");
+  const [editDate, setEditDate] = useState("");
+  const [showCount, setShowCount] = useState(PAGE);
 
   const totals = useMemo(() => {
     const t = { capital: 0, expense: 0, income: 0 };
@@ -46,20 +57,24 @@ export function CropFinanceSection({ userId, planId, cropType }: { userId: strin
   }, [rows]);
   const profit = totals.income - totals.expense;
   const tabRows = rows.filter((r) => r.entry_type === tab);
+  const visibleRows = tabRows.slice(0, showCount);
 
-  async function updateAmount(r: Entry, v: string) {
-    const amt = Math.max(0, Number(v) || 0);
-    if (amt === Number(r.amount)) return;
-    const { error } = await supabase.from("crop_plan_finances").update({ amount: amt }).eq("id", r.id);
+  async function saveEdit(r: Entry) {
+    const amt = Math.max(0, Number(editAmount) || 0);
+    const date = editDate || r.entry_date;
+    if (amt === Number(r.amount) && date === r.entry_date) { setEditId(null); return; }
+    const { error } = await supabase.from("crop_plan_finances").update({ amount: amt, entry_date: date }).eq("id", r.id);
     if (error) return toast.error("সংরক্ষণ ব্যর্থ");
+    setEditId(null);
     qc.invalidateQueries({ queryKey: key });
+    toast.success("আপডেট হয়েছে");
   }
   async function add() {
     const title = (pick === CUSTOM ? customTitle : pick).trim();
     if (!title) return toast.error("তালিকা থেকে নির্বাচন করুন বা নিজের নাম লিখুন");
-    const { error } = await supabase.from("crop_plan_finances").insert({ user_id: userId, plan_id: planId, entry_type: tab, title: title.slice(0, 80), amount: Math.max(0, Number(amount) || 0) });
+    const { error } = await supabase.from("crop_plan_finances").insert({ user_id: userId, plan_id: planId, entry_type: tab, title: title.slice(0, 80), amount: Math.max(0, Number(amount) || 0), entry_date: entryDate || todayIso() });
     if (error) return toast.error("যোগ করা যায়নি");
-    setPick(""); setCustomTitle(""); setAmount("");
+    setPick(""); setCustomTitle(""); setAmount(""); setEntryDate(todayIso());
     qc.invalidateQueries({ queryKey: key });
     toast.success("যোগ হয়েছে");
   }
@@ -91,7 +106,7 @@ ${table("capital")}${table("expense")}${table("income")}
         <button onClick={() => setOpen((o) => !o)} className="w-full px-4 py-3 flex items-center justify-between gap-2 text-left">
           <span className="inline-flex items-center gap-2 text-base font-bold text-gray-900 min-w-0">
             <Wallet className="h-5 w-5 text-emerald-600 shrink-0" />
-            <span className="truncate">এই ফসলের আয়ব্যয় রাখুন</span>
+            <span className="truncate">এই ফসলের আয়-ব্যয় রাখুন</span>
           </span>
           <span className="inline-flex items-center gap-2 shrink-0">
             <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${profit >= 0 ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"}`}>
@@ -113,7 +128,7 @@ ${table("capital")}${table("expense")}${table("income")}
             {/* Type tabs */}
             <div className="flex gap-2 mb-3">
               {(["capital", "expense", "income"] as EntryType[]).map((t) => (
-                <button key={t} onClick={() => { setTab(t); setPick(""); setCustomTitle(""); }}
+                <button key={t} onClick={() => { setTab(t); setPick(""); setCustomTitle(""); setEditId(null); setShowCount(PAGE); }}
                   className={`flex-1 py-1.5 rounded-full text-xs font-bold ring-1 transition ${tab === t ? "bg-emerald-600 text-white ring-emerald-600" : "bg-gray-50 text-gray-700 ring-gray-200"}`}>
                   {LABEL[t]} ({toBn(rows.filter((r) => r.entry_type === t).length)})
                 </button>
@@ -122,15 +137,42 @@ ${table("capital")}${table("expense")}${table("income")}
 
             {isLoading ? <p className="text-sm text-gray-500">লোড হচ্ছে…</p> : tabRows.length === 0 ? (
               <p className="text-sm text-gray-500 py-2">এই খাতে এখনো কিছু নেই — নিচ থেকে যোগ করুন।</p>
-            ) : tabRows.map((r) => (
-              <div key={r.id} className="flex items-center gap-2 py-1.5 border-b border-gray-100">
-                <span className="flex-1 text-sm text-gray-700 truncate">{r.title}</span>
-                <input type="number" min={0} defaultValue={Number(r.amount) || ""} placeholder="৳ ০"
-                  onBlur={(e) => updateAmount(r, e.target.value)}
-                  className="w-24 rounded-lg border border-gray-200 px-2 py-1 text-sm text-right" />
-                <button onClick={() => setDelTarget(r)} aria-label="মুছুন" className="text-gray-400 hover:text-rose-600"><Trash2 className="h-4 w-4" /></button>
-              </div>
-            ))}
+            ) : (
+              <>
+                {visibleRows.map((r) => (
+                  <div key={r.id} className="py-1.5 border-b border-gray-100">
+                    {editId === r.id ? (
+                      <div className="space-y-1.5">
+                        <p className="text-sm font-semibold text-gray-800 truncate">{r.title}</p>
+                        <div className="flex items-center gap-2">
+                          <input type="number" min={0} value={editAmount} onChange={(e) => setEditAmount(e.target.value)} placeholder="টাকা"
+                            className="w-24 rounded-lg border border-gray-200 px-2 py-1 text-sm text-right" />
+                          <input type="date" value={editDate} onChange={(e) => setEditDate(e.target.value)}
+                            className="flex-1 min-w-0 rounded-lg border border-gray-200 px-2 py-1 text-sm" />
+                          <button onClick={() => saveEdit(r)} aria-label="সংরক্ষণ" className="text-emerald-600 hover:text-emerald-700"><Check className="h-4 w-4" /></button>
+                          <button onClick={() => setEditId(null)} aria-label="বাতিল" className="text-gray-400 hover:text-gray-600"><X className="h-4 w-4" /></button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-gray-700 truncate">{r.title}</p>
+                          <p className="text-[11px] text-gray-400">{formatBnDate(r.entry_date)}</p>
+                        </div>
+                        <span className="text-sm font-bold text-gray-900 shrink-0">{fmtBdt(Number(r.amount))}</span>
+                        <button onClick={() => { setEditId(r.id); setEditAmount(String(Number(r.amount) || "")); setEditDate(r.entry_date); }} aria-label="এডিট" className="text-gray-400 hover:text-emerald-600 shrink-0"><Pencil className="h-4 w-4" /></button>
+                        <button onClick={() => setDelTarget(r)} aria-label="মুছুন" className="text-gray-400 hover:text-rose-600 shrink-0"><Trash2 className="h-4 w-4" /></button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+                {tabRows.length > showCount && (
+                  <button onClick={() => setShowCount((c) => c + PAGE)} className="mt-2 w-full inline-flex items-center justify-center gap-1 py-1.5 rounded-full bg-gray-50 text-gray-600 text-xs font-bold ring-1 ring-gray-200">
+                    <ChevronDown className="h-3.5 w-3.5" /> আরও {toBn(Math.min(PAGE, tabRows.length - showCount))}টি দেখুন (মোট {toBn(tabRows.length)}টি)
+                  </button>
+                )}
+              </>
+            )}
 
             {/* Add item: dropdown select or custom name */}
             <div className="mt-3 rounded-xl bg-gray-50 p-3 space-y-2">
@@ -145,6 +187,7 @@ ${table("capital")}${table("expense")}${table("income")}
               )}
               <div className="flex gap-2">
                 <input type="number" min={0} value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="টাকা" className="flex-1 min-w-0 rounded-lg border border-gray-200 px-2 py-1.5 text-sm" />
+                <input type="date" value={entryDate} onChange={(e) => setEntryDate(e.target.value)} className="w-32 rounded-lg border border-gray-200 px-2 py-1.5 text-sm" />
                 <button onClick={add} className="inline-flex items-center gap-1 px-4 rounded-lg bg-emerald-600 text-white text-sm font-bold shrink-0"><Plus className="h-4 w-4" /> যোগ</button>
               </div>
             </div>
