@@ -217,6 +217,50 @@ export type Database = {
           },
         ]
       }
+      crop_plan_finances: {
+        Row: {
+          amount: number
+          created_at: string
+          entry_date: string
+          entry_type: string
+          id: string
+          note: string | null
+          plan_id: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          entry_date?: string
+          entry_type: string
+          id?: string
+          note?: string | null
+          plan_id: string
+          title: string
+          user_id?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          entry_date?: string
+          entry_type?: string
+          id?: string
+          note?: string | null
+          plan_id?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crop_plan_finances_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "user_crop_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       crop_reminders: {
         Row: {
           created_at: string
