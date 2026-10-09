@@ -50,6 +50,38 @@ export function CropFinanceSection({ userId, planId, cropType }: { userId: strin
   const [editDate, setEditDate] = useState("");
   const [showCount, setShowCount] = useState(PAGE);
 
+  // Hide the bar when scrolling down; reveal it while scrolling up; hide again when scrolling stops.
+  const barRef = useRef<HTMLElement | null>(null);
+  const [barStuck, setBarStuck] = useState(false);
+  const [barShown, setBarShown] = useState(true);
+  useEffect(() => {
+    let last = window.scrollY;
+    let idle: ReturnType<typeof setTimeout> | undefined;
+    const onScroll = () => {
+      const y = window.scrollY;
+      const delta = y - last;
+      if (Math.abs(delta) < 6) return;
+      last = y;
+      const stuck = y > 8 && (barRef.current?.getBoundingClientRect().top ?? 0) <= 1;
+      setBarStuck(stuck);
+      if (!stuck) { setBarShown(true); return; }
+      if (idle) clearTimeout(idle);
+      if (delta < 0) {
+        setBarShown(true);
+        idle = setTimeout(() => setBarShown(false), 900);
+      } else {
+        setBarShown(false);
+      }
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (idle) clearTimeout(idle);
+    };
+  }, []);
+  const barHidden = barStuck && !barShown;
+
+
   const totals = useMemo(() => {
     const t = { capital: 0, expense: 0, income: 0 };
     rows.forEach((r) => (t[r.entry_type] += Number(r.amount)));
