@@ -64,9 +64,11 @@ export function CropFinanceSection({ userId, planId, cropType }: { userId: strin
     toast.success("যোগ হয়েছে");
   }
   async function remove(id: string) {
-    if (!confirm("আপনি কি নিশ্চিত মুছে ফেলতে চান?")) return;
-    await supabase.from("crop_plan_finances").delete().eq("id", id);
+    const { error } = await supabase.from("crop_plan_finances").delete().eq("id", id);
+    if (error) return toast.error("মুছে ফেলা যায়নি");
+    setDelTarget(null);
     qc.invalidateQueries({ queryKey: key });
+    toast.success("মুছে ফেলা হয়েছে");
   }
 
   function printReport() {
