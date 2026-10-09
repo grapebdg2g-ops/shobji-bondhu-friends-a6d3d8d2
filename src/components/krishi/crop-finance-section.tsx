@@ -50,11 +50,14 @@ export function CropFinanceSection({ userId, planId, cropType }: { userId: strin
   const [editDate, setEditDate] = useState("");
   const [showCount, setShowCount] = useState(PAGE);
 
-  // Hide the bar when scrolling down; reveal it while scrolling up; hide again when scrolling stops.
+  // Only the collapsed bar follows scroll direction; the open ledger stays in normal page flow.
   const barRef = useRef<HTMLElement | null>(null);
   const [barStuck, setBarStuck] = useState(false);
   const [barShown, setBarShown] = useState(true);
   useEffect(() => {
+    setBarStuck(false);
+    setBarShown(true);
+    if (open) return;
     let last = window.scrollY;
     let idle: ReturnType<typeof setTimeout> | undefined;
     const onScroll = () => {
@@ -78,8 +81,8 @@ export function CropFinanceSection({ userId, planId, cropType }: { userId: strin
       window.removeEventListener("scroll", onScroll);
       if (idle) clearTimeout(idle);
     };
-  }, []);
-  const barHidden = barStuck && !barShown;
+  }, [open]);
+  const barHidden = !open && barStuck && !barShown;
 
 
   const totals = useMemo(() => {
@@ -132,7 +135,7 @@ ${table("capital")}${table("expense")}${table("income")}
   }
 
   return (
-    <section ref={barRef} className={`px-5 mt-5 sticky top-0 z-30 transition-all duration-300 ease-out ${barHidden ? "-translate-y-full opacity-0 pointer-events-none" : "translate-y-0 opacity-100"}`}>
+    <section ref={barRef} className={`px-5 mt-5 ${open ? "relative" : "sticky top-0 z-30 transition-all duration-300 ease-out"} ${barHidden ? "-translate-y-full opacity-0 pointer-events-none" : "translate-y-0 opacity-100"}`}>
       <div className="bg-white rounded-2xl shadow-md ring-1 ring-emerald-100 overflow-hidden">
         {/* Always-visible collapsed bar */}
         <button onClick={() => setOpen((o) => !o)} className="w-full px-4 py-3 flex items-center justify-between gap-2 text-left">
