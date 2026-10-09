@@ -155,6 +155,25 @@ ${table("capital")}${table("expense")}${table("income")}
           </div>
         )}
       </div>
+
+      {/* Delete confirmation dialog */}
+      <AlertDialog open={!!delTarget} onOpenChange={(o) => !o && setDelTarget(null)}>
+        <AlertDialogContent className="max-w-sm rounded-2xl p-5">
+          <AlertDialogHeader className="items-center text-center space-y-2">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-rose-100">
+              <Trash2 className="h-6 w-6 text-rose-600" />
+            </div>
+            <AlertDialogTitle className="text-base font-bold text-gray-900">আপনি কি নিশ্চিত মুছে ফেলতে চান?</AlertDialogTitle>
+            <AlertDialogDescription className="text-sm text-gray-500">
+              <span className="font-bold text-gray-700">“{delTarget?.title}”</span> আইটেমটি{delTarget && Number(delTarget.amount) > 0 ? <> এবং এতে লেখা <span className="font-bold text-gray-700">{fmtBdt(Number(delTarget.amount))}</span> টাকাও</> : null} হিসাব থেকে মুছে যাবে। এটি আর ফেরানো যাবে না।
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-row gap-2 sm:justify-center">
+            <AlertDialogCancel className="flex-1 mt-0 rounded-full border-gray-200 bg-gray-50 text-gray-700 font-bold">বাতিল</AlertDialogCancel>
+            <AlertDialogAction onClick={() => remove(delTarget!.id)} className="flex-1 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-bold">মুছে ফেলুন</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </section>
   );
 }
