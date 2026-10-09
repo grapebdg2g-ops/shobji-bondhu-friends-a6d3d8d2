@@ -1,6 +1,6 @@
 # Tasks
 
-- [ ] Verify and fix the expanded crop ledger disappearing on scroll; check lower entries and Print/PDF remain reachable.
+- [x] Verify and fix the expanded crop ledger disappearing on scroll; check lower entries and Print/PDF remain reachable.
 
 - [x] Make community and status updates visible immediately without refresh.
 - [x] Reorder the home agriculture helper cards and rename organic fertilizer to জৈব কর্নার.

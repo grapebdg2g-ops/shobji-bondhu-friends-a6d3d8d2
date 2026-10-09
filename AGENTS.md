@@ -10,3 +10,4 @@
 
 - Prices mentioned in posts/comments are captured as community price reports tagged with origin_type/origin_id; one AI extraction per saved post/comment, only for the author.
 - Group chat membership changes go through security-definer RPCs (create_group_chat/add_group_members/remove_group_member) that only allow accepted friends; clients never write group_chat_members directly.
+- Keep the expanded crop finance ledger in normal page flow and restrict scroll-reveal behavior to its collapsed bar; long ledgers must remain visible and fully scrollable.
