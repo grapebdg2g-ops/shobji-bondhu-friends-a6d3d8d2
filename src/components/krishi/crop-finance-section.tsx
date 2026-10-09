@@ -1,22 +1,19 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus, Trash2, Printer, Wallet, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { fmtBdt, toBn } from "@/lib/bn";
 import { formatBnDate } from "@/lib/bn-date";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 type EntryType = "capital" | "expense" | "income";
 type Entry = { id: string; entry_type: EntryType; title: string; amount: number; entry_date: string; note: string | null };
 
 const LABEL: Record<EntryType, string> = { capital: "মূলধন", expense: "ব্যয়", income: "আয়" };
-const DEFAULTS: Array<[EntryType, string]> = [
-  ["capital", "নিজস্ব মূলধন"],
-  ["expense", "জমি চাষ/হালচাষ"], ["expense", "বীজ/চারা"], ["expense", "সার"],
-  ["expense", "কীটনাশক/বালাইনাশক"], ["expense", "সেচ"], ["expense", "শ্রমিক মজুরি"],
-  ["expense", "জমি লিজ/ভাড়া"], ["expense", "পরিবহন"],
-  ["income", "ফসল বিক্রি"],
-];
 const SUGGESTIONS: Record<EntryType, string[]> = {
   capital: ["নিজস্ব মূলধন", "ঋণ/ধার"],
   expense: ["জমি চাষ/হালচাষ", "বীজ/চারা", "সার", "কীটনাশক/বালাইনাশক", "সেচ", "শ্রমিক মজুরি", "জমি লিজ/ভাড়া", "পরিবহন", "মাচা/সাপোর্ট", "বীজতলা তৈরি"],
