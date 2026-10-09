@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus, Trash2, Printer, Wallet, ChevronDown, ChevronUp, Pencil, Check, X } from "lucide-react";
 import { toast } from "sonner";
@@ -50,6 +50,38 @@ export function CropFinanceSection({ userId, planId, cropType }: { userId: strin
   const [editDate, setEditDate] = useState("");
   const [showCount, setShowCount] = useState(PAGE);
 
+  // Hide the bar when scrolling down; reveal it while scrolling up; hide again when scrolling stops.
+  const barRef = useRef<HTMLElement | null>(null);
+  const [barStuck, setBarStuck] = useState(false);
+  const [barShown, setBarShown] = useState(true);
+  useEffect(() => {
+    let last = window.scrollY;
+    let idle: ReturnType<typeof setTimeout> | undefined;
+    const onScroll = () => {
+      const y = window.scrollY;
+      const delta = y - last;
+      if (Math.abs(delta) < 6) return;
+      last = y;
+      const stuck = y > 8 && (barRef.current?.getBoundingClientRect().top ?? 0) <= 1;
+      setBarStuck(stuck);
+      if (!stuck) { setBarShown(true); return; }
+      if (idle) clearTimeout(idle);
+      if (delta < 0) {
+        setBarShown(true);
+        idle = setTimeout(() => setBarShown(false), 900);
+      } else {
+        setBarShown(false);
+      }
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (idle) clearTimeout(idle);
+    };
+  }, []);
+  const barHidden = barStuck && !barShown;
+
+
   const totals = useMemo(() => {
     const t = { capital: 0, expense: 0, income: 0 };
     rows.forEach((r) => (t[r.entry_type] += Number(r.amount)));
@@ -100,13 +132,13 @@ ${table("capital")}${table("expense")}${table("income")}
   }
 
   return (
-    <section className="px-5 mt-5 sticky top-0 z-30">
+    <section ref={barRef} className={`px-5 mt-5 sticky top-0 z-30 transition-all duration-300 ease-out ${barHidden ? "-translate-y-full opacity-0 pointer-events-none" : "translate-y-0 opacity-100"}`}>
       <div className="bg-white rounded-2xl shadow-md ring-1 ring-emerald-100 overflow-hidden">
         {/* Always-visible collapsed bar */}
         <button onClick={() => setOpen((o) => !o)} className="w-full px-4 py-3 flex items-center justify-between gap-2 text-left">
           <span className="inline-flex items-center gap-2 text-base font-bold text-gray-900 min-w-0">
             <Wallet className="h-5 w-5 text-emerald-600 shrink-0" />
-            <span className="truncate">এই ফসলের আয়-ব্যয় রাখুন</span>
+            <span className="truncate">এই ফসলের আয়-ব্যয়ের হিসাব রাখুন</span>
           </span>
           <span className="inline-flex items-center gap-2 shrink-0">
             <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${profit >= 0 ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"}`}>
