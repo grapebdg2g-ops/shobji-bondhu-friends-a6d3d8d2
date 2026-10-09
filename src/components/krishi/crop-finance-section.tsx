@@ -148,7 +148,7 @@ ${table("capital")}${table("expense")}${table("income")}
               )}
               <div className="flex gap-2">
                 <input type="number" min={0} value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="টাকা" className="flex-[2] min-w-0 rounded-lg border border-gray-200 px-2 py-1.5 text-sm />
-                <input type="date" value={entryDate} onChange={(e) => setEntryDate(e.target.value)} className="w-[6.5rem] shrink-0 rounded-lg border-gray-200 px-1 py-1.5 text-xs" data-x=" border border-gray-200 px-2 py-1.5 text-sm" />
+                <input type="date" value={entryDate} onChange={(e) => setEntryDate(e.target.value)} className="w-[6.5rem] shrink-0 rounded-lg border border-gray-200 px-1 py-1.5 text-xs" />
                 <button onClick={add} className="inline-flex items-center gap-1 px-3 rounded-lg bg-emerald-600 text-white text-sm font-bold shrink-0"><Plus className="h-4 w-4" /> যোগ</button>
               </div>
             </div>
