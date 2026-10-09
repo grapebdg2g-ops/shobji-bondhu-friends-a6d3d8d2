@@ -120,12 +120,13 @@ export function NewAdWizard({
   const uploadImage = async (): Promise<string | null> => {
     if (!state.imageFile || !userId) return null;
     setUploadProgress(10);
-    const ext = state.imageFile.name.split(".").pop() || "jpg";
+    const mime = state.imageFile.type || "image/jpeg";
+    const ext = (mime.split("/")[1] || "jpg").replace("jpeg", "jpg").replace(/[^a-z0-9]/gi, "") || "jpg";
     const path = `${userId}/${crypto.randomUUID()}.${ext}`;
     setUploadProgress(40);
     const { error } = await supabase.storage
       .from("exchange-images")
-      .upload(path, state.imageFile, { upsert: false, contentType: state.imageFile.type });
+      .upload(path, state.imageFile, { upsert: false, contentType: mime });
     if (error) { setUploadProgress(0); return null; }
     setUploadProgress(80);
     const { data } = supabase.storage.from("exchange-images").getPublicUrl(path);
@@ -181,7 +182,7 @@ export function NewAdWizard({
       user_id: userId,
       user_name: sanitize(userName),
       user_phone: state.phone,
-    }).select().single();
+    }).select("id,created_at,title,description,type,is_free,price,unit,image_url,district,upazila,user_id,user_name,is_active").single();
     setSubmitting(false);
     if (error || !data) {
       toast.error("সংরক্ষণ ব্যর্থ হয়েছে, আবার চেষ্টা করুন");
