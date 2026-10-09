@@ -514,8 +514,9 @@ function CommunityFeedSection({ userName, onCompose }: { userName: string | null
           const incoming = payload.new as Post;
           if (mutedIds.includes(incoming.user_id)) return current;
           const exists = current.some((post) => post.id === incoming.id);
-          const next = exists ? current.map((post) => post.id === incoming.id ? incoming : post) : [incoming, ...current];
-          return next.slice(0, 5);
+          if (exists) return current.map((post) => post.id === incoming.id ? incoming : post);
+          if (payload.eventType !== "INSERT") return current;
+          return [incoming, ...current].slice(0, 5);
         });
       })
       .subscribe();

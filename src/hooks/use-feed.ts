@@ -122,7 +122,9 @@ export function useFeed(
         if (!districtMatches || !cropMatches || !typeMatches) return;
         setPosts((current) => {
           const exists = current.some((post) => post.id === incoming.id);
-          return exists ? current.map((post) => post.id === incoming.id ? incoming : post) : [incoming, ...current];
+          if (exists) return current.map((post) => post.id === incoming.id ? incoming : post);
+          if (payload.eventType !== "INSERT") return current;
+          return [incoming, ...current];
         });
       })
       .subscribe();
