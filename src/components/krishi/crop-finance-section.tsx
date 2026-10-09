@@ -1,22 +1,19 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus, Trash2, Printer, Wallet, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { fmtBdt, toBn } from "@/lib/bn";
 import { formatBnDate } from "@/lib/bn-date";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 type EntryType = "capital" | "expense" | "income";
 type Entry = { id: string; entry_type: EntryType; title: string; amount: number; entry_date: string; note: string | null };
 
 const LABEL: Record<EntryType, string> = { capital: "মূলধন", expense: "ব্যয়", income: "আয়" };
-const DEFAULTS: Array<[EntryType, string]> = [
-  ["capital", "নিজস্ব মূলধন"],
-  ["expense", "জমি চাষ/হালচাষ"], ["expense", "বীজ/চারা"], ["expense", "সার"],
-  ["expense", "কীটনাশক/বালাইনাশক"], ["expense", "সেচ"], ["expense", "শ্রমিক মজুরি"],
-  ["expense", "জমি লিজ/ভাড়া"], ["expense", "পরিবহন"],
-  ["income", "ফসল বিক্রি"],
-];
 const SUGGESTIONS: Record<EntryType, string[]> = {
   capital: ["নিজস্ব মূলধন", "ঋণ/ধার"],
   expense: ["জমি চাষ/হালচাষ", "বীজ/চারা", "সার", "কীটনাশক/বালাইনাশক", "সেচ", "শ্রমিক মজুরি", "জমি লিজ/ভাড়া", "পরিবহন", "মাচা/সাপোর্ট", "বীজতলা তৈরি"],
@@ -35,19 +32,12 @@ export function CropFinanceSection({ userId, planId, cropType }: { userId: strin
       return (data ?? []) as Entry[];
     },
   });
-  const [seeded, setSeeded] = useState(false);
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState<EntryType>("expense");
   const [pick, setPick] = useState("");
   const [customTitle, setCustomTitle] = useState("");
   const [amount, setAmount] = useState("");
-
-  useEffect(() => {
-    if (isLoading || seeded || rows.length) return;
-    setSeeded(true);
-    supabase.from("crop_plan_finances").insert(DEFAULTS.map(([entry_type, title]) => ({ user_id: userId, plan_id: planId, entry_type, title, amount: 0 })))
-      .then(() => qc.invalidateQueries({ queryKey: key }));
-  }, [isLoading, rows.length, seeded]); // eslint-disable-line react-hooks/exhaustive-deps
+  const [delTarget, setDelTarget] = useState<Entry | null>(null);
 
   const totals = useMemo(() => {
     const t = { capital: 0, expense: 0, income: 0 };
@@ -74,9 +64,11 @@ export function CropFinanceSection({ userId, planId, cropType }: { userId: strin
     toast.success("যোগ হয়েছে");
   }
   async function remove(id: string) {
-    if (!confirm("আপনি কি নিশ্চিত মুছে ফেলতে চান?")) return;
-    await supabase.from("crop_plan_finances").delete().eq("id", id);
+    const { error } = await supabase.from("crop_plan_finances").delete().eq("id", id);
+    if (error) return toast.error("মুছে ফেলা যায়নি");
+    setDelTarget(null);
     qc.invalidateQueries({ queryKey: key });
+    toast.success("মুছে ফেলা হয়েছে");
   }
 
   function printReport() {
@@ -136,7 +128,7 @@ ${table("capital")}${table("expense")}${table("income")}
                 <input type="number" min={0} defaultValue={Number(r.amount) || ""} placeholder="৳ ০"
                   onBlur={(e) => updateAmount(r, e.target.value)}
                   className="w-24 rounded-lg border border-gray-200 px-2 py-1 text-sm text-right" />
-                <button onClick={() => remove(r.id)} aria-label="মুছুন" className="text-gray-400 hover:text-rose-600"><Trash2 className="h-4 w-4" /></button>
+                <button onClick={() => setDelTarget(r)} aria-label="মুছুন" className="text-gray-400 hover:text-rose-600"><Trash2 className="h-4 w-4" /></button>
               </div>
             ))}
 
@@ -163,6 +155,25 @@ ${table("capital")}${table("expense")}${table("income")}
           </div>
         )}
       </div>
+
+      {/* Delete confirmation dialog */}
+      <AlertDialog open={!!delTarget} onOpenChange={(o) => !o && setDelTarget(null)}>
+        <AlertDialogContent className="max-w-sm rounded-2xl p-5">
+          <AlertDialogHeader className="items-center text-center space-y-2">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-rose-100">
+              <Trash2 className="h-6 w-6 text-rose-600" />
+            </div>
+            <AlertDialogTitle className="text-base font-bold text-gray-900">আপনি কি নিশ্চিত মুছে ফেলতে চান?</AlertDialogTitle>
+            <AlertDialogDescription className="text-sm text-gray-500">
+              <span className="font-bold text-gray-700">“{delTarget?.title}”</span> আইটেমটি{delTarget && Number(delTarget.amount) > 0 ? <> এবং এতে লেখা <span className="font-bold text-gray-700">{fmtBdt(Number(delTarget.amount))}</span> টাকাও</> : null} হিসাব থেকে মুছে যাবে। এটি আর ফেরানো যাবে না।
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-row gap-2 sm:justify-center">
+            <AlertDialogCancel className="flex-1 mt-0 rounded-full border-gray-200 bg-gray-50 text-gray-700 font-bold">বাতিল</AlertDialogCancel>
+            <AlertDialogAction onClick={() => remove(delTarget!.id)} className="flex-1 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-bold">মুছে ফেলুন</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </section>
   );
 }
