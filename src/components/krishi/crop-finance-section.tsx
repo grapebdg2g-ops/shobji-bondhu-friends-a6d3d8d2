@@ -32,19 +32,12 @@ export function CropFinanceSection({ userId, planId, cropType }: { userId: strin
       return (data ?? []) as Entry[];
     },
   });
-  const [seeded, setSeeded] = useState(false);
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState<EntryType>("expense");
   const [pick, setPick] = useState("");
   const [customTitle, setCustomTitle] = useState("");
   const [amount, setAmount] = useState("");
-
-  useEffect(() => {
-    if (isLoading || seeded || rows.length) return;
-    setSeeded(true);
-    supabase.from("crop_plan_finances").insert(DEFAULTS.map(([entry_type, title]) => ({ user_id: userId, plan_id: planId, entry_type, title, amount: 0 })))
-      .then(() => qc.invalidateQueries({ queryKey: key }));
-  }, [isLoading, rows.length, seeded]); // eslint-disable-line react-hooks/exhaustive-deps
+  const [delTarget, setDelTarget] = useState<Entry | null>(null);
 
   const totals = useMemo(() => {
     const t = { capital: 0, expense: 0, income: 0 };
