@@ -13,6 +13,7 @@ import { SprayScheduleSection } from "@/components/krishi/spray-schedule-section
 import { markSprayReminderDone } from "@/lib/spray-schedule";
 import { CropKnowledgePanel } from "@/components/krishi/crop-knowledge-panel";
 import { useCropCompletions } from "@/hooks/use-crop-completions";
+import { CropFinanceSection } from "@/components/krishi/crop-finance-section";
 
 export const Route = createFileRoute("/crop-guide/plan/$planId")({
   component: PlanAdvisory,
@@ -210,6 +211,8 @@ function PlanAdvisory() {
           <ArrowDown className="h-5 w-5 text-sky-600" />
         </button>
       </section>
+
+      {user && <CropFinanceSection userId={user.id} planId={planId} cropType={plan.crop_type} />}
 
       <CropKnowledgePanel cropType={plan.crop_type} plantingDate={plan.planting_date} days={days} completions={completions} />
 
