@@ -215,9 +215,8 @@ function PlanAdvisory() {
         </button>
       </section>
 
-      {user && <CropFinanceSection userId={user.id} planId={planId} cropType={plan.crop_type} />}
-
       <CropKnowledgePanel cropType={plan.crop_type} plantingDate={plan.planting_date} days={days} completions={completions} />
+
 
       {user && (
         <SprayScheduleSection
