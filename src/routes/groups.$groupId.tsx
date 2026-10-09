@@ -263,7 +263,7 @@ function GroupChatPage() {
       <BottomSheet open={membersOpen} onClose={() => setMembersOpen(false)} title="গ্রুপের তথ্য">
         <div className="space-y-4 pb-4">
           {g?.topic && <p className="rounded-xl bg-muted p-3 text-sm text-foreground">{g.topic}</p>}
-          {isGroupAdmin && (
+          {me && (
             <button type="button" onClick={() => { setMembersOpen(false); setAddOpen(true); }} className="flex w-full items-center gap-3 rounded-xl bg-secondary p-3 text-sm font-bold text-primary">
               <UserPlus className="h-5 w-5" /> বন্ধু যোগ করুন
             </button>
