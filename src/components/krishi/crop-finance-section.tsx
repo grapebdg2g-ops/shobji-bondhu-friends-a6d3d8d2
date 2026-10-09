@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-react-query-placeholder";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus, Trash2, Printer, Wallet, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";

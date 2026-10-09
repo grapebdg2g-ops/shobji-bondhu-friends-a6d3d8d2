@@ -182,6 +182,9 @@ function PlanAdvisory() {
         </div>
       </header>
 
+      {/* Crop finance ledger — sticky, always on top */}
+      {user && <CropFinanceSection userId={user.id} planId={planId} cropType={plan.crop_type} />}
+
       {/* Planting info card */}
       <section className="px-5 mt-5">
         <div className="bg-white rounded-2xl p-4 shadow-sm ring-1 ring-emerald-100 space-y-2 text-sm">
