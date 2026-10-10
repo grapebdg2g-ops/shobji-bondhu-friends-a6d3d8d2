@@ -231,6 +231,18 @@ export function SprayScheduleSection({ userId, planId, cropType, plantingDate, d
             <input inputMode="decimal" value={shotok} onChange={(ev) => saveLand(ev.target.value)} placeholder="যেমন ২০" className="w-20 rounded-lg bg-card ring-1 ring-border px-2 py-1.5 text-sm" />
             <span className="text-muted-foreground">শতক — ড্রাম হিসাবের জন্য</span>
           </label>
+          {land > 0 && (
+            <div className="rounded-xl bg-primary/5 ring-1 ring-primary/15 p-3 text-xs space-y-1">
+              <p className="font-bold text-primary">🪣 ড্রাম হিসাব — {toBn(land)} শতক</p>
+              <p className="text-foreground">প্রতিটি স্প্রের জন্য পানি লাগবে ≈ <strong>{toBn(tankPlan(land, 0).waterLiters)} লিটার</strong> = <strong>{toBn(tankPlan(land, 0).tanks)} ড্রাম</strong> ({toBn(TANK_LITERS)} লিটার স্প্রেয়ার)</p>
+              {next && nextDose ? (
+                <p className="text-foreground">পরবর্তী স্প্রে ({next.title}): মোট ওষুধ <strong>{toBn(tankPlan(land, nextDose.amount).total)} {nextDose.unit}</strong> {next.problem!.chemicals[0].name.split(" (")[0]}</p>
+              ) : next && !nextDose ? (
+                <p className="text-foreground">পরবর্তী স্প্রে ({next.title}): ওষুধের পরিমাণ দেখতে স্প্রেটি খুলুন।</p>
+              ) : null}
+              <p className="text-muted-foreground">প্রতিটি স্প্রে খুললে সেই ওষুধের ড্রাম-ভিত্তিক হিসাব দেখা যাবে।</p>
+            </div>
+          )}
         </div>
 
         {cropType === "টমেটো" && (
