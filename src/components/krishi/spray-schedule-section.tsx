@@ -50,6 +50,25 @@ export function SprayScheduleSection({ userId, planId, cropType, plantingDate, d
     localStorage.setItem(`spray-land:${planId}`, v);
   }
   const land = parseFloat(shotok.replace(/[০-৯]/g, (d) => String("০১২৩৪৫৬৭৮৯".indexOf(d)))) || 0;
+  const [doseEdits, setDoseEdits] = useState<Record<string, string>>({});
+  const toNum = (s: string) => parseFloat(s.replace(/[০-৯]/g, (d) => String("০১২৩৪৫৬৭৮৯".indexOf(d)))) || 0;
+  function doseFor(e: SprayEvent | undefined) {
+    if (!e?.problem) return null;
+    const def = parseDosePerLiter(e.problem.chemicals[0]?.dose ?? "");
+    const raw = doseEdits[e.id];
+    const amount = raw !== undefined ? toNum(raw) : def?.amount ?? 0;
+    return { amount, unit: def?.unit ?? "মিলি", raw: raw ?? (def ? String(def.amount) : "") };
+  }
+  const doseInput = (e: SprayEvent) => {
+    const d = doseFor(e)!;
+    return (
+      <label className="flex items-center gap-2">
+        <span className="font-semibold text-foreground">💧 ওষুধের মাত্রা</span>
+        <input inputMode="decimal" value={d.raw} onChange={(ev) => setDoseEdits((m) => ({ ...m, [e.id]: ev.target.value }))} placeholder="যেমন ২" className="w-16 rounded-lg bg-card ring-1 ring-border px-2 py-1.5 text-sm" />
+        <span className="text-muted-foreground">{d.unit} / লিটার পানি</span>
+      </label>
+    );
+  };
   const harvestDay = FARMING_STAGES[cropType]?.totalDays ?? 0;
   if (events.length === 0) return null;
   const sw = weather.data?.forecast ? evaluateSprayWeather(weather.data.forecast) : null;
