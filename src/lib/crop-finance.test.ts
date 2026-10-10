@@ -1,4 +1,6 @@
-import { describe, expect, it } from "bun:test";
+import { describe, it } from "node:test";
+import assert from "node:assert/strict";
+const expect = (a: unknown) => ({ toBe: (b: unknown) => assert.equal(a, b), toBeNull: () => assert.equal(a, null) });
 import { summarize, perUnit } from "./crop-finance";
 
 const r = (entry_type: any, amount: number, is_settled = false) => ({ entry_type, amount, is_settled });
