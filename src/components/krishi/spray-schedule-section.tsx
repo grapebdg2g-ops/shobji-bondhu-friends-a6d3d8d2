@@ -50,6 +50,25 @@ export function SprayScheduleSection({ userId, planId, cropType, plantingDate, d
     localStorage.setItem(`spray-land:${planId}`, v);
   }
   const land = parseFloat(shotok.replace(/[০-৯]/g, (d) => String("০১২৩৪৫৬৭৮৯".indexOf(d)))) || 0;
+  const [doseEdits, setDoseEdits] = useState<Record<string, string>>({});
+  const toNum = (s: string) => parseFloat(s.replace(/[০-৯]/g, (d) => String("০১২৩৪৫৬৭৮৯".indexOf(d)))) || 0;
+  function doseFor(e: SprayEvent | undefined) {
+    if (!e?.problem) return null;
+    const def = parseDosePerLiter(e.problem.chemicals[0]?.dose ?? "");
+    const raw = doseEdits[e.id];
+    const amount = raw !== undefined ? toNum(raw) : def?.amount ?? 0;
+    return { amount, unit: def?.unit ?? "মিলি", raw: raw ?? (def ? String(def.amount) : "") };
+  }
+  const doseInput = (e: SprayEvent) => {
+    const d = doseFor(e)!;
+    return (
+      <label className="flex items-center gap-2">
+        <span className="font-semibold text-foreground">💧 ওষুধের মাত্রা</span>
+        <input inputMode="decimal" value={d.raw} onChange={(ev) => setDoseEdits((m) => ({ ...m, [e.id]: ev.target.value }))} placeholder="যেমন ২" className="w-16 rounded-lg bg-card ring-1 ring-border px-2 py-1.5 text-sm" />
+        <span className="text-muted-foreground">{d.unit} / লিটার পানি</span>
+      </label>
+    );
+  };
   const harvestDay = FARMING_STAGES[cropType]?.totalDays ?? 0;
   if (events.length === 0) return null;
   const sw = weather.data?.forecast ? evaluateSprayWeather(weather.data.forecast) : null;
@@ -67,7 +86,7 @@ export function SprayScheduleSection({ userId, planId, cropType, plantingDate, d
   }
 
   const next = main.find((e) => !completions.has(e.id) && e.day >= days - 3);
-  const nextDose = next?.problem ? parseDosePerLiter(next.problem.chemicals[0]?.dose ?? "") : null;
+  const nextDose = doseFor(next);
 
   async function setReminders() {
     setBusy(true);
@@ -143,7 +162,7 @@ export function SprayScheduleSection({ userId, planId, cropType, plantingDate, d
               const phi = maxPhiDays(names.slice(0, 1));
               const pc = phiConflict(e.day, harvestDay, phi);
               const rot = rotationWarning(e);
-              const dose = parseDosePerLiter(e.problem.chemicals[0]?.dose ?? "");
+              const dose = doseFor(e);
               const mix = [...names].sort((a, b) => mixRank(a) - mixRank(b));
               const mixW = tankMixWarnings(names);
               return (
@@ -153,7 +172,8 @@ export function SprayScheduleSection({ userId, planId, cropType, plantingDate, d
                   )}
                   {rot && <p className="rounded-lg bg-accent/50 p-2 text-xs text-foreground">🔄 {rot}</p>}
                   {dose && (
-                    <div className="rounded-lg bg-primary/5 p-2 text-xs">
+                    <div className="rounded-lg bg-primary/5 p-2 text-xs space-y-1">
+                      {doseInput(e)}
                       <p className="font-bold text-primary">🪣 ড্রাম হিসাব ({toBn(TANK_LITERS)} লিটার স্প্রেয়ার)</p>
                       <p>প্রতি ড্রামে: <strong>{toBn(tankPlan(0, dose.amount).perTank)} {dose.unit}</strong> {e.problem.chemicals[0].name.split(" (")[0]}</p>
                       {land > 0 ? (
@@ -235,10 +255,11 @@ export function SprayScheduleSection({ userId, planId, cropType, plantingDate, d
             <div className="rounded-xl bg-primary/5 ring-1 ring-primary/15 p-3 text-xs space-y-1">
               <p className="font-bold text-primary">🪣 ড্রাম হিসাব — {toBn(land)} শতক</p>
               <p className="text-foreground">প্রতিটি স্প্রের জন্য পানি লাগবে ≈ <strong>{toBn(tankPlan(land, 0).waterLiters)} লিটার</strong> = <strong>{toBn(tankPlan(land, 0).tanks)} ড্রাম</strong> ({toBn(TANK_LITERS)} লিটার স্প্রেয়ার)</p>
-              {next && nextDose ? (
+              {next && nextDose && doseInput(next)}
+              {next && nextDose && nextDose.amount > 0 ? (
                 <p className="text-foreground">পরবর্তী স্প্রে ({next.title}): মোট ওষুধ <strong>{toBn(tankPlan(land, nextDose.amount).total)} {nextDose.unit}</strong> {next.problem!.chemicals[0].name.split(" (")[0]}</p>
-              ) : next && !nextDose ? (
-                <p className="text-foreground">পরবর্তী স্প্রে ({next.title}): ওষুধের পরিমাণ দেখতে স্প্রেটি খুলুন।</p>
+              ) : next && nextDose ? (
+                <p className="text-muted-foreground">ওষুধের মাত্রা দিলে মোট ওষুধ দেখাবে (লেবেলে লেখা মাত্রা দিন)।</p>
               ) : null}
               <p className="text-muted-foreground">প্রতিটি স্প্রে খুললে সেই ওষুধের ড্রাম-ভিত্তিক হিসাব দেখা যাবে।</p>
             </div>
