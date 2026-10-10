@@ -14,6 +14,7 @@ import { markSprayReminderDone } from "@/lib/spray-schedule";
 import { CropKnowledgePanel } from "@/components/krishi/crop-knowledge-panel";
 import { useCropCompletions } from "@/hooks/use-crop-completions";
 import { CropFinanceSection } from "@/components/krishi/crop-finance-section";
+import { GapProtocolSection } from "@/components/krishi/gap-protocol-section";
 
 export const Route = createFileRoute("/crop-guide/plan/$planId")({
   component: PlanAdvisory,
@@ -41,7 +42,7 @@ export const Route = createFileRoute("/crop-guide/plan/$planId")({
   ),
 });
 
-type Plan = { id: string; crop_type: string; planting_date: string; is_active: boolean };
+type Plan = { id: string; crop_type: string; planting_date: string; is_active: boolean; is_gap?: boolean };
 
 function PlanAdvisory() {
   const { planId } = Route.useParams();
@@ -191,6 +192,7 @@ function PlanAdvisory() {
           <div className="flex items-center gap-2">
             <span className="text-3xl"><CropIcon crop={plan.crop_type} /></span>
             <span className="font-bold text-lg text-gray-900">{plan.crop_type}</span>
+            {plan.is_gap && <span className="ml-auto rounded-full bg-primary/15 text-primary text-xs font-bold px-2 py-1">🛡️ GAP ট্র্যাকিং সচল</span>}
           </div>
           <p className="text-gray-700"><strong>রোপণের তারিখ:</strong> {formatBnDate(plan.planting_date)}</p>
           <p className="text-gray-700"><strong>মৌসুম:</strong> {guide.season}</p>
@@ -214,6 +216,19 @@ function PlanAdvisory() {
           <ArrowDown className="h-5 w-5 text-sky-600" />
         </button>
       </section>
+
+      {plan.is_gap && (
+        <GapProtocolSection
+          cropType={plan.crop_type}
+          daysUntilHarvest={guide.totalDays - days}
+          completions={completions}
+          onComplete={async (tid) => {
+            if (completions.has(tid)) return;
+            try { await complete.mutateAsync({ planId, taskId: tid }); toast.success("GAP কাজ সম্পন্ন"); }
+            catch { toast.error("সংরক্ষণ ব্যর্থ"); }
+          }}
+        />
+      )}
 
       <CropKnowledgePanel cropType={plan.crop_type} plantingDate={plan.planting_date} days={days} completions={completions} />
 

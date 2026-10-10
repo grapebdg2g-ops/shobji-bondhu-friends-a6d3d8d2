@@ -10,6 +10,8 @@ import { useUser } from "@/contexts/user-context";
 import { formatBnDate, toIsoDate } from "@/lib/bn-date";
 import { toast } from "sonner";
 import { syncSprayReminders } from "@/lib/spray-schedule";
+import { isGapEligible } from "@/data/gap-protocol";
+import { ShieldCheck } from "lucide-react";
 
 export const Route = createFileRoute("/crop-guide/new/$crop")({
   component: NewCropPlan,
@@ -50,13 +52,15 @@ function NewCropPlan() {
   const { user } = useUser();
   const [date, setDate] = useState<Date>(new Date());
   const [saving, setSaving] = useState(false);
+  const gapEligible = isGapEligible(crop);
+  const [gap, setGap] = useState(false);
 
   async function handleSave() {
     if (!user) { navigate({ to: "/login" }); return; }
     setSaving(true);
     const { data, error } = await supabase
       .from("user_crop_plans" as never)
-      .insert({ user_id: user.id, crop_type: crop, planting_date: toIsoDate(date) } as never)
+      .insert({ user_id: user.id, crop_type: crop, planting_date: toIsoDate(date), is_gap: gapEligible && gap } as never)
       .select("id")
       .single();
     setSaving(false);
@@ -119,6 +123,17 @@ function NewCropPlan() {
             <p>• মোট চক্র: <strong>{guide.totalDays} দিন</strong></p>
             <p>• আনুমানিক ফলন: <strong>{guide.yield}</strong></p>
           </div>
+
+          {gapEligible && (
+            <div className="mt-5 rounded-2xl ring-1 ring-primary/30 bg-primary/5 p-4">
+              <p className="font-bold text-foreground flex items-center gap-2"><ShieldCheck className="h-5 w-5 text-primary" /> আপনি কি GAP সার্টিফাইড ফসল উৎপাদন করতে চান?</p>
+              <p className="text-xs text-muted-foreground mt-1">GAP (উত্তম কৃষি চর্চা) মেনে নিরাপদ ফসল ফলালে সুপারশপ ও রপ্তানিতে বেশি দাম পাওয়া যায়। জমি প্রস্তুতি, স্প্রে ও সংগ্রহ সব GAP নিয়মে সাজানো হবে।</p>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <button type="button" onClick={() => setGap(false)} className={`rounded-xl py-2 text-sm font-semibold ring-1 ${!gap ? "bg-primary text-primary-foreground ring-primary" : "bg-card ring-border text-foreground"}`}>না, সাধারণ চাষ</button>
+                <button type="button" onClick={() => setGap(true)} className={`rounded-xl py-2 text-sm font-semibold ring-1 ${gap ? "bg-primary text-primary-foreground ring-primary" : "bg-card ring-border text-foreground"}`}>হ্যাঁ, GAP চাষ</button>
+              </div>
+            </div>
+          )}
 
           <button
             onClick={handleSave}
