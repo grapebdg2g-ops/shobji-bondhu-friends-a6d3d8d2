@@ -6,10 +6,10 @@ describe("spray tools", () => {
   it("parses Bengali dose per litre", () => {
     assert.deepEqual(parseDosePerLiter("০.৫ গ্রাম / লিটার পানি"), { amount: 0.5, unit: "গ্রাম" });
   });
-  it("20 shotok needs 60 L = 4 tanks of 16 L, 16 ml per tank at 1 ml/L", () => {
+  it("20 shotok needs 40 L = 3 tanks of 16 L, 16 ml per tank at 1 ml/L", () => {
     const p = tankPlan(20, 1);
-    assert.equal(p.waterLiters, 60);
-    assert.equal(p.tanks, 4);
+    assert.equal(p.waterLiters, 40);
+    assert.equal(p.tanks, 3);
     assert.equal(p.perTank, 16);
   });
   it("flags spraying 5 days before harvest with 7-day PHI", () => {

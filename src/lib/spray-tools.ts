@@ -4,8 +4,8 @@ import type { Forecast } from "./weather-types";
 import { getAllChemicalInfo } from "@/data/crop-knowledge";
 
 export const TANK_LITERS = 16;
-/** Typical knapsack spray volume: about 3 litres of water per শতক. */
-export const LITERS_PER_SHOTOK = 3;
+/** Typical knapsack spray volume: about 2 litres of water per শতক. */
+export const LITERS_PER_SHOTOK = 2;
 
 const BN = "০১২৩৪৫৬৭৮৯";
 export function bnToNum(s: string): string {
