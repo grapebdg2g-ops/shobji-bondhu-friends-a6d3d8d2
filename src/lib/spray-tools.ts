@@ -44,7 +44,7 @@ export function evaluateSprayWeather(f: Forecast): SprayWeather {
   if (rain > 50) reasons.push(`বৃষ্টির সম্ভাবনা ${Math.round(rain)}% — ওষুধ ধুয়ে যাবে`);
   if (f.current.wind_speed > 20) reasons.push(`বাতাস বেশি (${Math.round(f.current.wind_speed)} কিমি/ঘণ্টা) — ওষুধ উড়ে যাবে`);
   if (f.current.temperature > 35) reasons.push(`তাপমাত্রা বেশি (${Math.round(f.current.temperature)}°C) — দুপুরে স্প্রে করবেন না`);
-  const ok = reasons.length === 0 || (reasons.length === 1 && f.current.temperature > 35 && rain <= 50 && !storm && f.current.wind_speed <= 20);
+  const ok = !storm && rain <= 50 && f.current.wind_speed <= 20;
   return { ok, reasons, bestTime: "সকাল ৭টা–৯টা অথবা বিকেল ৪টা–৬টা" };
 }
 
