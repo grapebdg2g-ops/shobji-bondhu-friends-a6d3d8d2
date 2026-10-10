@@ -11,3 +11,4 @@
 - Prices mentioned in posts/comments are captured as community price reports tagged with origin_type/origin_id; one AI extraction per saved post/comment, only for the author.
 - Group chat membership changes go through security-definer RPCs (create_group_chat/add_group_members/remove_group_member) that only allow accepted friends; clients never write group_chat_members directly.
 - Keep the expanded crop finance ledger in normal page flow and restrict scroll-reveal behavior to its collapsed bar; long ledgers must remain visible and fully scrollable.
+- Keep GAP (good agricultural practice) protocol rules in src/data/gap-protocol.ts keyed by Bangla crop name and gated by user_crop_plans.is_gap; GAP checklist completions reuse crop_task_completions with 'gap:' task ids.
