@@ -5,7 +5,7 @@ import { getWeatherForecast } from "@/lib/weather.functions";
 import { useUser } from "@/contexts/user-context";
 import { FARMING_STAGES } from "@/data/farming-guide";
 import { groupKey } from "@/data/crop-knowledge";
-import { evaluateSprayWeather, parseDosePerLiter, tankPlan, mixRank, MIX_LABELS, tankMixWarnings, maxPhiDays, phiConflict, TANK_LITERS } from "@/lib/spray-tools";
+import { evaluateSprayWeather, parseDosePerLiter, tankPlan, mixRank, MIX_LABELS, tankMixWarnings, maxPhiDays, phiConflict, TANK_LITERS, LITERS_PER_SHOTOK } from "@/lib/spray-tools";
 import { Bell, Check, SprayCan, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
 import { buildSpraySchedule, syncSprayReminders, type SprayEvent } from "@/lib/spray-schedule";
@@ -67,6 +67,7 @@ export function SprayScheduleSection({ userId, planId, cropType, plantingDate, d
   }
 
   const next = main.find((e) => !completions.has(e.id) && e.day >= days - 3);
+  const nextDose = next?.problem ? parseDosePerLiter(next.problem.chemicals[0]?.dose ?? "") : null;
 
   async function setReminders() {
     setBusy(true);
