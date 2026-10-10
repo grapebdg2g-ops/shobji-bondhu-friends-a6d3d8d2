@@ -92,6 +92,13 @@
       "when": 1791536463787,
       "tag": "0012_crop_plan_finances",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1791650174073,
+      "tag": "0013_crop_finance_credit_withdrawal",
+      "breakpoints": true
     }
   ]
 }
