@@ -224,6 +224,7 @@ export type Database = {
           entry_date: string
           entry_type: string
           id: string
+          is_settled: boolean
           note: string | null
           plan_id: string
           title: string
@@ -235,6 +236,7 @@ export type Database = {
           entry_date?: string
           entry_type: string
           id?: string
+          is_settled?: boolean
           note?: string | null
           plan_id: string
           title: string
@@ -246,6 +248,7 @@ export type Database = {
           entry_date?: string
           entry_type?: string
           id?: string
+          is_settled?: boolean
           note?: string | null
           plan_id?: string
           title?: string
@@ -1385,24 +1388,30 @@ export type Database = {
           crop_type: string
           id: string
           is_active: boolean
+          land_shotok: number | null
           planting_date: string
           user_id: string
+          yield_kg: number | null
         }
         Insert: {
           created_at?: string
           crop_type: string
           id?: string
           is_active?: boolean
+          land_shotok?: number | null
           planting_date: string
           user_id: string
+          yield_kg?: number | null
         }
         Update: {
           created_at?: string
           crop_type?: string
           id?: string
           is_active?: boolean
+          land_shotok?: number | null
           planting_date?: string
           user_id?: string
+          yield_kg?: number | null
         }
         Relationships: []
       }
