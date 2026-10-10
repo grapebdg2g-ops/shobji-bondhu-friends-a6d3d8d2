@@ -50,6 +50,7 @@ import { Route as AiBondhuCalendarRouteImport } from './routes/ai-bondhu.calenda
 import { Route as AiBondhuDiseaseRouteImport } from './routes/ai-bondhu.disease'
 import { Route as AiBondhuPesticideRouteImport } from './routes/ai-bondhu.pesticide'
 import { Route as AiBondhuSoilRouteImport } from './routes/ai-bondhu.soil'
+import { Route as CropFinancePlanIdRouteImport } from './routes/crop-finance.$planId'
 import { Route as CropGuideIndexRouteImport } from './routes/crop-guide.index'
 import { Route as CropPlannerMyPlansRouteImport } from './routes/crop-planner.my-plans'
 import { Route as GroupsGroupIdRouteImport } from './routes/groups.$groupId'
@@ -275,6 +276,11 @@ const AiBondhuSoilRoute = AiBondhuSoilRouteImport.update({
   path: '/ai-bondhu/soil',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CropFinancePlanIdRoute = CropFinancePlanIdRouteImport.update({
+  id: '/crop-finance/$planId',
+  path: '/crop-finance/$planId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CropGuideIndexRoute = CropGuideIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -416,6 +422,7 @@ export interface FileRoutesByFullPath {
   '/ai-bondhu/disease': typeof AiBondhuDiseaseRoute
   '/ai-bondhu/pesticide': typeof AiBondhuPesticideRoute
   '/ai-bondhu/soil': typeof AiBondhuSoilRoute
+  '/crop-finance/$planId': typeof CropFinancePlanIdRoute
   '/crop-planner/my-plans': typeof CropPlannerMyPlansRoute
   '/groups/$groupId': typeof GroupsGroupIdRoute
   '/messages/$userId': typeof MessagesUserIdRoute
@@ -476,6 +483,7 @@ export interface FileRoutesByTo {
   '/ai-bondhu/disease': typeof AiBondhuDiseaseRoute
   '/ai-bondhu/pesticide': typeof AiBondhuPesticideRoute
   '/ai-bondhu/soil': typeof AiBondhuSoilRoute
+  '/crop-finance/$planId': typeof CropFinancePlanIdRoute
   '/crop-planner/my-plans': typeof CropPlannerMyPlansRoute
   '/groups/$groupId': typeof GroupsGroupIdRoute
   '/messages/$userId': typeof MessagesUserIdRoute
@@ -539,6 +547,7 @@ export interface FileRoutesById {
   '/ai-bondhu/disease': typeof AiBondhuDiseaseRoute
   '/ai-bondhu/pesticide': typeof AiBondhuPesticideRoute
   '/ai-bondhu/soil': typeof AiBondhuSoilRoute
+  '/crop-finance/$planId': typeof CropFinancePlanIdRoute
   '/crop-planner/my-plans': typeof CropPlannerMyPlansRoute
   '/groups/$groupId': typeof GroupsGroupIdRoute
   '/messages/$userId': typeof MessagesUserIdRoute
@@ -603,6 +612,7 @@ export interface FileRouteTypes {
     | '/ai-bondhu/disease'
     | '/ai-bondhu/pesticide'
     | '/ai-bondhu/soil'
+    | '/crop-finance/$planId'
     | '/crop-planner/my-plans'
     | '/groups/$groupId'
     | '/messages/$userId'
@@ -663,6 +673,7 @@ export interface FileRouteTypes {
     | '/ai-bondhu/disease'
     | '/ai-bondhu/pesticide'
     | '/ai-bondhu/soil'
+    | '/crop-finance/$planId'
     | '/crop-planner/my-plans'
     | '/groups/$groupId'
     | '/messages/$userId'
@@ -725,6 +736,7 @@ export interface FileRouteTypes {
     | '/ai-bondhu/disease'
     | '/ai-bondhu/pesticide'
     | '/ai-bondhu/soil'
+    | '/crop-finance/$planId'
     | '/crop-planner/my-plans'
     | '/groups/$groupId'
     | '/messages/$userId'
@@ -777,6 +789,7 @@ export interface RootRouteChildren {
   AiBondhuDiseaseRoute: typeof AiBondhuDiseaseRoute
   AiBondhuPesticideRoute: typeof AiBondhuPesticideRoute
   AiBondhuSoilRoute: typeof AiBondhuSoilRoute
+  CropFinancePlanIdRoute: typeof CropFinancePlanIdRoute
   GroupsGroupIdRoute: typeof GroupsGroupIdRoute
   ProfileDiseaseHistoryRoute: typeof ProfileDiseaseHistoryRoute
   UUserIdRoute: typeof UUserIdRoute
@@ -1082,6 +1095,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AiBondhuSoilRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/crop-finance/$planId': {
+      id: '/crop-finance/$planId'
+      path: '/crop-finance/$planId'
+      fullPath: '/crop-finance/$planId'
+      preLoaderRoute: typeof CropFinancePlanIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/crop-guide/': {
       id: '/crop-guide/'
       path: '/'
@@ -1331,6 +1351,7 @@ const rootRouteChildren: RootRouteChildren = {
   AiBondhuDiseaseRoute: AiBondhuDiseaseRoute,
   AiBondhuPesticideRoute: AiBondhuPesticideRoute,
   AiBondhuSoilRoute: AiBondhuSoilRoute,
+  CropFinancePlanIdRoute: CropFinancePlanIdRoute,
   GroupsGroupIdRoute: GroupsGroupIdRoute,
   ProfileDiseaseHistoryRoute: ProfileDiseaseHistoryRoute,
   UUserIdRoute: UUserIdRoute,
