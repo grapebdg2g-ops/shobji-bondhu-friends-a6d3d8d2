@@ -1,4 +1,11 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { getWeatherForecast } from "@/lib/weather.functions";
+import { useUser } from "@/contexts/user-context";
+import { FARMING_STAGES } from "@/data/farming-guide";
+import { groupKey } from "@/data/crop-knowledge";
+import { evaluateSprayWeather, parseDosePerLiter, tankPlan, mixRank, MIX_LABELS, tankMixWarnings, maxPhiDays, phiConflict, TANK_LITERS } from "@/lib/spray-tools";
 import { Bell, Check, SprayCan, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
 import { buildSpraySchedule, syncSprayReminders, type SprayEvent } from "@/lib/spray-schedule";
@@ -25,7 +32,39 @@ export function SprayScheduleSection({ userId, planId, cropType, plantingDate, d
   const [showMain, setShowMain] = useState(false);
   const [open, setOpen] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [shotok, setShotok] = useState("");
+  const { user } = useUser();
+  const fetchWeather = useServerFn(getWeatherForecast);
+  const weather = useQuery({
+    queryKey: ["spray-weather", user?.district, user?.upazila],
+    enabled: !!user?.district,
+    staleTime: 30 * 60 * 1000,
+    queryFn: () => fetchWeather({ data: { district: user!.district!, upazila: user?.upazila ?? null } }),
+  });
+  useEffect(() => {
+    const v = localStorage.getItem(`spray-land:${planId}`);
+    if (v) setShotok(v);
+  }, [planId]);
+  function saveLand(v: string) {
+    setShotok(v);
+    localStorage.setItem(`spray-land:${planId}`, v);
+  }
+  const land = parseFloat(shotok.replace(/[০-৯]/g, (d) => String("০১২৩৪৫৬৭৮৯".indexOf(d)))) || 0;
+  const harvestDay = FARMING_STAGES[cropType]?.totalDays ?? 0;
   if (events.length === 0) return null;
+  const sw = weather.data?.forecast ? evaluateSprayWeather(weather.data.forecast) : null;
+
+  function rotationWarning(e: SprayEvent): string | null {
+    if (!e.problem) return null;
+    const idx = main.indexOf(e);
+    const prev = [...main.slice(0, idx)].reverse().find((p) => completions.has(p.id) && p.problem);
+    if (!prev?.problem) return null;
+    const prevGroups = new Set(getAllChemicalInfo(prev.problem.chemicals[0]?.name ?? "").filter((a) => !a.group.startsWith("M")).map(groupKey));
+    const mine = getAllChemicalInfo(e.problem.chemicals[0]?.name ?? "").filter((a) => prevGroups.has(groupKey(a)));
+    if (mine.length === 0) return null;
+    const alt = e.problem.chemicals.find((c) => getAllChemicalInfo(c.name).every((a) => !prevGroups.has(groupKey(a))));
+    return `গত স্প্রেতে ${mine[0].system} ${mine[0].group} গ্রুপ দিয়েছেন — একই গ্রুপ পরপর দিলে পোকা/রোগ ওষুধ সহ্য করতে শেখে।${alt ? ` এবার দিন: ${alt.name}` : " এবার অন্য গ্রুপের ওষুধ দিন।"}`;
+  }
 
   const next = main.find((e) => !completions.has(e.id) && e.day >= days - 3);
 
@@ -98,6 +137,39 @@ export function SprayScheduleSection({ userId, planId, cropType, plantingDate, d
                 {e.problem.phi && <p className="text-xs text-destructive">ফসল তোলার অন্তত {e.problem.phi} আগে স্প্রে বন্ধ করুন</p>}
               </div>
             )}
+            {!done && e.problem && (() => {
+              const names = e.problem.chemicals.map((c) => c.name);
+              const phi = maxPhiDays(names.slice(0, 1));
+              const pc = phiConflict(e.day, harvestDay, phi);
+              const rot = rotationWarning(e);
+              const dose = parseDosePerLiter(e.problem.chemicals[0]?.dose ?? "");
+              const mix = [...names].sort((a, b) => mixRank(a) - mixRank(b));
+              const mixW = tankMixWarnings(names);
+              return (
+                <div className="space-y-2">
+                  {pc.conflict && (
+                    <p className="rounded-lg bg-destructive/10 p-2 text-xs text-destructive font-semibold">⛔ ফসল তোলার মাত্র {toBn(Math.max(0, pc.daysLeft))} দিন বাকি, কিন্তু এই ওষুধের বিষ কাটতে {toBn(phi)} দিন লাগে। এই স্প্রের পর {toBn(phi)} দিন ফসল তুলবেন না/খাবেন না, অথবা জৈব বিকল্প ব্যবহার করুন।</p>
+                  )}
+                  {rot && <p className="rounded-lg bg-accent/50 p-2 text-xs text-foreground">🔄 {rot}</p>}
+                  {dose && (
+                    <div className="rounded-lg bg-primary/5 p-2 text-xs">
+                      <p className="font-bold text-primary">🪣 ড্রাম হিসাব ({toBn(TANK_LITERS)} লিটার স্প্রেয়ার)</p>
+                      <p>প্রতি ড্রামে: <strong>{toBn(tankPlan(0, dose.amount).perTank)} {dose.unit}</strong> {e.problem.chemicals[0].name.split(" (")[0]}</p>
+                      {land > 0 ? (
+                        <p>{toBn(land)} শতকে লাগবে ≈ {toBn(tankPlan(land, dose.amount).waterLiters)} লিটার পানি = <strong>{toBn(tankPlan(land, dose.amount).tanks)} ড্রাম</strong>, মোট ওষুধ {toBn(tankPlan(land, dose.amount).total)} {dose.unit}</p>
+                      ) : <p className="text-muted-foreground">উপরে জমির পরিমাণ দিলে মোট ড্রাম দেখাবে।</p>}
+                    </div>
+                  )}
+                  {names.length > 1 && (
+                    <div className="rounded-lg bg-muted p-2 text-xs space-y-0.5">
+                      <p className="font-bold">🧴 একসাথে মেশালে এই ক্রমে দিন</p>
+                      {mix.map((n, i) => <p key={n}>{toBn(i + 1)}. {n} <span className="text-muted-foreground">({MIX_LABELS[mixRank(n)]})</span></p>)}
+                      {mixW.map((w) => <p key={w} className="text-destructive font-semibold">⚠️ {w}</p>)}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
             <p className="text-[11px] text-muted-foreground">⚠️ লেবেলের নির্দেশনা মেনে, সকাল/বিকেলে বাতাসহীন সময়ে স্প্রে করুন।</p>
             <button
               onClick={() => onComplete(e.id)}
@@ -140,6 +212,25 @@ export function SprayScheduleSection({ userId, planId, cropType, plantingDate, d
             <p className="text-xs text-muted-foreground">{formatBnDate(addDays(plantingDate, next.day))} ({toBn(next.day)}তম দিন)</p>
           </div>
         )}
+
+        <div className="mx-4 mb-3 grid gap-2">
+          {sw ? (
+            <div className={`rounded-xl p-3 text-xs ${sw.ok ? "bg-primary/10" : "bg-destructive/10"}`}>
+              <p className={`font-bold text-sm ${sw.ok ? "text-primary" : "text-destructive"}`}>{sw.ok ? "✅ আজ স্প্রে করার উপযোগী" : "⛔ আজ স্প্রে করবেন না"}</p>
+              {sw.reasons.map((r) => <p key={r} className="text-foreground">• {r}</p>)}
+              <p className="text-muted-foreground mt-0.5">সেরা সময়: {sw.bestTime} (বাতাস কম থাকে)</p>
+            </div>
+          ) : !user?.district ? (
+            <p className="rounded-xl bg-muted p-3 text-xs text-muted-foreground">প্রোফাইলে জেলা দিলে আজকের আবহাওয়া দেখে স্প্রে পরামর্শ পাবেন।</p>
+          ) : weather.isLoading ? (
+            <p className="rounded-xl bg-muted p-3 text-xs text-muted-foreground">আবহাওয়া দেখা হচ্ছে…</p>
+          ) : null}
+          <label className="rounded-xl bg-muted p-3 text-xs flex items-center gap-2">
+            <span className="font-semibold text-foreground">🌾 জমির পরিমাণ</span>
+            <input inputMode="decimal" value={shotok} onChange={(ev) => saveLand(ev.target.value)} placeholder="যেমন ২০" className="w-20 rounded-lg bg-card ring-1 ring-border px-2 py-1.5 text-sm" />
+            <span className="text-muted-foreground">শতক — ড্রাম হিসাবের জন্য</span>
+          </label>
+        </div>
 
         {cropType === "টমেটো" && (
           <div className="mx-4 mb-3 rounded-xl bg-accent/40 p-3 text-xs text-foreground space-y-1">
