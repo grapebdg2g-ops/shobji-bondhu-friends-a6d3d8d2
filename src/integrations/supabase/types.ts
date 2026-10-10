@@ -1388,6 +1388,7 @@ export type Database = {
           crop_type: string
           id: string
           is_active: boolean
+          is_gap: boolean
           land_shotok: number | null
           planting_date: string
           user_id: string
@@ -1398,6 +1399,7 @@ export type Database = {
           crop_type: string
           id?: string
           is_active?: boolean
+          is_gap?: boolean
           land_shotok?: number | null
           planting_date: string
           user_id: string
@@ -1408,6 +1410,7 @@ export type Database = {
           crop_type?: string
           id?: string
           is_active?: boolean
+          is_gap?: boolean
           land_shotok?: number | null
           planting_date?: string
           user_id?: string

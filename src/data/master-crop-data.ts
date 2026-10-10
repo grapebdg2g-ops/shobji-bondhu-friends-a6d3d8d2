@@ -2789,6 +2789,109 @@ export const CROPS: Record<string, CropData> = {
     goodCompanions: [], badCompanions: ['শসা', 'মিষ্টি কুমড়া'], govtSupport: [],
     tips: ['রমজান ও চৈত্র-বৈশাখে চাহিদা ও দাম বেশি থাকে।', 'খরচ, ফলন ও বাজারদর প্রাথমিক অনুমান—স্থানীয় কৃষি কর্মকর্তার পরামর্শ নিন।'],
   },
+
+  // ক্যাপসিকাম (মিষ্টি মরিচ) — BARI
+  'capsicum': {
+    id: 'capsicum', name: 'ক্যাপসিকাম', nameEn: 'Capsicum', icon: '🫑', category: 'সবজি',
+    seasons: ['রবি'], plantingMonths: [10, 11], harvestMonths: [1, 2, 3], totalDays: 130,
+    soilTypes: ['দোআঁশ', 'বেলে-দোআঁশ'], waterRequirement: 'মাঝারি', irrigationNeeded: true,
+    phRange: { min: 6.0, max: 7.0 },
+    seedCostPerBigha: 6000, fertilizerCost: 5000, pesticideCost: 4000, laborCost: 9000, otherCost: 4000,
+    get totalCost() { return this.seedCostPerBigha + this.fertilizerCost + this.pesticideCost + this.laborCost + this.otherCost },
+    yieldMin: 60, yieldMax: 100, avgMarketPrice: 2400,
+    get profitMin() { return (this.yieldMin * this.avgMarketPrice) - this.totalCost },
+    get profitMax() { return (this.yieldMax * this.avgMarketPrice) - this.totalCost },
+    get roi() { return Math.round(((this.profitMin + this.profitMax) / 2 / this.totalCost) * 100) },
+    riskLevel: 'মাঝারি', riskFactors: ['থ্রিপস ও মাকড়', 'ঢলে পড়া রোগ', 'বেশি গরমে ফুল ঝরা'],
+    varieties: [
+      { name: 'বারি মিষ্টি মরিচ-১', type: 'উফশী', daysToHarvest: 120, yieldPerBigha: 70 },
+      { name: 'হাইব্রিড ক্যালিফোর্নিয়া ওয়ান্ডার', type: 'হাইব্রিড', daysToHarvest: 110, yieldPerBigha: 90 },
+    ],
+    stages: [
+      { id: 'seedbed', name: 'বীজতলা', icon: '🌱', startDay: 0, endDay: 30,
+        tasks: [{ title: 'বীজতলা/ট্রে-তে চারা', type: 'preparation', urgency: 'জরুরি', desc: 'নেট-ঢাকা বীজতলা বা প্লাগ ট্রে-তে চারা তৈরি করুন। বীজ ট্রাইকোডার্মা দিয়ে শোধন করুন।' }] },
+      { id: 'transplanting', name: 'রোপণ', icon: '🚜', startDay: 30, endDay: 40,
+        tasks: [
+          { title: 'উঁচু বেডে রোপণ', type: 'task', urgency: 'জরুরি', desc: '৫০×৪০ সেমি দূরত্বে, মালচিং পেপার দিলে ভালো।' },
+          { title: 'বেসাল সার', type: 'fertilizer', urgency: 'জরুরি', desc: 'পচা গোবর/কম্পোস্ট, TSP, অর্ধেক MOP, জিপসাম, বোরন।' },
+        ] },
+      { id: 'vegetative', name: 'বাড়ন্ত ও খুঁটি', icon: '🌿', startDay: 40, endDay: 80,
+        tasks: [
+          { title: 'খুঁটি/সাপোর্ট', type: 'task', urgency: 'সাধারণ', desc: 'ফলের ভারে গাছ হেলে না যায়, খুঁটি দিন।' },
+          { title: 'ইউরিয়া কিস্তি', type: 'fertilizer', urgency: 'জরুরি', desc: 'রোপণের ২৫ ও ৫০ দিনে ইউরিয়া ও বাকি MOP।' },
+          { title: 'থ্রিপস/মাকড় দমন', type: 'pest', urgency: 'জরুরি', desc: 'নীল/হলুদ আঠালো ফাঁদ; প্রয়োজনে Abamectin বা Spinosad।' },
+        ] },
+      { id: 'harvest', name: 'সংগ্রহ', icon: '🧺', startDay: 80, endDay: 130,
+        tasks: [{ title: 'ফল তোলা', type: 'harvest', urgency: 'জরুরি', desc: 'পূর্ণ আকারের চকচকে ফল বোঁটাসহ কেটে তুলুন।' }] },
+    ],
+    fertilizerGuide: {
+      perBigha: { urea: 30, tsp: 25, mop: 20, gypsum: 15, zinc: 1.0, boron: 1.0 },
+      soilAdjustment: { 'এঁটেল': {}, 'দোআঁশ': {}, 'বালি': { urea: 1.1 }, 'পলি': {}, 'বেলে-দোআঁশ': {} },
+      schedule: [
+        { timing: 'রোপণের আগে', items: ['পচা গোবর', 'TSP', 'MOP ১/২', 'জিপসাম', 'জিঙ্ক', 'বোরন'], note: '' },
+        { timing: 'রোপণের ২৫ ও ৫০ দিন পর', items: ['Urea কিস্তিতে', 'MOP ১/২'], note: '' },
+      ],
+      warnings: ['প্রাথমিক হিসাব: মাটি পরীক্ষা অনুযায়ী মাত্রা ঠিক করুন।'],
+    },
+    calendarEvents: [
+      { month: 10, type: 'planting', title: 'ক্যাপসিকাম চারা', desc: 'অক্টোবরে বীজতলা' },
+      { month: 1, type: 'harvest', title: 'ক্যাপসিকাম সংগ্রহ', desc: 'জানুয়ারি-মার্চ' },
+    ],
+    bestSellingMonths: [1, 2], demandLevel: 'বেশি', exportPotential: true,
+    goodCompanions: ['পেঁয়াজ', 'গাজর'], badCompanions: ['টমেটো', 'আলু'], govtSupport: [],
+    tips: ['সুপারশপ ও হোটেলে চাহিদা বেশি — GAP পদ্ধতিতে উৎপাদন করলে ভালো দাম।'],
+  },
+
+  // ব্রকলি — BARI
+  'broccoli': {
+    id: 'broccoli', name: 'ব্রকলি', nameEn: 'Broccoli', icon: '🥦', category: 'সবজি',
+    seasons: ['রবি'], plantingMonths: [9, 10, 11], harvestMonths: [12, 1, 2], totalDays: 90,
+    soilTypes: ['দোআঁশ', 'বেলে-দোআঁশ', 'এঁটেল'], waterRequirement: 'মাঝারি', irrigationNeeded: true,
+    phRange: { min: 6.0, max: 7.0 },
+    seedCostPerBigha: 3500, fertilizerCost: 4000, pesticideCost: 2500, laborCost: 6500, otherCost: 2000,
+    get totalCost() { return this.seedCostPerBigha + this.fertilizerCost + this.pesticideCost + this.laborCost + this.otherCost },
+    yieldMin: 30, yieldMax: 50, avgMarketPrice: 2000,
+    get profitMin() { return (this.yieldMin * this.avgMarketPrice) - this.totalCost },
+    get profitMax() { return (this.yieldMax * this.avgMarketPrice) - this.totalCost },
+    get roi() { return Math.round(((this.profitMin + this.profitMax) / 2 / this.totalCost) * 100) },
+    riskLevel: 'মাঝারি', riskFactors: ['ডায়মন্ড ব্যাক মথ', 'দেরিতে তুললে ফুল ফুটে যায়'],
+    varieties: [
+      { name: 'বারি ব্রকলি-১', type: 'উফশী', daysToHarvest: 85, yieldPerBigha: 35 },
+      { name: 'গ্রিন ম্যাজিক', type: 'হাইব্রিড', daysToHarvest: 75, yieldPerBigha: 45 },
+    ],
+    stages: [
+      { id: 'seedbed', name: 'বীজতলা', icon: '🌱', startDay: 0, endDay: 25,
+        tasks: [{ title: 'বীজতলা', type: 'preparation', urgency: 'জরুরি', desc: 'শোধিত বীজে নেট-ঢাকা বীজতলা তৈরি।' }] },
+      { id: 'transplanting', name: 'রোপণ', icon: '🚜', startDay: 25, endDay: 35,
+        tasks: [
+          { title: 'রোপণ', type: 'task', urgency: 'জরুরি', desc: '৬০×৪৫ সেমি দূরত্বে রোপণ।' },
+          { title: 'বেসাল সার', type: 'fertilizer', urgency: 'জরুরি', desc: 'পচা গোবর, TSP, MOP, জিপসাম, বোরন।' },
+        ] },
+      { id: 'heading', name: 'মাথা গঠন', icon: '🥦', startDay: 35, endDay: 75,
+        tasks: [
+          { title: 'ইউরিয়া কিস্তি', type: 'fertilizer', urgency: 'জরুরি', desc: 'রোপণের ২০ ও ৪০ দিনে ইউরিয়া।' },
+          { title: 'পোকা দমন', type: 'pest', urgency: 'জরুরি', desc: 'ফেরোমোন ফাঁদ, প্রয়োজনে Spinosad বা Bt।' },
+        ] },
+      { id: 'harvest', name: 'সংগ্রহ', icon: '🧺', startDay: 75, endDay: 90,
+        tasks: [{ title: 'মাথা কাটা', type: 'harvest', urgency: 'জরুরি', desc: 'কুঁড়ি ফোটার আগে শক্ত সবুজ মাথা ১০-১৫ সেমি ডাঁটাসহ কাটুন।' }] },
+    ],
+    fertilizerGuide: {
+      perBigha: { urea: 25, tsp: 15, mop: 15, gypsum: 8, zinc: 1.0, boron: 1.0 },
+      soilAdjustment: { 'এঁটেল': {}, 'দোআঁশ': {}, 'বালি': { urea: 1.1 }, 'পলি': {}, 'বেলে-দোআঁশ': {} },
+      schedule: [
+        { timing: 'রোপণের আগে', items: ['পচা গোবর', 'TSP', 'MOP ১/২', 'জিপসাম', 'বোরন'], note: '' },
+        { timing: 'রোপণের ২০ ও ৪০ দিন পর', items: ['Urea কিস্তিতে', 'MOP ১/২'], note: '' },
+      ],
+      warnings: ['বোরনের অভাবে ডাঁটা ফাঁপা হয়।'],
+    },
+    calendarEvents: [
+      { month: 10, type: 'planting', title: 'ব্রকলি রোপণ', desc: 'অক্টোবর-নভেম্বর' },
+      { month: 1, type: 'harvest', title: 'ব্রকলি সংগ্রহ', desc: 'ডিসেম্বর-ফেব্রুয়ারি' },
+    ],
+    bestSellingMonths: [12, 1], demandLevel: 'বেশি', exportPotential: true,
+    goodCompanions: ['পেঁয়াজ', 'লেটুস'], badCompanions: ['বাঁধাকপি', 'ফুলকপি'], govtSupport: [],
+    tips: ['মাথা তোলার পর পাশের ছোট মাথাও বিক্রি করা যায়।'],
+  },
 }
 
 // ══════════════════════════════════════

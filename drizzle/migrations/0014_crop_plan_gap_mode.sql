@@ -1,0 +1,1 @@
+ALTER TABLE public.user_crop_plans ADD COLUMN IF NOT EXISTS is_gap boolean NOT NULL DEFAULT false;
