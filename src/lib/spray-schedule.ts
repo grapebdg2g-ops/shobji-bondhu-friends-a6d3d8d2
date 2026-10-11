@@ -6,6 +6,9 @@ import { PESTICIDE_GUIDE, type Problem } from "@/data/pesticide-guide";
 import { supabase } from "@/integrations/supabase/client";
 import { addDays, toIsoDate } from "@/lib/bn-date";
 import { buildTomatoSchedule } from "@/lib/tomato-spray-schedule";
+import { isSprayAllowedUnderGap } from "@/data/gap-protocol";
+import { getBioOptions } from "@/data/crop-knowledge";
+import { toBn } from "@/lib/bn";
 
 export const SPRAY_REMINDER_PREFIX = "🧪 স্প্রে: ";
 
@@ -70,10 +73,31 @@ export async function markSprayReminderDone(planId: string, cropType: string, pl
   if (error) throw error;
 }
 
+/** GAP mode: chemical sprays inside the PHI window become safe bio alternatives. */
+export function applyGapSchedule(events: SprayEvent[], cropType: string): SprayEvent[] {
+  const harvestDay = FARMING_STAGES[cropType]?.totalDays ?? 0;
+  return events.map((e) => {
+    if (!e.problem) return e;
+    const daysLeft = harvestDay - e.day;
+    if (isSprayAllowedUnderGap(cropType, daysLeft)) return e;
+    const bio = getBioOptions(`${e.title} ${e.desc} ${e.problem.name}`);
+    const altText = bio.length > 0
+      ? bio.map((b) => `${b.name} — ${b.dose} (${b.method})`).join("; ")
+      : e.problem.organic[0] ?? "নিম তেল ৫ মিলি/লিটার পানি";
+    return {
+      ...e,
+      title: `জৈব বিকল্প: ${e.title}`,
+      desc: `🛡️ GAP নিয়ম: ফসল তোলার আনুমানিক ${toBn(Math.max(0, daysLeft))} দিন বাকি থাকায় এই সময়ে রাসায়নিক স্প্রে নিষেধ। নিরাপদ বিকল্প: ${altText}`,
+      problem: undefined,
+    };
+  });
+}
+
 /** Creates reminders for all upcoming spray dates of a plan (skips existing ones). */
-export async function syncSprayReminders(userId: string, planId: string, cropType: string, plantingDate: string) {
+export async function syncSprayReminders(userId: string, planId: string, cropType: string, plantingDate: string, isGap = false) {
   const today = toIsoDate(new Date());
-  const events = buildSpraySchedule(cropType, plantingDate);
+  const base = buildSpraySchedule(cropType, plantingDate);
+  const events = isGap ? applyGapSchedule(base, cropType) : base;
   const { data: existing } = await supabase
     .from("crop_reminders")
     .select("title, reminder_date")
