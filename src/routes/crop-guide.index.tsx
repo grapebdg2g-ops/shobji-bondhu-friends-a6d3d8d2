@@ -1,7 +1,8 @@
 import { CropIcon } from "@/components/krishi/crop-icon";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Plus, ChevronRight, Check, Trash2, RotateCcw } from "lucide-react";
+import { ArrowLeft, Plus, ChevronRight, Check, Trash2, RotateCcw, ShieldCheck } from "lucide-react";
+import { isGapEligible } from "@/data/gap-protocol";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -37,6 +38,7 @@ type Plan = {
   crop_type: string;
   planting_date: string;
   is_active: boolean;
+  is_gap?: boolean | null;
   created_at: string;
 };
 
@@ -143,8 +145,14 @@ function CropGuideIndex() {
               const currentStage = guide.stages.find((s) => days >= s.startDay && days < s.endDay) ?? guide.stages[guide.stages.length - 1];
               const done = !p.is_active;
               return (
-                <div key={p.id} className={`bg-white rounded-2xl p-4 shadow-sm ring-1 ${done ? "ring-emerald-300" : "ring-emerald-100"}`}>
+                <div key={p.id} className={`bg-white rounded-2xl p-4 shadow-sm ${p.is_gap ? "ring-2 ring-emerald-500" : `ring-1 ${done ? "ring-emerald-300" : "ring-emerald-100"}`}`}>
                   <Link to="/crop-guide/plan/$planId" params={{ planId: p.id }} className="block">
+                    {p.is_gap && (
+                      <div className="mb-3 -mt-1 flex items-center gap-2 rounded-xl bg-emerald-600 text-white px-3 py-1.5">
+                        <ShieldCheck className="h-4 w-4 shrink-0" />
+                        <span className="text-xs font-bold">GAP নিয়ম মেনে চাষ করা হচ্ছে</span>
+                      </div>
+                    )}
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
                         <span className="text-2xl"><CropIcon crop={p.crop_type} /></span>
@@ -198,8 +206,13 @@ function CropGuideIndex() {
                 key={crop}
                 to="/crop-guide/new/$crop"
                 params={{ crop }}
-                className="bg-white rounded-2xl p-4 shadow-sm ring-1 ring-gray-100 flex flex-col items-center text-center active:scale-95 transition"
+                className="relative bg-white rounded-2xl p-4 shadow-sm ring-1 ring-gray-100 flex flex-col items-center text-center active:scale-95 transition"
               >
+                {isGapEligible(crop) && (
+                  <span className="absolute top-2 right-2 inline-flex items-center gap-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold px-1.5 py-0.5">
+                    <ShieldCheck className="h-3 w-3" /> GAP
+                  </span>
+                )}
                 <span className="text-4xl mb-2"><CropIcon crop={crop} /></span>
                 <span className="font-bold text-gray-900 text-sm">{crop}</span>
                 <span className="text-[11px] text-gray-500 mt-1 line-clamp-1">{g.season}</span>
