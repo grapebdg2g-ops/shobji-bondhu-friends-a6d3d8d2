@@ -22,6 +22,7 @@ export function GapProtocolSection({ cropType, plantingDate, daysUntilHarvest, c
   const [open, setOpen] = useState<GapPhase | null>("land");
   const { user } = useUser();
   if (!profile) return null;
+  const prof = profile;
 
   const done = tasks.filter((t) => completions.has(t.id)).length;
   const pct = Math.round((done / tasks.length) * 100);
