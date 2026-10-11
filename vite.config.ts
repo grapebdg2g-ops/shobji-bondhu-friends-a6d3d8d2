@@ -24,7 +24,7 @@ export default defineConfig({
         workbox: {
           cacheId: "krishibondhu-v1",
           navigateFallback: "/offline",
-          navigateFallbackDenylist: [/^\/~oauth/, /^\/api\//],
+          navigateFallbackDenylist: [/^\/~oauth/, /^\/api\//, /^\/mcp/, /^\/\.well-known\//, /^\/\.lovable\//],
           globPatterns: ["**/*.{js,css,html,svg,png,ico,webp,woff,woff2}"],
           cleanupOutdatedCaches: true,
           clientsClaim: true,

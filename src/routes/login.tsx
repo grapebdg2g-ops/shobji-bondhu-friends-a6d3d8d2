@@ -12,11 +12,16 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
+  validateSearch: (s: Record<string, unknown>): { next?: string } =>
+    typeof s.next === "string" ? { next: s.next } : {},
   head: () => ({ meta: [{ title: "প্রবেশ করুন — কৃষক বন্ধু" }] }),
 });
 
 function LoginPage() {
   const navigate = useNavigate();
+  const { next: rawNext } = Route.useSearch();
+  const next = rawNext ? oauthReturnPath(rawNext) : null;
+  const returnUrl = () => (next ? new URL(next, window.location.origin).href : window.location.origin);
 
   // --- Login states ---
   const [email, setEmail] = useState("");
@@ -43,6 +48,7 @@ function LoginPage() {
   const afterLogin = async () => {
     const { data } = await supabase.auth.getSession();
     if (!data.session) return;
+    if (next && next !== "/") { window.location.href = next; return; }
     const { data: p } = await supabase
       .from("profiles").select("district").eq("id", data.session.user.id).maybeSingle();
     navigate({ to: p?.district ? "/dashboard" : "/register" });
