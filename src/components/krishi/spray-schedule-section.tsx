@@ -302,10 +302,10 @@ export function SprayScheduleSection({ userId, planId, cropType, plantingDate, d
             onClick={() => setShowMain((v) => !v)}
             className="w-full flex items-center justify-between rounded-xl bg-muted px-3 py-2.5 text-sm font-bold text-foreground"
           >
-            <span>📋 পুরো স্প্রে শিডিউল ({toBn(main.length)}টি)</span>
+            <span>📋 পুরো স্প্রে শিডিউল ({toBn(displayMain.length)}টি)</span>
             {showMain ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </button>
-          {showMain && <ol className="mt-2 space-y-2">{main.map(renderEvent)}</ol>}
+          {showMain && <ol className="mt-2 space-y-2">{displayMain.map(renderEvent)}</ol>}
         </div>
 
         {nutrients.length > 0 && (
