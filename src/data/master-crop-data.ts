@@ -5267,6 +5267,63 @@ export const CROPS: Record<string, CropData> = {
 };
 
 // ══════════════════════════════════════
+// STAGE NORMALIZATION — guarantees stages cover [0, totalDays] with no gaps/overlaps.
+// Gaps get a bridging stage with safe, generic care tasks (IPM scouting, irrigation).
+// ══════════════════════════════════════
+function bridgeStage(startDay: number, endDay: number, beforeHarvest: boolean): Stage {
+  return {
+    id: `bridge-${startDay}`,
+    name: beforeHarvest ? "ফুল, ফল ও পরিপক্বতা" : "পরবর্তী বৃদ্ধি ও পরিচর্যা",
+    icon: beforeHarvest ? "🌼" : "🌿",
+    startDay,
+    endDay,
+    tasks: [
+      {
+        title: "মাটির রস দেখে সেচ",
+        desc: beforeHarvest
+          ? "ফুল ও ফল ধরার সময় মাটি যেন শুকিয়ে না যায়; আবার পানি জমতেও দেবেন না।"
+          : "মাটির উপরের ২ ইঞ্চি শুকালে হালকা সেচ দিন; পানি জমলে নালা দিয়ে বের করুন।",
+        type: "irrigation",
+        urgency: "জরুরি",
+      },
+      {
+        title: "পোকা-রোগ পর্যবেক্ষণ (IPM)",
+        desc: "সপ্তাহে ২ দিন ১০টি গাছ দেখুন; ১০টির ২টিতে ক্ষতি দেখলে তবেই ওষুধ দিন। আগে হলুদ ফাঁদ, হাতবাছাই ও জৈব বালাইনাশক।",
+        type: "pest",
+        urgency: "সাধারণ",
+      },
+      {
+        title: "আগাছা পরিষ্কার",
+        desc: "গাছের গোড়া আগাছামুক্ত রাখুন যাতে সার ও পানি ফসলই পায়।",
+        type: "task",
+        urgency: "সাধারণ",
+      },
+    ],
+  };
+}
+
+function normalizeStages(crop: CropData) {
+  const s = [...crop.stages].sort((a, b) => a.startDay - b.startDay);
+  const out: Stage[] = [];
+  if (s.length && s[0].startDay > 0) s[0] = { ...s[0], startDay: 0 };
+  for (let i = 0; i < s.length; i++) {
+    const cur = { ...s[i] };
+    const next = s[i + 1];
+    if (next && cur.endDay > next.startDay) cur.endDay = next.startDay; // overlap
+    out.push(cur);
+    if (next && cur.endDay < next.startDay) {
+      const isHarvest = next.tasks.some((t) => t.type === "harvest");
+      out.push(bridgeStage(cur.endDay, next.startDay, isHarvest));
+    }
+  }
+  const last = out[out.length - 1];
+  if (last && last.endDay !== crop.totalDays) last.endDay = crop.totalDays;
+  crop.stages = out;
+}
+
+Object.values(CROPS).forEach(normalizeStages);
+
+// ══════════════════════════════════════
 // HELPER FUNCTIONS
 // ══════════════════════════════════════
 
