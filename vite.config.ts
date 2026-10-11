@@ -6,6 +6,7 @@
 // You can pass additional config via defineConfig({ vite: { ... } }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 import { VitePWA } from "vite-plugin-pwa";
+import { mcpPlugin } from "@lovable.dev/mcp-js/stacks/tanstack/vite";
 
 export default defineConfig({
   tanstackStart: {
@@ -13,6 +14,7 @@ export default defineConfig({
   },
   vite: {
     plugins: [
+      mcpPlugin(),
       VitePWA({
         registerType: "autoUpdate",
         // CRITICAL: never enable in dev — would break the Lovable preview iframe
@@ -22,7 +24,7 @@ export default defineConfig({
         workbox: {
           cacheId: "krishibondhu-v1",
           navigateFallback: "/offline",
-          navigateFallbackDenylist: [/^\/~oauth/, /^\/api\//],
+          navigateFallbackDenylist: [/^\/~oauth/, /^\/api\//, /^\/mcp/, /^\/\.well-known\//, /^\/\.lovable\//],
           globPatterns: ["**/*.{js,css,html,svg,png,ico,webp,woff,woff2}"],
           cleanupOutdatedCaches: true,
           clientsClaim: true,

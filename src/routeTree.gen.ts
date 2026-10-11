@@ -22,6 +22,7 @@ import { Route as FarmersRouteImport } from './routes/farmers'
 import { Route as FeedRouteImport } from './routes/feed'
 import { Route as FriendsRouteImport } from './routes/friends'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as McpRouteImport } from './routes/mcp'
 import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as ModerationRouteImport } from './routes/moderation'
 import { Route as NotificationsRouteImport } from './routes/notifications'
@@ -32,6 +33,8 @@ import { Route as PricePredictionRouteImport } from './routes/price-prediction'
 import { Route as PricesRouteImport } from './routes/prices'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as WeatherRouteImport } from './routes/weather'
+import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
@@ -61,6 +64,8 @@ import { Route as ProfileDiseaseHistoryRouteImport } from './routes/profile.dise
 import { Route as UUserIdRouteImport } from './routes/u.$userId'
 import { Route as VegetableGuideIndexRouteImport } from './routes/vegetable-guide.index'
 import { Route as VegetableGuideSlugRouteImport } from './routes/vegetable-guide.$slug'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
+import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as AiBondhuChatIndexRouteImport } from './routes/ai-bondhu.chat.index'
 import { Route as AiBondhuChatSessionIdRouteImport } from './routes/ai-bondhu.chat.$sessionId'
 import { Route as CropGuideNewCropRouteImport } from './routes/crop-guide.new.$crop'
@@ -136,6 +141,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MessagesRoute = MessagesRouteImport.update({
   id: '/messages',
   path: '/messages',
@@ -186,6 +196,18 @@ const WeatherRoute = WeatherRouteImport.update({
   path: '/weather',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Char91DotmcpChar93ListToolsRoute =
+  Char91DotmcpChar93ListToolsRouteImport.update({
+    id: '/.mcp/list-tools',
+    path: '/.mcp/list-tools',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -331,6 +353,17 @@ const VegetableGuideSlugRoute = VegetableGuideSlugRouteImport.update({
   path: '/vegetable-guide/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Char91DotmcpChar93InvokeToolToolRoute =
+  Char91DotmcpChar93InvokeToolToolRouteImport.update({
+    id: '/.mcp/invoke-tool/$tool',
+    path: '/.mcp/invoke-tool/$tool',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AiBondhuChatIndexRoute = AiBondhuChatIndexRouteImport.update({
   id: '/ai-bondhu/chat/',
   path: '/ai-bondhu/chat/',
@@ -396,6 +429,7 @@ export interface FileRoutesByFullPath {
   '/feed': typeof FeedRoute
   '/friends': typeof FriendsRoute
   '/login': typeof LoginRoute
+  '/mcp': typeof McpRoute
   '/messages': typeof MessagesRouteWithChildren
   '/moderation': typeof ModerationRoute
   '/notifications': typeof NotificationsRoute
@@ -406,6 +440,8 @@ export interface FileRoutesByFullPath {
   '/prices': typeof PricesRoute
   '/register': typeof RegisterRoute
   '/weather': typeof WeatherRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/content': typeof AdminContentRoute
@@ -435,6 +471,8 @@ export interface FileRoutesByFullPath {
   '/crop-guide/': typeof CropGuideIndexRoute
   '/profile/': typeof ProfileIndexRoute
   '/vegetable-guide/': typeof VegetableGuideIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/ai-bondhu/chat/$sessionId': typeof AiBondhuChatSessionIdRoute
   '/crop-guide/new/$crop': typeof CropGuideNewCropRoute
   '/crop-guide/plan/$planId': typeof CropGuidePlanPlanIdRoute
@@ -457,6 +495,7 @@ export interface FileRoutesByTo {
   '/feed': typeof FeedRoute
   '/friends': typeof FriendsRoute
   '/login': typeof LoginRoute
+  '/mcp': typeof McpRoute
   '/messages': typeof MessagesRouteWithChildren
   '/moderation': typeof ModerationRoute
   '/notifications': typeof NotificationsRoute
@@ -467,6 +506,8 @@ export interface FileRoutesByTo {
   '/prices': typeof PricesRoute
   '/register': typeof RegisterRoute
   '/weather': typeof WeatherRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/content': typeof AdminContentRoute
@@ -496,6 +537,8 @@ export interface FileRoutesByTo {
   '/crop-guide': typeof CropGuideIndexRoute
   '/profile': typeof ProfileIndexRoute
   '/vegetable-guide': typeof VegetableGuideIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/ai-bondhu/chat/$sessionId': typeof AiBondhuChatSessionIdRoute
   '/crop-guide/new/$crop': typeof CropGuideNewCropRoute
   '/crop-guide/plan/$planId': typeof CropGuidePlanPlanIdRoute
@@ -521,6 +564,7 @@ export interface FileRoutesById {
   '/feed': typeof FeedRoute
   '/friends': typeof FriendsRoute
   '/login': typeof LoginRoute
+  '/mcp': typeof McpRoute
   '/messages': typeof MessagesRouteWithChildren
   '/moderation': typeof ModerationRoute
   '/notifications': typeof NotificationsRoute
@@ -531,6 +575,8 @@ export interface FileRoutesById {
   '/prices': typeof PricesRoute
   '/register': typeof RegisterRoute
   '/weather': typeof WeatherRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/content': typeof AdminContentRoute
@@ -560,6 +606,8 @@ export interface FileRoutesById {
   '/crop-guide/': typeof CropGuideIndexRoute
   '/profile/': typeof ProfileIndexRoute
   '/vegetable-guide/': typeof VegetableGuideIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/ai-bondhu/chat/$sessionId': typeof AiBondhuChatSessionIdRoute
   '/crop-guide/new/$crop': typeof CropGuideNewCropRoute
   '/crop-guide/plan/$planId': typeof CropGuidePlanPlanIdRoute
@@ -586,6 +634,7 @@ export interface FileRouteTypes {
     | '/feed'
     | '/friends'
     | '/login'
+    | '/mcp'
     | '/messages'
     | '/moderation'
     | '/notifications'
@@ -596,6 +645,8 @@ export interface FileRouteTypes {
     | '/prices'
     | '/register'
     | '/weather'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/admin/analytics'
     | '/admin/audit'
     | '/admin/content'
@@ -625,6 +676,8 @@ export interface FileRouteTypes {
     | '/crop-guide/'
     | '/profile/'
     | '/vegetable-guide/'
+    | '/.lovable/oauth/consent'
+    | '/.mcp/invoke-tool/$tool'
     | '/ai-bondhu/chat/$sessionId'
     | '/crop-guide/new/$crop'
     | '/crop-guide/plan/$planId'
@@ -647,6 +700,7 @@ export interface FileRouteTypes {
     | '/feed'
     | '/friends'
     | '/login'
+    | '/mcp'
     | '/messages'
     | '/moderation'
     | '/notifications'
@@ -657,6 +711,8 @@ export interface FileRouteTypes {
     | '/prices'
     | '/register'
     | '/weather'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/admin/analytics'
     | '/admin/audit'
     | '/admin/content'
@@ -686,6 +742,8 @@ export interface FileRouteTypes {
     | '/crop-guide'
     | '/profile'
     | '/vegetable-guide'
+    | '/.lovable/oauth/consent'
+    | '/.mcp/invoke-tool/$tool'
     | '/ai-bondhu/chat/$sessionId'
     | '/crop-guide/new/$crop'
     | '/crop-guide/plan/$planId'
@@ -710,6 +768,7 @@ export interface FileRouteTypes {
     | '/feed'
     | '/friends'
     | '/login'
+    | '/mcp'
     | '/messages'
     | '/moderation'
     | '/notifications'
@@ -720,6 +779,8 @@ export interface FileRouteTypes {
     | '/prices'
     | '/register'
     | '/weather'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/admin/analytics'
     | '/admin/audit'
     | '/admin/content'
@@ -749,6 +810,8 @@ export interface FileRouteTypes {
     | '/crop-guide/'
     | '/profile/'
     | '/vegetable-guide/'
+    | '/.lovable/oauth/consent'
+    | '/.mcp/invoke-tool/$tool'
     | '/ai-bondhu/chat/$sessionId'
     | '/crop-guide/new/$crop'
     | '/crop-guide/plan/$planId'
@@ -774,6 +837,7 @@ export interface RootRouteChildren {
   FeedRoute: typeof FeedRoute
   FriendsRoute: typeof FriendsRoute
   LoginRoute: typeof LoginRoute
+  McpRoute: typeof McpRoute
   MessagesRoute: typeof MessagesRouteWithChildren
   ModerationRoute: typeof ModerationRoute
   NotificationsRoute: typeof NotificationsRoute
@@ -784,6 +848,8 @@ export interface RootRouteChildren {
   PricesRoute: typeof PricesRoute
   RegisterRoute: typeof RegisterRoute
   WeatherRoute: typeof WeatherRoute
+  Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
+  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   AiBondhuCalculatorRoute: typeof AiBondhuCalculatorRoute
   AiBondhuCalendarRoute: typeof AiBondhuCalendarRoute
   AiBondhuDiseaseRoute: typeof AiBondhuDiseaseRoute
@@ -797,6 +863,8 @@ export interface RootRouteChildren {
   AiBondhuIndexRoute: typeof AiBondhuIndexRoute
   ProfileIndexRoute: typeof ProfileIndexRoute
   VegetableGuideIndexRoute: typeof VegetableGuideIndexRoute
+  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
+  Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   AiBondhuChatSessionIdRoute: typeof AiBondhuChatSessionIdRoute
   AiBondhuChatIndexRoute: typeof AiBondhuChatIndexRoute
   ApiPublicHooksCheckPredictionAccuracyRoute: typeof ApiPublicHooksCheckPredictionAccuracyRoute
@@ -899,6 +967,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/messages': {
       id: '/messages'
       path: '/messages'
@@ -967,6 +1042,20 @@ declare module '@tanstack/react-router' {
       path: '/weather'
       fullPath: '/weather'
       preLoaderRoute: typeof WeatherRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.mcp/list-tools': {
+      id: '/.mcp/list-tools'
+      path: '/.mcp/list-tools'
+      fullPath: '/.mcp/list-tools'
+      preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -1172,6 +1261,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VegetableGuideSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.mcp/invoke-tool/$tool': {
+      id: '/.mcp/invoke-tool/$tool'
+      path: '/.mcp/invoke-tool/$tool'
+      fullPath: '/.mcp/invoke-tool/$tool'
+      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ai-bondhu/chat/': {
       id: '/ai-bondhu/chat/'
       path: '/ai-bondhu/chat'
@@ -1336,6 +1439,7 @@ const rootRouteChildren: RootRouteChildren = {
   FeedRoute: FeedRoute,
   FriendsRoute: FriendsRoute,
   LoginRoute: LoginRoute,
+  McpRoute: McpRoute,
   MessagesRoute: MessagesRouteWithChildren,
   ModerationRoute: ModerationRoute,
   NotificationsRoute: NotificationsRoute,
@@ -1346,6 +1450,9 @@ const rootRouteChildren: RootRouteChildren = {
   PricesRoute: PricesRoute,
   RegisterRoute: RegisterRoute,
   WeatherRoute: WeatherRoute,
+  Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
   AiBondhuCalculatorRoute: AiBondhuCalculatorRoute,
   AiBondhuCalendarRoute: AiBondhuCalendarRoute,
   AiBondhuDiseaseRoute: AiBondhuDiseaseRoute,
@@ -1359,6 +1466,8 @@ const rootRouteChildren: RootRouteChildren = {
   AiBondhuIndexRoute: AiBondhuIndexRoute,
   ProfileIndexRoute: ProfileIndexRoute,
   VegetableGuideIndexRoute: VegetableGuideIndexRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
+  Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   AiBondhuChatSessionIdRoute: AiBondhuChatSessionIdRoute,
   AiBondhuChatIndexRoute: AiBondhuChatIndexRoute,
   ApiPublicHooksCheckPredictionAccuracyRoute:

@@ -9,14 +9,20 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { toast } from "sonner";
+import { oauthReturnPath } from "@/lib/oauth-return-path";
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
+  validateSearch: (s: Record<string, unknown>): { next?: string } =>
+    typeof s.next === "string" ? { next: s.next } : {},
   head: () => ({ meta: [{ title: "প্রবেশ করুন — কৃষক বন্ধু" }] }),
 });
 
 function LoginPage() {
   const navigate = useNavigate();
+  const { next: rawNext } = Route.useSearch();
+  const next = rawNext ? oauthReturnPath(rawNext) : null;
+  const returnUrl = () => (next ? new URL(next, window.location.origin).href : window.location.origin);
 
   // --- Login states ---
   const [email, setEmail] = useState("");
@@ -43,6 +49,7 @@ function LoginPage() {
   const afterLogin = async () => {
     const { data } = await supabase.auth.getSession();
     if (!data.session) return;
+    if (next && next !== "/") { window.location.href = next; return; }
     const { data: p } = await supabase
       .from("profiles").select("district").eq("id", data.session.user.id).maybeSingle();
     navigate({ to: p?.district ? "/dashboard" : "/register" });
@@ -50,7 +57,7 @@ function LoginPage() {
 
   const handleGoogle = async () => {
     setLoading(true);
-    const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
+    const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: returnUrl() });
     if (r.error) { toast.error("Google সাইন-ইন ব্যর্থ"); setLoading(false); return; }
     if (r.redirected) return;
     await afterLogin();
@@ -109,7 +116,7 @@ function LoginPage() {
     const { data, error } = await supabase.auth.signUp({
       email: regEmail,
       password: regPassword,
-      options: { emailRedirectTo: window.location.origin },
+      options: { emailRedirectTo: returnUrl() },
     });
     if (error) { toast.error(error.message); setLoading(false); return; }
     if (data.session) {

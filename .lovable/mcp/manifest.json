@@ -1,0 +1,167 @@
+{
+  "version": 1,
+  "sdk_version": "0.28.0",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://iymwibfltcxaqjlpwyot.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "shobji-bondhu",
+      "version": "0.1.0",
+      "title": "Shobji Bondhu"
+    },
+    "tools": [
+      {
+        "name": "list_crops",
+        "title": "List crops",
+        "description": "List the crops covered by this app's Bengali farming guide, with season, category, duration and profitability summary.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "season": {
+              "description": "Season filter: রবি, খরিফ-১, খরিফ-২, সারা বছর.",
+              "type": "string",
+              "minLength": 1
+            },
+            "category": {
+              "description": "Category filter: ধান্য, সবজি, মসলা, তেল, কন্দাল.",
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_crop_guide",
+        "title": "Get crop guide",
+        "description": "Get the full Bengali cultivation guide for one crop: stages, tasks, fertilizer schedule, varieties, costs, risks and tips.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "crop": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Crop id, Bengali name, or English name, e.g. 'tomato' / 'টমেটো'."
+            }
+          },
+          "required": [
+            "crop"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_market_prices",
+        "title": "List market prices",
+        "description": "List recent community-reported vegetable and crop market prices, optionally filtered by product name and district (Bengali names).",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "product": {
+              "description": "Product name, e.g. 'টমেটো'.",
+              "type": "string",
+              "minLength": 1
+            },
+            "district": {
+              "description": "District name in Bengali, e.g. 'ঢাকা'.",
+              "type": "string",
+              "minLength": 1
+            },
+            "limit": {
+              "description": "Max rows (default 20).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "report_market_price",
+        "title": "Report a market price",
+        "description": "Submit a new community market price report for a product in a market/district, on behalf of the signed-in user.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "product_name": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Product name in Bengali, e.g. 'আলু'."
+            },
+            "price": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 1000000,
+              "description": "Price in BDT."
+            },
+            "unit": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Unit, e.g. 'কেজি'."
+            },
+            "market_name": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Market name."
+            },
+            "district": {
+              "type": "string",
+              "minLength": 1,
+              "description": "District name in Bengali."
+            },
+            "upazila": {
+              "description": "Upazila name in Bengali.",
+              "type": "string",
+              "minLength": 1
+            },
+            "category": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Category, e.g. 'সবজি'."
+            }
+          },
+          "required": [
+            "product_name",
+            "price",
+            "unit",
+            "market_name",
+            "district",
+            "category"
+          ]
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
