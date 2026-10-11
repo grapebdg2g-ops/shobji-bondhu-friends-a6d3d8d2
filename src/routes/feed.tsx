@@ -40,7 +40,7 @@ import { useAuthorAvatars } from "@/hooks/use-author-avatars";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const feedSearchSchema = z.object({
-  filter: z.enum(["all", "help", "success"]).catch("all"),
+  filter: z.enum(["all", "help", "success"]).optional().catch("all"),
 });
 
 export const Route = createFileRoute("/feed")({
@@ -121,7 +121,7 @@ function timeAgo(iso: string) {
 function FeedPage() {
   const navigate = useNavigate();
   const { user } = useUser();
-  const { filter } = Route.useSearch() as { filter: "all" | "help" | "success" };
+  const filter = Route.useSearch().filter ?? "all";
   const headerMeta = FILTER_HEADER[filter];
 
   const [filters, setFilters] = useState<FeedFilters>({
