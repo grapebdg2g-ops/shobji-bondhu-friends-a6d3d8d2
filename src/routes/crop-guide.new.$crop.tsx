@@ -70,7 +70,7 @@ function NewCropPlan() {
     }
     toast.success("ফসল পরিকল্পনা যোগ হয়েছে");
     try {
-      const n = await syncSprayReminders(user.id, (data as { id: string }).id, crop, toIsoDate(date));
+      const n = await syncSprayReminders(user.id, (data as { id: string }).id, crop, toIsoDate(date), gapEligible && gap);
       if (n > 0) toast.success(`${n}টি স্প্রে রিমাইন্ডার সেট হয়েছে`);
     } catch { /* plan still saved */ }
     navigate({ to: "/crop-guide/plan/$planId", params: { planId: (data as { id: string }).id } });
