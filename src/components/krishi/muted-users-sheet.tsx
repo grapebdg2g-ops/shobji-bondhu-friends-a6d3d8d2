@@ -28,7 +28,10 @@ export function MutedUsersSheet({ open, onClose }: { open: boolean; onClose: () 
           <input
             type="text"
             value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
             placeholder="নাম বা জেলা দিয়ে খুঁজুন..."
             className="w-full h-10 pl-9 pr-3 rounded-xl border border-border bg-card text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
           />
@@ -58,14 +61,20 @@ export function MutedUsersSheet({ open, onClose }: { open: boolean; onClose: () 
                   >
                     <div className="h-10 w-10 rounded-full bg-primary/15 text-primary flex items-center justify-center font-bold overflow-hidden shrink-0">
                       {p?.avatar_url ? (
-                        <LazyImage src={p.avatar_url} alt={name} wrapperClassName="h-full w-full rounded-full" />
+                        <LazyImage
+                          src={p.avatar_url}
+                          alt={name}
+                          wrapperClassName="h-full w-full rounded-full"
+                        />
                       ) : (
                         <span>{name.charAt(0)}</span>
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-bold text-foreground truncate">{name}</p>
-                      {p?.district && <p className="text-[11px] text-muted-foreground truncate">{p.district}</p>}
+                      {p?.district && (
+                        <p className="text-[11px] text-muted-foreground truncate">{p.district}</p>
+                      )}
                     </div>
                     <button
                       type="button"

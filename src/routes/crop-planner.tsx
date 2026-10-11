@@ -2,12 +2,33 @@ import { CropIcon } from "@/components/krishi/crop-icon";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
-  ArrowLeft, Sparkles, ChevronRight, ChevronLeft, Zap, Target, Check,
-  Droplets, CloudRain, CloudDrizzle, TrendingUp, Shield, Home,
-  Leaf, Scale, X, Star, AlertTriangle, ChevronDown, ChevronUp,
+  ArrowLeft,
+  Sparkles,
+  ChevronRight,
+  ChevronLeft,
+  Zap,
+  Target,
+  Check,
+  Droplets,
+  CloudRain,
+  CloudDrizzle,
+  TrendingUp,
+  Shield,
+  Home,
+  Leaf,
+  Scale,
+  X,
+  Star,
+  AlertTriangle,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import {
-  getRecommendedCrops, getCrop, type SoilType, type WaterNeed, type CropData,
+  getRecommendedCrops,
+  getCrop,
+  type SoilType,
+  type WaterNeed,
+  type CropData,
 } from "@/data/master-crop-data";
 import { toBn, fmtBdt } from "@/lib/bn";
 import { useUser } from "@/contexts/user-context";
@@ -18,10 +39,16 @@ export const Route = createFileRoute("/crop-planner")({
     meta: [
       { title: "ফসল পরিকল্পনা — কৃষক বন্ধু" },
       { property: "og:title", content: "ফসল পরিকল্পনা — কৃষক বন্ধু" },
-      { property: "og:description", content: "আপনার জমির জন্য সেরা ফসল খুঁজুন — মাটি, পানি ও লক্ষ্যের ভিত্তিতে।" },
+      {
+        property: "og:description",
+        content: "আপনার জমির জন্য সেরা ফসল খুঁজুন — মাটি, পানি ও লক্ষ্যের ভিত্তিতে।",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "description", content: "আপনার জমির জন্য সেরা ফসল খুঁজুন — মাটি, পানি ও লক্ষ্যের ভিত্তিতে।" },
+      {
+        name: "description",
+        content: "আপনার জমির জন্য সেরা ফসল খুঁজুন — মাটি, পানি ও লক্ষ্যের ভিত্তিতে।",
+      },
     ],
   }),
 });
@@ -76,14 +103,17 @@ function CropPlannerPage() {
 
   const recs: CropData[] = useMemo(() => {
     if (screen !== "results") return [];
-    return getRecommendedCrops({ soilType: soil, waterAvail: water, month, goal: primaryGoal, areaInShotok: areaShotok });
+    return getRecommendedCrops({
+      soilType: soil,
+      waterAvail: water,
+      month,
+      goal: primaryGoal,
+      areaInShotok: areaShotok,
+    });
   }, [screen, soil, water, month, primaryGoal, areaShotok]);
 
   const top = recs[0];
   const others = recs.slice(1);
-
-
-
 
   // Loading auto-advance
   useEffect(() => {
@@ -94,7 +124,11 @@ function CropPlannerPage() {
 
   function startQuick() {
     // Quick: use sensible defaults + profile district
-    setSoil("দোআঁশ"); setWater("মাঝারি"); setGoals(["profit"]); setAreaVal(50); setUnit("শতক");
+    setSoil("দোআঁশ");
+    setWater("মাঝারি");
+    setGoals(["profit"]);
+    setAreaVal(50);
+    setUnit("শতক");
     setScreen("loading");
   }
 
@@ -112,9 +146,9 @@ function CropPlannerPage() {
   }
 
   function toggleCompare(id: string) {
-    setCompareIds((prev) => prev.includes(id)
-      ? prev.filter((x) => x !== id)
-      : prev.length >= 3 ? prev : [...prev, id]);
+    setCompareIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : prev.length >= 3 ? prev : [...prev, id],
+    );
   }
 
   return (
@@ -122,8 +156,15 @@ function CropPlannerPage() {
       {/* ===== SCREEN 1: ENTRY ===== */}
       {screen === "entry" && (
         <>
-          <header className="px-5 pt-8 pb-8 rounded-b-3xl text-white" style={{ background: "var(--gradient-brand)" }}>
-            <button onClick={() => navigate({ to: "/dashboard" })} aria-label="ফিরে যান" className="h-9 w-9 rounded-full bg-white/15 flex items-center justify-center">
+          <header
+            className="px-5 pt-8 pb-8 rounded-b-3xl text-white"
+            style={{ background: "var(--gradient-brand)" }}
+          >
+            <button
+              onClick={() => navigate({ to: "/dashboard" })}
+              aria-label="ফিরে যান"
+              className="h-9 w-9 rounded-full bg-white/15 flex items-center justify-center"
+            >
               <ArrowLeft className="h-5 w-5" />
             </button>
             <h1 className="mt-5 text-3xl font-bold flex items-center gap-2">
@@ -154,14 +195,19 @@ function CropPlannerPage() {
 
             {/* Option B — Custom */}
             <button
-              onClick={() => { setScreen("step"); setStep(1); }}
+              onClick={() => {
+                setScreen("step");
+                setStep(1);
+              }}
               className="w-full text-left rounded-2xl p-5 border-2 border-emerald-300 bg-white active:scale-[0.99] transition"
             >
               <div className="flex items-center gap-2 text-sm font-semibold text-emerald-700">
                 <Target className="h-5 w-5" /> বিস্তারিত পরিকল্পনা
               </div>
               <h2 className="text-lg font-bold text-gray-900 mt-2">আরো সঠিক পরামর্শ</h2>
-              <p className="text-sm text-gray-600 mt-1">জমি, মাটি, পানি — সব দিয়ে নিখুঁত সুপারিশ</p>
+              <p className="text-sm text-gray-600 mt-1">
+                জমি, মাটি, পানি — সব দিয়ে নিখুঁত সুপারিশ
+              </p>
               <span className="mt-3 inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-full text-sm font-semibold">
                 শুরু করি <ChevronRight className="h-4 w-4" />
               </span>
@@ -180,13 +226,23 @@ function CropPlannerPage() {
       {/* ===== SCREEN 2: STEP-BY-STEP ===== */}
       {screen === "step" && (
         <>
-          <header className="px-5 pt-8 pb-5 rounded-b-3xl text-white" style={{ background: "var(--gradient-brand)" }}>
-            <button onClick={prev} aria-label="পিছনে" className="h-9 w-9 rounded-full bg-white/15 flex items-center justify-center">
+          <header
+            className="px-5 pt-8 pb-5 rounded-b-3xl text-white"
+            style={{ background: "var(--gradient-brand)" }}
+          >
+            <button
+              onClick={prev}
+              aria-label="পিছনে"
+              className="h-9 w-9 rounded-full bg-white/15 flex items-center justify-center"
+            >
               <ChevronLeft className="h-5 w-5" />
             </button>
             <div className="mt-4 flex items-center gap-2">
               {[1, 2, 3, 4].map((n) => (
-                <div key={n} className={`h-2 flex-1 rounded-full ${n <= step ? "bg-white" : "bg-white/30"}`} />
+                <div
+                  key={n}
+                  className={`h-2 flex-1 rounded-full ${n <= step ? "bg-white" : "bg-white/30"}`}
+                />
               ))}
             </div>
             <p className="text-xs text-white/80 mt-2">ধাপ {toBn(step)}/৪</p>
@@ -217,8 +273,8 @@ function CropPlannerPage() {
                     ))}
                   </div>
                   <p className="mt-4 text-center text-sm text-gray-600">
-                    = {toBn(areaShotok)} শতক = {toBn(Math.round((areaShotok / 33) * 100) / 100)} বিঘা ={" "}
-                    {toBn(Math.round((areaShotok / 100) * 100) / 100)} একর
+                    = {toBn(areaShotok)} শতক = {toBn(Math.round((areaShotok / 33) * 100) / 100)}{" "}
+                    বিঘা = {toBn(Math.round((areaShotok / 100) * 100) / 100)} একর
                   </p>
                 </div>
               </div>
@@ -250,17 +306,29 @@ function CropPlannerPage() {
                   className="w-full text-sm text-emerald-700 font-semibold py-2 inline-flex items-center justify-center gap-1"
                 >
                   নিশ্চিত না? আমাকে সাহায্য করুন
-                  {showSoilHelp ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                  {showSoilHelp ? (
+                    <ChevronUp className="h-4 w-4" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4" />
+                  )}
                 </button>
                 {showSoilHelp && (
                   <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-gray-700 space-y-2">
                     <p className="font-bold">🧪 সহজ পরীক্ষা:</p>
                     <p>এক মুঠো মাটি সামান্য ভেজা করে হাতে চাপুন:</p>
                     <ul className="space-y-1 ml-3">
-                      <li>• <b>বল বানিয়ে ফাটে না</b> — এঁটেল</li>
-                      <li>• <b>বল বানায় তবে চাপলে ভেঙে যায়</b> — দোআঁশ</li>
-                      <li>• <b>বল বানায় না, ঝরে পড়ে</b> — বালি</li>
-                      <li>• <b>মসৃণ, পিচ্ছিল লাগে</b> — পলি</li>
+                      <li>
+                        • <b>বল বানিয়ে ফাটে না</b> — এঁটেল
+                      </li>
+                      <li>
+                        • <b>বল বানায় তবে চাপলে ভেঙে যায়</b> — দোআঁশ
+                      </li>
+                      <li>
+                        • <b>বল বানায় না, ঝরে পড়ে</b> — বালি
+                      </li>
+                      <li>
+                        • <b>মসৃণ, পিচ্ছিল লাগে</b> — পলি
+                      </li>
                     </ul>
                   </div>
                 )}
@@ -280,7 +348,9 @@ function CropPlannerPage() {
                       onClick={() => setWater(w.v)}
                       className={`w-full p-4 rounded-2xl border-2 text-left transition flex items-start gap-3 ${active ? "border-emerald-500 bg-emerald-50" : "border-gray-200 bg-white"}`}
                     >
-                      <Icon className={`h-6 w-6 mt-0.5 shrink-0 ${active ? "text-emerald-600" : "text-gray-400"}`} />
+                      <Icon
+                        className={`h-6 w-6 mt-0.5 shrink-0 ${active ? "text-emerald-600" : "text-gray-400"}`}
+                      />
                       <div className="flex-1">
                         <div className="font-bold text-gray-900">{w.title}</div>
                         <div className="text-xs text-gray-500 mt-0.5">{w.sub}</div>
@@ -309,7 +379,9 @@ function CropPlannerPage() {
                         onClick={() => toggleGoal(g.v)}
                         className={`p-4 rounded-2xl border-2 text-left transition ${active ? "border-emerald-500 bg-emerald-50" : "border-gray-200 bg-white"}`}
                       >
-                        <Icon className={`h-6 w-6 ${active ? "text-emerald-600" : "text-gray-400"}`} />
+                        <Icon
+                          className={`h-6 w-6 ${active ? "text-emerald-600" : "text-gray-400"}`}
+                        />
                         <div className="font-bold text-gray-900 mt-2">{g.label}</div>
                         <div className="text-xs text-gray-500">{g.sub}</div>
                       </button>
@@ -326,7 +398,15 @@ function CropPlannerPage() {
               disabled={(step === 1 && areaShotok <= 0) || (step === 4 && goals.length === 0)}
               className="mx-auto flex w-full max-w-lg items-center justify-center gap-2 rounded-xl bg-emerald-600 py-3 font-bold text-white shadow-sm transition active:scale-[0.99] disabled:opacity-50"
             >
-              {step === 4 ? <>ফলাফল দেখুন <Sparkles className="h-5 w-5" /></> : <>পরবর্তী <ChevronRight className="h-5 w-5" /></>}
+              {step === 4 ? (
+                <>
+                  ফলাফল দেখুন <Sparkles className="h-5 w-5" />
+                </>
+              ) : (
+                <>
+                  পরবর্তী <ChevronRight className="h-5 w-5" />
+                </>
+              )}
             </button>
           </div>
         </>
@@ -338,8 +418,15 @@ function CropPlannerPage() {
       {/* ===== SCREEN 4: RESULTS ===== */}
       {screen === "results" && (
         <>
-          <header className="px-5 pt-8 pb-6 rounded-b-3xl text-white" style={{ background: "var(--gradient-brand)" }}>
-            <button onClick={() => setScreen("entry")} aria-label="পুনরায়" className="h-9 w-9 rounded-full bg-white/15 flex items-center justify-center">
+          <header
+            className="px-5 pt-8 pb-6 rounded-b-3xl text-white"
+            style={{ background: "var(--gradient-brand)" }}
+          >
+            <button
+              onClick={() => setScreen("entry")}
+              aria-label="পুনরায়"
+              className="h-9 w-9 rounded-full bg-white/15 flex items-center justify-center"
+            >
               <ArrowLeft className="h-5 w-5" />
             </button>
             <h1 className="mt-4 text-2xl font-bold">🌱 আপনার সুপারিশ</h1>
@@ -351,9 +438,13 @@ function CropPlannerPage() {
           {recs.length === 0 && (
             <div className="px-5 mt-6">
               <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-gray-700">
-                আপনার শর্তে এই মাসে রোপণযোগ্য ফসল পাওয়া যায়নি। মাটি বা সেচের ব্যবস্থা পরিবর্তন করে আবার চেষ্টা করুন।
+                আপনার শর্তে এই মাসে রোপণযোগ্য ফসল পাওয়া যায়নি। মাটি বা সেচের ব্যবস্থা পরিবর্তন করে
+                আবার চেষ্টা করুন।
               </div>
-              <button onClick={() => setScreen("entry")} className="mt-4 w-full py-3 rounded-xl bg-emerald-600 text-white font-bold">
+              <button
+                onClick={() => setScreen("entry")}
+                className="mt-4 w-full py-3 rounded-xl bg-emerald-600 text-white font-bold"
+              >
                 আবার চেষ্টা করুন
               </button>
             </div>
@@ -421,7 +512,10 @@ function CropPlannerPage() {
           ids={compareIds}
           bighas={bighas}
           onClose={() => setCompareOpen(false)}
-          onClear={() => { setCompareIds([]); setCompareOpen(false); }}
+          onClear={() => {
+            setCompareIds([]);
+            setCompareOpen(false);
+          }}
         />
       )}
     </main>
@@ -452,8 +546,15 @@ function LoadingScreen() {
       <h2 className="text-xl font-bold text-gray-900 mb-5">বিশ্লেষণ করছি...</h2>
       <ul className="w-full max-w-xs space-y-2">
         {STEPS.map((s, i) => (
-          <li key={s} className={`flex items-center gap-2 text-sm transition ${i < done ? "text-emerald-700 font-semibold" : "text-gray-400"}`}>
-            {i < done ? <Check className="h-4 w-4" /> : <span className="h-4 w-4 rounded-full border-2 border-gray-300" />}
+          <li
+            key={s}
+            className={`flex items-center gap-2 text-sm transition ${i < done ? "text-emerald-700 font-semibold" : "text-gray-400"}`}
+          >
+            {i < done ? (
+              <Check className="h-4 w-4" />
+            ) : (
+              <span className="h-4 w-4 rounded-full border-2 border-gray-300" />
+            )}
             {s}
           </li>
         ))}
@@ -464,10 +565,21 @@ function LoadingScreen() {
 
 /* ============== Hero card with full plan ============== */
 function HeroCropCard({
-  crop, soil, bighas, goalLabel, district, inCompare, onCompare,
+  crop,
+  soil,
+  bighas,
+  goalLabel,
+  district,
+  inCompare,
+  onCompare,
 }: {
-  crop: CropData; soil: SoilType; bighas: number; goalLabel: string;
-  district?: string | null; inCompare: boolean; onCompare: () => void;
+  crop: CropData;
+  soil: SoilType;
+  bighas: number;
+  goalLabel: string;
+  district?: string | null;
+  inCompare: boolean;
+  onCompare: () => void;
 }) {
   const [showBreakdown, setShowBreakdown] = useState(false);
   const month = new Date().getMonth() + 1;
@@ -492,10 +604,14 @@ function HeroCropCard({
       </div>
       <div className="p-5">
         <div className="flex items-center gap-3">
-          <span className="text-5xl"><CropIcon crop={crop.id} /></span>
+          <span className="text-5xl">
+            <CropIcon crop={crop.id} />
+          </span>
           <div>
             <h2 className="text-2xl font-bold text-gray-900">{crop.name}</h2>
-            <p className="text-xs text-gray-500">{crop.seasons.join(", ")} • {toBn(crop.totalDays)} দিন</p>
+            <p className="text-xs text-gray-500">
+              {crop.seasons.join(", ")} • {toBn(crop.totalDays)} দিন
+            </p>
           </div>
         </div>
 
@@ -512,13 +628,25 @@ function HeroCropCard({
 
         <div className="mt-4 grid grid-cols-3 gap-2">
           <Stat label="খরচ" value={fmtBdt(cost)} tone="gray" />
-          <Stat label="আয়" value={`${fmtBdt(revenueMin)}–${fmtBdt(revenueMax).replace("৳", "")}`} tone="blue" />
-          <Stat label="লাভ" value={`${fmtBdt(profitMin)}–${fmtBdt(profitMax).replace("৳", "")}`} tone="emerald" />
+          <Stat
+            label="আয়"
+            value={`${fmtBdt(revenueMin)}–${fmtBdt(revenueMax).replace("৳", "")}`}
+            tone="blue"
+          />
+          <Stat
+            label="লাভ"
+            value={`${fmtBdt(profitMin)}–${fmtBdt(profitMax).replace("৳", "")}`}
+            tone="emerald"
+          />
         </div>
 
         <div className="mt-3 flex items-center justify-between text-xs">
-          <span className="text-gray-600">সময়: <b className="text-gray-900">{toBn(crop.totalDays)} দিন</b></span>
-          <span className={`px-2 py-1 rounded-full font-bold ${crop.riskLevel === "কম" ? "bg-green-100 text-green-700" : crop.riskLevel === "মাঝারি" ? "bg-yellow-100 text-yellow-700" : "bg-red-100 text-red-700"}`}>
+          <span className="text-gray-600">
+            সময়: <b className="text-gray-900">{toBn(crop.totalDays)} দিন</b>
+          </span>
+          <span
+            className={`px-2 py-1 rounded-full font-bold ${crop.riskLevel === "কম" ? "bg-green-100 text-green-700" : crop.riskLevel === "মাঝারি" ? "bg-yellow-100 text-yellow-700" : "bg-red-100 text-red-700"}`}
+          >
             ঝুঁকি: {crop.riskLevel}
           </span>
         </div>
@@ -540,8 +668,17 @@ function HeroCropCard({
             <Row label="অন্যান্য" value={fmtBdt(crop.otherCost * bighas)} />
             <div className="border-t pt-1.5 mt-1.5">
               <Row label="মোট খরচ" value={fmtBdt(cost)} bold />
-              <Row label="আনুমানিক আয়" value={`${fmtBdt(revenueMin)}–${toBn(revenueMax.toLocaleString("en-IN"))}`} bold />
-              <Row label="আনুমানিক লাভ" value={`${fmtBdt(profitMin)}–${toBn(profitMax.toLocaleString("en-IN"))}`} bold tone="emerald" />
+              <Row
+                label="আনুমানিক আয়"
+                value={`${fmtBdt(revenueMin)}–${toBn(revenueMax.toLocaleString("en-IN"))}`}
+                bold
+              />
+              <Row
+                label="আনুমানিক লাভ"
+                value={`${fmtBdt(profitMin)}–${toBn(profitMax.toLocaleString("en-IN"))}`}
+                bold
+                tone="emerald"
+              />
             </div>
           </div>
         )}
@@ -574,8 +711,20 @@ function HeroCropCard({
   );
 }
 
-function Stat({ label, value, tone }: { label: string; value: string; tone: "gray" | "blue" | "emerald" }) {
-  const cls = { gray: "bg-gray-50 text-gray-900", blue: "bg-blue-50 text-blue-900", emerald: "bg-emerald-50 text-emerald-800" }[tone];
+function Stat({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: string;
+  tone: "gray" | "blue" | "emerald";
+}) {
+  const cls = {
+    gray: "bg-gray-50 text-gray-900",
+    blue: "bg-blue-50 text-blue-900",
+    emerald: "bg-emerald-50 text-emerald-800",
+  }[tone];
   return (
     <div className={`rounded-lg p-2 ${cls}`}>
       <div className="text-[10px] opacity-70">{label}</div>
@@ -584,9 +733,21 @@ function Stat({ label, value, tone }: { label: string; value: string; tone: "gra
   );
 }
 
-function Row({ label, value, bold, tone }: { label: string; value: string; bold?: boolean; tone?: "emerald" }) {
+function Row({
+  label,
+  value,
+  bold,
+  tone,
+}: {
+  label: string;
+  value: string;
+  bold?: boolean;
+  tone?: "emerald";
+}) {
   return (
-    <div className={`flex justify-between ${bold ? "font-bold" : ""} ${tone === "emerald" ? "text-emerald-700" : "text-gray-700"}`}>
+    <div
+      className={`flex justify-between ${bold ? "font-bold" : ""} ${tone === "emerald" ? "text-emerald-700" : "text-gray-700"}`}
+    >
       <span>{label}</span>
       <span>{value}</span>
     </div>
@@ -594,16 +755,48 @@ function Row({ label, value, bold, tone }: { label: string; value: string; bold?
 }
 
 /* ============== Alt cards ============== */
-function AltCropCard({ crop, bighas, inCompare, onCompare }: { crop: CropData; bighas: number; inCompare: boolean; onCompare: () => void }) {
+function AltCropCard({
+  crop,
+  bighas,
+  inCompare,
+  onCompare,
+}: {
+  crop: CropData;
+  bighas: number;
+  inCompare: boolean;
+  onCompare: () => void;
+}) {
   return (
     <div className="snap-start shrink-0 w-[180px] bg-white rounded-2xl shadow-sm ring-1 ring-gray-100 p-3">
-      <div className="text-3xl"><CropIcon crop={crop.id} /></div>
+      <div className="text-3xl">
+        <CropIcon crop={crop.id} />
+      </div>
       <h4 className="font-bold text-gray-900 mt-1">{crop.name}</h4>
       <div className="mt-2 space-y-0.5 text-[11px] text-gray-600">
-        <div>ROI: <b className="text-emerald-700">{toBn(crop.roi)}%</b></div>
-        <div>ঝুঁকি: <b className={crop.riskLevel === "কম" ? "text-green-700" : crop.riskLevel === "মাঝারি" ? "text-yellow-700" : "text-red-700"}>{crop.riskLevel}</b></div>
+        <div>
+          ROI: <b className="text-emerald-700">{toBn(crop.roi)}%</b>
+        </div>
+        <div>
+          ঝুঁকি:{" "}
+          <b
+            className={
+              crop.riskLevel === "কম"
+                ? "text-green-700"
+                : crop.riskLevel === "মাঝারি"
+                  ? "text-yellow-700"
+                  : "text-red-700"
+            }
+          >
+            {crop.riskLevel}
+          </b>
+        </div>
         <div>{toBn(crop.totalDays)} দিন</div>
-        <div>লাভ: <b className="text-emerald-700">{fmtBdt(Math.round(((crop.profitMin + crop.profitMax) / 2) * bighas))}</b></div>
+        <div>
+          লাভ:{" "}
+          <b className="text-emerald-700">
+            {fmtBdt(Math.round(((crop.profitMin + crop.profitMax) / 2) * bighas))}
+          </b>
+        </div>
       </div>
       <Link
         to="/crop-guide/new/$crop"
@@ -623,10 +816,20 @@ function AltCropCard({ crop, bighas, inCompare, onCompare }: { crop: CropData; b
 }
 
 /* ============== Unsuitable warnings ============== */
-function UnsuitableSection({ soil, water, recs }: { soil: SoilType; water: WaterNeed; recs: CropData[] }) {
+function UnsuitableSection({
+  soil,
+  water,
+  recs,
+}: {
+  soil: SoilType;
+  water: WaterNeed;
+  recs: CropData[];
+}) {
   // Find crops user could think of but won't work in their conditions
   const recIds = new Set(recs.map((r) => r.id));
-  const all = ["onion", "begun", "tomato", "potato", "boro-dhan"].map((id) => getCrop(id)).filter(Boolean) as CropData[];
+  const all = ["onion", "begun", "tomato", "potato", "boro-dhan"]
+    .map((id) => getCrop(id))
+    .filter(Boolean) as CropData[];
   const bad: { crop: CropData; reason: string }[] = [];
   for (const c of all) {
     if (recIds.has(c.id)) continue;
@@ -645,8 +848,13 @@ function UnsuitableSection({ soil, water, recs }: { soil: SoilType; water: Water
       </h3>
       <div className="space-y-2">
         {bad.map(({ crop, reason }) => (
-          <div key={crop.id} className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-center gap-3">
-            <span className="text-2xl"><CropIcon crop={crop.id} /></span>
+          <div
+            key={crop.id}
+            className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-center gap-3"
+          >
+            <span className="text-2xl">
+              <CropIcon crop={crop.id} />
+            </span>
             <div className="flex-1 min-w-0">
               <div className="font-bold text-gray-900 text-sm">{crop.name}</div>
               <div className="text-xs text-gray-600">{reason}</div>
@@ -676,28 +884,108 @@ const SMART_PRESETS = [
     id: 1,
     name: "লাখপতি প্রজেক্ট প্ল্যান-১",
     crops: [
-      { name: "তরমুজ", share: 0.4, saplingsPerBigha: 1400, productiveRatio: 0.85, yieldPerPlant: 3, costPerBigha: 50000, pricePerKg: 30 },
-      { name: "শসা", share: 0.35, saplingsPerBigha: 4000, productiveRatio: 0.75, yieldPerPlant: 2.5, costPerBigha: 37500, pricePerKg: 15 },
-      { name: "মরিচ", share: 0.25, saplingsPerBigha: 4500, productiveRatio: 0.88, yieldPerPlant: 1, costPerBigha: 45000, pricePerKg: 40 },
+      {
+        name: "তরমুজ",
+        share: 0.4,
+        saplingsPerBigha: 1400,
+        productiveRatio: 0.85,
+        yieldPerPlant: 3,
+        costPerBigha: 50000,
+        pricePerKg: 30,
+      },
+      {
+        name: "শসা",
+        share: 0.35,
+        saplingsPerBigha: 4000,
+        productiveRatio: 0.75,
+        yieldPerPlant: 2.5,
+        costPerBigha: 37500,
+        pricePerKg: 15,
+      },
+      {
+        name: "মরিচ",
+        share: 0.25,
+        saplingsPerBigha: 4500,
+        productiveRatio: 0.88,
+        yieldPerPlant: 1,
+        costPerBigha: 45000,
+        pricePerKg: 40,
+      },
     ],
   },
   {
     id: 3,
     name: "লাখপতি প্রজেক্ট প্ল্যান-৩",
     crops: [
-      { name: "টমেটো", share: 0.3, saplingsPerBigha: 3000, productiveRatio: 0.83, yieldPerPlant: 3, costPerBigha: 60000, pricePerKg: 40 },
-      { name: "শসা", share: 0.3, saplingsPerBigha: 4000, productiveRatio: 0.75, yieldPerPlant: 2.5, costPerBigha: 50000, pricePerKg: 20 },
-      { name: "করলা", share: 0.25, saplingsPerBigha: 1000, productiveRatio: 0.8, yieldPerPlant: 6, costPerBigha: 50000, pricePerKg: 30 },
-      { name: "ঝিঙা", share: 0.15, saplingsPerBigha: 600, productiveRatio: 0.83, yieldPerPlant: 7, costPerBigha: 35000, pricePerKg: 30 },
+      {
+        name: "টমেটো",
+        share: 0.3,
+        saplingsPerBigha: 3000,
+        productiveRatio: 0.83,
+        yieldPerPlant: 3,
+        costPerBigha: 60000,
+        pricePerKg: 40,
+      },
+      {
+        name: "শসা",
+        share: 0.3,
+        saplingsPerBigha: 4000,
+        productiveRatio: 0.75,
+        yieldPerPlant: 2.5,
+        costPerBigha: 50000,
+        pricePerKg: 20,
+      },
+      {
+        name: "করলা",
+        share: 0.25,
+        saplingsPerBigha: 1000,
+        productiveRatio: 0.8,
+        yieldPerPlant: 6,
+        costPerBigha: 50000,
+        pricePerKg: 30,
+      },
+      {
+        name: "ঝিঙা",
+        share: 0.15,
+        saplingsPerBigha: 600,
+        productiveRatio: 0.83,
+        yieldPerPlant: 7,
+        costPerBigha: 35000,
+        pricePerKg: 30,
+      },
     ],
   },
   {
     id: 5,
     name: "লাখপতি প্রজেক্ট প্ল্যান-৫",
     crops: [
-      { name: "ফুলকপি", share: 0.4, saplingsPerBigha: 5500, productiveRatio: 0.9, yieldPerPlant: 0.4, costPerBigha: 40000, pricePerKg: 50 },
-      { name: "শসা", share: 0.35, saplingsPerBigha: 4000, productiveRatio: 0.75, yieldPerPlant: 2.5, costPerBigha: 50000, pricePerKg: 20 },
-      { name: "করলা", share: 0.25, saplingsPerBigha: 1000, productiveRatio: 0.8, yieldPerPlant: 6, costPerBigha: 50000, pricePerKg: 30 },
+      {
+        name: "ফুলকপি",
+        share: 0.4,
+        saplingsPerBigha: 5500,
+        productiveRatio: 0.9,
+        yieldPerPlant: 0.4,
+        costPerBigha: 40000,
+        pricePerKg: 50,
+      },
+      {
+        name: "শসা",
+        share: 0.35,
+        saplingsPerBigha: 4000,
+        productiveRatio: 0.75,
+        yieldPerPlant: 2.5,
+        costPerBigha: 50000,
+        pricePerKg: 20,
+      },
+      {
+        name: "করলা",
+        share: 0.25,
+        saplingsPerBigha: 1000,
+        productiveRatio: 0.8,
+        yieldPerPlant: 6,
+        costPerBigha: 50000,
+        pricePerKg: 30,
+      },
     ],
   },
 ];
@@ -747,7 +1035,8 @@ function LakhpotiPlanSection({
     }
 
     const planCrops = crops.slice(0, 3);
-    const shares = planCrops.length === 1 ? [1] : planCrops.length === 2 ? [0.6, 0.4] : [0.5, 0.3, 0.2];
+    const shares =
+      planCrops.length === 1 ? [1] : planCrops.length === 2 ? [0.6, 0.4] : [0.5, 0.3, 0.2];
     return planCrops.map((crop, index) => {
       const share = shares[index] ?? 0;
       const areaBigha = bighas * share;
@@ -792,7 +1081,9 @@ function LakhpotiPlanSection({
               </div>
               <h2 className="mt-3 text-2xl font-bold">লাখপতি কৃষি পরিকল্পনা</h2>
               <p className="mt-1 text-sm leading-6 text-emerald-50/90">
-                {targetReached ? "এই ফসলচক্রে লাখ টাকার লাভের লক্ষ্য পূরণ হতে পারে।" : "লক্ষ্য ধরে ধাপে ধাপে লাভ বাড়ানোর একটি বাস্তবসম্মত ছক।"}
+                {targetReached
+                  ? "এই ফসলচক্রে লাখ টাকার লাভের লক্ষ্য পূরণ হতে পারে।"
+                  : "লক্ষ্য ধরে ধাপে ধাপে লাভ বাড়ানোর একটি বাস্তবসম্মত ছক।"}
               </p>
             </div>
             <div className="rounded-2xl bg-white/15 px-3 py-2 text-right backdrop-blur">
@@ -840,10 +1131,15 @@ function LakhpotiPlanSection({
               <span className="font-bold">{toBn(targetProgress)}%</span>
             </div>
             <div className="mt-2 h-2 overflow-hidden rounded-full bg-black/20">
-              <div className="h-full rounded-full bg-lime-300 transition-all" style={{ width: `${targetProgress}%` }} />
+              <div
+                className="h-full rounded-full bg-lime-300 transition-all"
+                style={{ width: `${targetProgress}%` }}
+              />
             </div>
             <p className="mt-2 text-[11px] text-emerald-50/80">
-              {targetReached ? "লক্ষ্য অতিক্রমের সম্ভাবনা আছে—বাজারদর ও খরচ নিয়মিত যাচাই করুন।" : `লক্ষ্য পূরণে আনুমানিক আরও ${fmtBdt(targetGap)} লাভ দরকার।`}
+              {targetReached
+                ? "লক্ষ্য অতিক্রমের সম্ভাবনা আছে—বাজারদর ও খরচ নিয়মিত যাচাই করুন।"
+                : `লক্ষ্য পূরণে আনুমানিক আরও ${fmtBdt(targetGap)} লাভ দরকার।`}
             </p>
           </div>
         </div>
@@ -855,10 +1151,13 @@ function LakhpotiPlanSection({
               <h3 className="font-bold">উপরের পরিকল্পনার হিসাব কীভাবে ব্যবহার করা হয়েছে?</h3>
             </div>
             <p className="mt-2 text-sm leading-6 text-gray-600">
-              আপনার <b>{toBn(areaShotok)} শতক</b> জমি, <b>{soil}</b> মাটি, <b>{water}</b> সেচ এবং “<b>{goalLabel}</b>” লক্ষ্য ধরে আগের সুপারিশের প্রথম তিনটি ফসল ভাগ করে হিসাব করা হয়েছে। প্রতি ফসলের পরিমাণ = মোট জমি × পরিকল্পনার ভাগ।
+              আপনার <b>{toBn(areaShotok)} শতক</b> জমি, <b>{soil}</b> মাটি, <b>{water}</b> সেচ এবং “
+              <b>{goalLabel}</b>” লক্ষ্য ধরে আগের সুপারিশের প্রথম তিনটি ফসল ভাগ করে হিসাব করা
+              হয়েছে। প্রতি ফসলের পরিমাণ = মোট জমি × পরিকল্পনার ভাগ।
             </p>
             <div className="mt-3 rounded-xl bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-800">
-              হিসাবের সূত্র: সম্ভাব্য বিক্রয় = ফলন × গড় বাজারদর; আনুমানিক লাভ = সম্ভাব্য বিক্রয় − মোট চাষ খরচ
+              হিসাবের সূত্র: সম্ভাব্য বিক্রয় = ফলন × গড় বাজারদর; আনুমানিক লাভ = সম্ভাব্য বিক্রয় −
+              মোট চাষ খরচ
             </div>
           </div>
 
@@ -879,17 +1178,34 @@ function LakhpotiPlanSection({
                 {rows.map((row) => (
                   <tr key={row.crop.id} className="border-t border-emerald-50 align-top">
                     <td className="px-3 py-3">
-                      <div className="font-bold text-gray-900"><CropIcon crop={row.crop.id} /> {row.crop.name}</div>
-                      <div className="mt-1 text-[9px] text-emerald-700">{toBn(Math.round(row.share * 100))}% জমি • {toBn(Math.round(row.areaBigha * 100) / 100)} বিঘা</div>
+                      <div className="font-bold text-gray-900">
+                        <CropIcon crop={row.crop.id} /> {row.crop.name}
+                      </div>
+                      <div className="mt-1 text-[9px] text-emerald-700">
+                        {toBn(Math.round(row.share * 100))}% জমি •{" "}
+                        {toBn(Math.round(row.areaBigha * 100) / 100)} বিঘা
+                      </div>
                     </td>
                     <td className="px-3 py-3 text-right text-gray-700">{toBn(row.saplings)}</td>
-                    <td className="px-3 py-3 text-right text-gray-700">{toBn(row.productivePlants)}</td>
-                    <td className="px-3 py-3 text-right text-gray-700">{fmtBdt(row.cost).replace("৳", "")}</td>
-                    <td className="px-3 py-3 text-right text-gray-700">{toBn(Math.round(row.productivePlants * row.yieldPerPlant))}</td>
-                    <td className="px-3 py-3 text-right font-semibold text-blue-700">{fmtBdt(row.revenue).replace("৳", "")}</td>
+                    <td className="px-3 py-3 text-right text-gray-700">
+                      {toBn(row.productivePlants)}
+                    </td>
+                    <td className="px-3 py-3 text-right text-gray-700">
+                      {fmtBdt(row.cost).replace("৳", "")}
+                    </td>
+                    <td className="px-3 py-3 text-right text-gray-700">
+                      {toBn(Math.round(row.productivePlants * row.yieldPerPlant))}
+                    </td>
+                    <td className="px-3 py-3 text-right font-semibold text-blue-700">
+                      {fmtBdt(row.revenue).replace("৳", "")}
+                    </td>
                     <td className="px-3 py-3 text-right">
-                      <div className="font-bold text-emerald-700">{fmtBdt(row.profit).replace("৳", "")}</div>
-                      <div className="text-[8px] text-gray-400">বিঘায়: {fmtBdt(Math.round(row.profit / row.areaBigha)).replace("৳", "")}</div>
+                      <div className="font-bold text-emerald-700">
+                        {fmtBdt(row.profit).replace("৳", "")}
+                      </div>
+                      <div className="text-[8px] text-gray-400">
+                        বিঘায়: {fmtBdt(Math.round(row.profit / row.areaBigha)).replace("৳", "")}
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -909,11 +1225,22 @@ function LakhpotiPlanSection({
           <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4">
             <h3 className="font-bold text-amber-900">চাষে ব্যবহার করার ৩টি ধাপ</h3>
             <ol className="mt-2 space-y-2 text-sm leading-5 text-amber-900/85">
-              <li><b>১.</b> আগে টেবিলের জমির ভাগ অনুযায়ী বীজ, সার, শ্রম ও সেচের বাজেট আলাদা করুন।</li>
-              <li><b>২.</b> একই সময়ে সব ফসল না তুলে কাটার সময় ভিন্ন এমন ফসল রাখুন, যাতে বাজারে নিয়মিত বিক্রির সুযোগ থাকে।</li>
-              <li><b>৩.</b> প্রতি সপ্তাহে বাজারদর ও খরচ লিখে প্রকৃত লাভ মিলিয়ে দেখুন; বাজারদর কমলে পুরো জমিতে এক ফসল না করে ভাগ করে চাষ করুন।</li>
+              <li>
+                <b>১.</b> আগে টেবিলের জমির ভাগ অনুযায়ী বীজ, সার, শ্রম ও সেচের বাজেট আলাদা করুন।
+              </li>
+              <li>
+                <b>২.</b> একই সময়ে সব ফসল না তুলে কাটার সময় ভিন্ন এমন ফসল রাখুন, যাতে বাজারে
+                নিয়মিত বিক্রির সুযোগ থাকে।
+              </li>
+              <li>
+                <b>৩.</b> প্রতি সপ্তাহে বাজারদর ও খরচ লিখে প্রকৃত লাভ মিলিয়ে দেখুন; বাজারদর কমলে
+                পুরো জমিতে এক ফসল না করে ভাগ করে চাষ করুন।
+              </li>
             </ol>
-            <p className="mt-3 text-[11px] text-amber-800">এটি পরিকল্পনা তৈরির আনুমানিক হিসাব—আবহাওয়া, রোগ-পোকা, ফলন, বাজারদর ও বাস্তব খরচের কারণে ফলাফল কম-বেশি হতে পারে।</p>
+            <p className="mt-3 text-[11px] text-amber-800">
+              এটি পরিকল্পনা তৈরির আনুমানিক হিসাব—আবহাওয়া, রোগ-পোকা, ফলন, বাজারদর ও বাস্তব খরচের
+              কারণে ফলাফল কম-বেশি হতে পারে।
+            </p>
           </div>
         </div>
       </div>
@@ -922,7 +1249,17 @@ function LakhpotiPlanSection({
 }
 
 /* ============== Compare Modal ============== */
-function CompareModal({ ids, bighas, onClose, onClear }: { ids: string[]; bighas: number; onClose: () => void; onClear: () => void }) {
+function CompareModal({
+  ids,
+  bighas,
+  onClose,
+  onClear,
+}: {
+  ids: string[];
+  bighas: number;
+  onClose: () => void;
+  onClear: () => void;
+}) {
   const crops = ids.map((id) => getCrop(id)).filter(Boolean) as CropData[];
   if (crops.length === 0) return null;
 
@@ -930,7 +1267,9 @@ function CompareModal({ ids, bighas, onClose, onClear }: { ids: string[]; bighas
   const riskRank = { কম: 0, মাঝারি: 1, বেশি: 2 } as const;
   const best = {
     cost: crops.reduce((a, b) => (a.totalCost < b.totalCost ? a : b)).id,
-    revenue: crops.reduce((a, b) => (a.yieldMax * a.avgMarketPrice > b.yieldMax * b.avgMarketPrice ? a : b)).id,
+    revenue: crops.reduce((a, b) =>
+      a.yieldMax * a.avgMarketPrice > b.yieldMax * b.avgMarketPrice ? a : b,
+    ).id,
     profit: crops.reduce((a, b) => (a.profitMax > b.profitMax ? a : b)).id,
     roi: crops.reduce((a, b) => (a.roi > b.roi ? a : b)).id,
     days: crops.reduce((a, b) => (a.totalDays < b.totalDays ? a : b)).id,
@@ -939,19 +1278,39 @@ function CompareModal({ ids, bighas, onClose, onClear }: { ids: string[]; bighas
 
   const rows: { label: string; key: keyof typeof best; val: (c: CropData) => string }[] = [
     { label: "খরচ/বিঘা", key: "cost", val: (c) => fmtBdt(c.totalCost) },
-    { label: "আয়/বিঘা", key: "revenue", val: (c) => `${toBn(Math.round(c.yieldMin * c.avgMarketPrice / 1000))}-${toBn(Math.round(c.yieldMax * c.avgMarketPrice / 1000))}হাজার` },
-    { label: "লাভ/বিঘা", key: "profit", val: (c) => `${toBn(Math.round(c.profitMin / 1000))}-${toBn(Math.round(c.profitMax / 1000))}হাজার` },
+    {
+      label: "আয়/বিঘা",
+      key: "revenue",
+      val: (c) =>
+        `${toBn(Math.round((c.yieldMin * c.avgMarketPrice) / 1000))}-${toBn(Math.round((c.yieldMax * c.avgMarketPrice) / 1000))}হাজার`,
+    },
+    {
+      label: "লাভ/বিঘা",
+      key: "profit",
+      val: (c) =>
+        `${toBn(Math.round(c.profitMin / 1000))}-${toBn(Math.round(c.profitMax / 1000))}হাজার`,
+    },
     { label: "ROI", key: "roi", val: (c) => `${toBn(c.roi)}%` },
     { label: "সময়", key: "days", val: (c) => `${toBn(c.totalDays)} দিন` },
     { label: "ঝুঁকি", key: "risk", val: (c) => c.riskLevel },
   ];
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 flex items-end md:items-center justify-center" onClick={onClose}>
-      <div onClick={(e) => e.stopPropagation()} className="bg-white w-full md:max-w-[560px] rounded-t-3xl md:rounded-3xl max-h-[85vh] overflow-hidden flex flex-col">
+    <div
+      className="fixed inset-0 z-50 bg-black/60 flex items-end md:items-center justify-center"
+      onClick={onClose}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="bg-white w-full md:max-w-[560px] rounded-t-3xl md:rounded-3xl max-h-[85vh] overflow-hidden flex flex-col"
+      >
         <div className="p-4 border-b flex items-center justify-between">
-          <h3 className="font-bold text-gray-900 inline-flex items-center gap-2"><Scale className="h-5 w-5" /> তুলনা ({toBn(crops.length)} ফসল)</h3>
-          <button onClick={onClose} aria-label="বন্ধ"><X className="h-5 w-5" /></button>
+          <h3 className="font-bold text-gray-900 inline-flex items-center gap-2">
+            <Scale className="h-5 w-5" /> তুলনা ({toBn(crops.length)} ফসল)
+          </h3>
+          <button onClick={onClose} aria-label="বন্ধ">
+            <X className="h-5 w-5" />
+          </button>
         </div>
         <div className="overflow-auto p-4">
           <table className="w-full text-xs">
@@ -960,7 +1319,9 @@ function CompareModal({ ids, bighas, onClose, onClear }: { ids: string[]; bighas
                 <th className="text-left py-2 font-bold text-gray-600"></th>
                 {crops.map((c) => (
                   <th key={c.id} className="text-center py-2 px-1">
-                    <div className="text-2xl"><CropIcon crop={c.id} /></div>
+                    <div className="text-2xl">
+                      <CropIcon crop={c.id} />
+                    </div>
                     <div className="font-bold text-gray-900 text-xs">{c.name}</div>
                   </th>
                 ))}
@@ -971,7 +1332,10 @@ function CompareModal({ ids, bighas, onClose, onClear }: { ids: string[]; bighas
                 <tr key={r.label} className="border-t">
                   <td className="py-2 text-gray-600 font-semibold">{r.label}</td>
                   {crops.map((c) => (
-                    <td key={c.id} className={`text-center py-2 px-1 ${best[r.key] === c.id ? "bg-emerald-100 text-emerald-800 font-bold rounded" : "text-gray-700"}`}>
+                    <td
+                      key={c.id}
+                      className={`text-center py-2 px-1 ${best[r.key] === c.id ? "bg-emerald-100 text-emerald-800 font-bold rounded" : "text-gray-700"}`}
+                    >
                       {r.val(c)}
                     </td>
                   ))}
@@ -990,8 +1354,18 @@ function CompareModal({ ids, bighas, onClose, onClear }: { ids: string[]; bighas
           <p className="text-[10px] text-gray-500 mt-2">🟢 সবুজ = সেই বিভাগে সেরা</p>
         </div>
         <div className="p-4 border-t flex gap-2">
-          <button onClick={onClear} className="flex-1 py-2.5 rounded-xl border border-gray-300 text-gray-700 font-semibold text-sm">পরিষ্কার করুন</button>
-          <button onClick={onClose} className="flex-1 py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-sm">বন্ধ করুন</button>
+          <button
+            onClick={onClear}
+            className="flex-1 py-2.5 rounded-xl border border-gray-300 text-gray-700 font-semibold text-sm"
+          >
+            পরিষ্কার করুন
+          </button>
+          <button
+            onClick={onClose}
+            className="flex-1 py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-sm"
+          >
+            বন্ধ করুন
+          </button>
         </div>
       </div>
     </div>

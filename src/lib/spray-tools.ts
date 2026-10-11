@@ -37,13 +37,20 @@ export type SprayWeather = { ok: boolean; reasons: string[]; bestTime: string };
 /** Judges whether today is suitable for spraying using the next 24 hours. */
 export function evaluateSprayWeather(f: Forecast): SprayWeather {
   const next = f.hourly.slice(0, 24);
-  const rain = Math.max(f.current.precipitation_prob ?? 0, ...next.map((h) => h.precipitation_probability));
+  const rain = Math.max(
+    f.current.precipitation_prob ?? 0,
+    ...next.map((h) => h.precipitation_probability),
+  );
   const storm = Math.max(f.current.weather_code, ...next.map((h) => h.weather_code)) >= 95;
   const reasons: string[] = [];
   if (storm) reasons.push("বজ্রঝড়ের সম্ভাবনা");
   if (rain > 50) reasons.push(`বৃষ্টির সম্ভাবনা ${Math.round(rain)}% — ওষুধ ধুয়ে যাবে`);
-  if (f.current.wind_speed > 20) reasons.push(`বাতাস বেশি (${Math.round(f.current.wind_speed)} কিমি/ঘণ্টা) — ওষুধ উড়ে যাবে`);
-  if (f.current.temperature > 35) reasons.push(`তাপমাত্রা বেশি (${Math.round(f.current.temperature)}°C) — দুপুরে স্প্রে করবেন না`);
+  if (f.current.wind_speed > 20)
+    reasons.push(`বাতাস বেশি (${Math.round(f.current.wind_speed)} কিমি/ঘণ্টা) — ওষুধ উড়ে যাবে`);
+  if (f.current.temperature > 35)
+    reasons.push(
+      `তাপমাত্রা বেশি (${Math.round(f.current.temperature)}°C) — দুপুরে স্প্রে করবেন না`,
+    );
   const ok = !storm && rain <= 50 && f.current.wind_speed <= 20;
   return { ok, reasons, bestTime: "সকাল ৭টা–৯টা অথবা বিকেল ৪টা–৬টা" };
 }
@@ -57,7 +64,14 @@ export function mixRank(name: string): number {
   if (/ইসি|ec|এসএল|sl|তরল/.test(s)) return 4;
   return 5; // PGR, vitamins, micronutrients and others last
 }
-export const MIX_LABELS = ["", "দানাদার (WG/SG)", "পাউডার (WP/SP)", "সাসপেনশন (SC)", "তরল (EC/SL)", "ভিটামিন/অনুখাদ্য/অন্যান্য"];
+export const MIX_LABELS = [
+  "",
+  "দানাদার (WG/SG)",
+  "পাউডার (WP/SP)",
+  "সাসপেনশন (SC)",
+  "তরল (EC/SL)",
+  "ভিটামিন/অনুখাদ্য/অন্যান্য",
+];
 
 const COPPER_SULFUR = /কপার|তামা|সালফার|গন্ধক|বোর্দো|copper|sulfur|sulphur/i;
 const ALKALINE = /চুন|বোর্দো|lime/i;

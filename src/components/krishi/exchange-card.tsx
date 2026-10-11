@@ -1,5 +1,14 @@
 import { useState, type ReactNode } from "react";
-import { MapPin, User as UserIcon, Clock, Sprout, Leaf, Wrench, HardHat, Phone } from "lucide-react";
+import {
+  MapPin,
+  User as UserIcon,
+  Clock,
+  Sprout,
+  Leaf,
+  Wrench,
+  HardHat,
+  Phone,
+} from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import type { Exchange, ExchangeType } from "@/hooks/use-exchanges";
 import { ContentMenu } from "@/components/krishi/content-menu";
@@ -28,7 +37,11 @@ function toWaLink(phone?: string | null) {
   if (!phone) return null;
   const digits = phone.replace(/\D/g, "");
   if (!digits) return null;
-  const intl = digits.startsWith("880") ? digits : digits.startsWith("0") ? `880${digits.slice(1)}` : `880${digits}`;
+  const intl = digits.startsWith("880")
+    ? digits
+    : digits.startsWith("0")
+      ? `880${digits.slice(1)}`
+      : `880${digits}`;
   return `https://wa.me/${intl}`;
 }
 
@@ -45,7 +58,9 @@ function CardImage({ src, type }: { src?: string | null; type: ExchangeType }) {
   const meta = TYPE_META[type];
   const Icon = meta.icon;
   return (
-    <div className={`h-20 w-20 shrink-0 rounded-xl overflow-hidden flex items-center justify-center ${meta.tint}`}>
+    <div
+      className={`h-20 w-20 shrink-0 rounded-xl overflow-hidden flex items-center justify-center ${meta.tint}`}
+    >
       {src ? (
         <>
           {!loaded && <Icon className="h-8 w-8 opacity-60" />}
@@ -73,7 +88,10 @@ function CardBody({ item }: { item: Exchange }) {
     if (loadingWa) return;
     setLoadingWa(true);
     try {
-      const { data, error } = await supabase.rpc("get_exchange_phone" as never, { _id: item.id } as never);
+      const { data, error } = await supabase.rpc(
+        "get_exchange_phone" as never,
+        { _id: item.id } as never,
+      );
       if (error) throw error;
       const wa = toWaLink(data as string | null);
       if (!wa) {
@@ -91,7 +109,9 @@ function CardBody({ item }: { item: Exchange }) {
   return (
     <div className="flex-1 min-w-0">
       <div className="flex items-start gap-1">
-        <h3 className="flex-1 text-base font-bold text-foreground leading-snug line-clamp-2">{item.title}</h3>
+        <h3 className="flex-1 text-base font-bold text-foreground leading-snug line-clamp-2">
+          {item.title}
+        </h3>
         <ContentMenu
           contentType="exchange"
           contentId={item.id}
@@ -100,31 +120,54 @@ function CardBody({ item }: { item: Exchange }) {
           onDelete={async () => {
             const { error } = await supabase.from("exchanges").delete().eq("id", item.id);
             if (error) toast.error("মুছে ফেলা যায়নি");
-            else { toast.success("মুছে ফেলা হয়েছে"); window.location.reload(); }
+            else {
+              toast.success("মুছে ফেলা হয়েছে");
+              window.location.reload();
+            }
           }}
         />
       </div>
       <div className="mt-1 flex items-center gap-2 flex-wrap">
-        <span className={`text-xs font-semibold px-2 py-0.5 rounded-md ${meta.tint}`}>{meta.label}</span>
+        <span className={`text-xs font-semibold px-2 py-0.5 rounded-md ${meta.tint}`}>
+          {meta.label}
+        </span>
         {item.is_free ? (
-          <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-[#52B788] text-white">বিনামূল্যে</span>
+          <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-[#52B788] text-white">
+            বিনামূল্যে
+          </span>
         ) : (
           <span className="text-base font-bold text-primary">
             ৳{item.price ?? 0}
-            {item.unit ? <span className="text-xs text-muted-foreground font-medium">/{item.unit}</span> : null}
+            {item.unit ? (
+              <span className="text-xs text-muted-foreground font-medium">/{item.unit}</span>
+            ) : null}
           </span>
         )}
       </div>
       <div className="mt-2 flex items-center gap-3 text-[11px] text-muted-foreground flex-wrap">
-        <span className="inline-flex items-center gap-1"><MapPin className="h-3 w-3" />{item.upazila ? `${item.upazila}, ${item.district}` : item.district}</span>
+        <span className="inline-flex items-center gap-1">
+          <MapPin className="h-3 w-3" />
+          {item.upazila ? `${item.upazila}, ${item.district}` : item.district}
+        </span>
         {item.user_id ? (
-          <Link to="/u/$userId" params={{ userId: item.user_id }} className="inline-flex items-center gap-1 hover:underline">
-            <UserIcon className="h-3 w-3" />{item.user_name || "কৃষক"}
+          <Link
+            to="/u/$userId"
+            params={{ userId: item.user_id }}
+            className="inline-flex items-center gap-1 hover:underline"
+          >
+            <UserIcon className="h-3 w-3" />
+            {item.user_name || "কৃষক"}
           </Link>
         ) : (
-          <span className="inline-flex items-center gap-1"><UserIcon className="h-3 w-3" />{item.user_name || "কৃষক"}</span>
+          <span className="inline-flex items-center gap-1">
+            <UserIcon className="h-3 w-3" />
+            {item.user_name || "কৃষক"}
+          </span>
         )}
-        <span className="inline-flex items-center gap-1"><Clock className="h-3 w-3" />{timeAgoBn(item.created_at)}</span>
+        <span className="inline-flex items-center gap-1">
+          <Clock className="h-3 w-3" />
+          {timeAgoBn(item.created_at)}
+        </span>
       </div>
       <div className="mt-2 flex justify-end">
         <button

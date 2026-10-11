@@ -44,12 +44,16 @@ const PRESETS: Record<ImageType, OptimizationOptions> = {
  */
 export async function optimizeImage(file: File, type: ImageType): Promise<File> {
   const options = PRESETS[type];
-  
+
   try {
-    console.log(`[Optimizer] Optimizing ${type} image. Original size: ${(file.size / 1024).toFixed(2)} KB`);
+    console.log(
+      `[Optimizer] Optimizing ${type} image. Original size: ${(file.size / 1024).toFixed(2)} KB`,
+    );
     const compressedFile = await imageCompression(file, { ...options, fileType: "image/jpeg" });
-    console.log(`[Optimizer] Optimization complete. New size: ${(compressedFile.size / 1024).toFixed(2)} KB`);
-    
+    console.log(
+      `[Optimizer] Optimization complete. New size: ${(compressedFile.size / 1024).toFixed(2)} KB`,
+    );
+
     // Return the new file with the original name but potentially new extension/blob
     return new File([compressedFile], file.name, {
       type: compressedFile.type,
@@ -80,4 +84,3 @@ export async function fileToRawBase64(file: File | Blob): Promise<string> {
   const dataUrl = await fileToBase64(file);
   return dataUrl.split(",")[1] || "";
 }
-

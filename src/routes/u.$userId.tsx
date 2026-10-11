@@ -72,15 +72,16 @@ function PublicProfilePage() {
     (async () => {
       try {
         setLoading(true);
-        const fields = "id,name,district,upazila,avatar_url,bio,crops,role,is_verified,posts_count,prices_count,exchanges_count,created_at";
-        
+        const fields =
+          "id,name,district,upazila,avatar_url,bio,crops,role,is_verified,posts_count,prices_count,exchanges_count,created_at";
+
         // Try with cover_url
         let { data, error } = await supabase
           .from("profiles")
           .select(`${fields},cover_url`)
           .eq("id", userId)
           .maybeSingle();
-        
+
         // Fallback if cover_url fails
         if (error) {
           console.warn("Public profile fetch failed, trying fallback...", error.message);
@@ -89,14 +90,14 @@ function PublicProfilePage() {
             .select(fields)
             .eq("id", userId)
             .maybeSingle();
-          
+
           if (fallbackErr) throw fallbackErr;
           // Fallback lacks cover_url — normalize it so the shapes match
           data = (fallbackData ? { ...fallbackData, cover_url: null } : null) as typeof data;
         }
 
         if (cancelled) return;
-        
+
         if (!data) {
           setNotFound(true);
         } else {
@@ -156,11 +157,7 @@ function PublicProfilePage() {
           <section className="mx-auto max-w-3xl overflow-hidden bg-white sm:rounded-b-2xl">
             <div className="relative h-24 overflow-hidden bg-gray-100 sm:h-48">
               {profile.cover_url ? (
-                <img
-                  src={profile.cover_url}
-                  alt=""
-                  className="h-full w-full object-cover"
-                />
+                <img src={profile.cover_url} alt="" className="h-full w-full object-cover" />
               ) : (
                 <div className="h-full w-full bg-gradient-to-br from-[#1B4332] via-[#2D6A4F] to-[#74C69D]">
                   <div className="pointer-events-none absolute -right-10 -top-20 h-56 w-56 rounded-full bg-white/15 blur-2xl" />

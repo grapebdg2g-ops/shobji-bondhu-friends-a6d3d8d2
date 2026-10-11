@@ -44,27 +44,43 @@ export function usePushNotifications() {
     "Notification" in window;
 
   const refresh = useCallback(async () => {
-    if (!supported) { setStatus("unsupported"); return; }
-    if (!user) { setStatus("disabled"); return; }
-    if (Notification.permission === "denied") { setStatus("denied"); return; }
+    if (!supported) {
+      setStatus("unsupported");
+      return;
+    }
+    if (!user) {
+      setStatus("disabled");
+      return;
+    }
+    if (Notification.permission === "denied") {
+      setStatus("denied");
+      return;
+    }
     try {
       const reg = await navigator.serviceWorker.getRegistration();
       const sub = reg ? await reg.pushManager.getSubscription() : null;
       const { hasSubscription } = await checkSub({});
-      setStatus(sub && hasSubscription && Notification.permission === "granted" ? "enabled" : "disabled");
+      setStatus(
+        sub && hasSubscription && Notification.permission === "granted" ? "enabled" : "disabled",
+      );
     } catch {
       setStatus("disabled");
     }
   }, [supported, user, checkSub]);
 
-  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
   const enable = useCallback(async () => {
     if (!supported || !user) return false;
     setBusy(true);
     try {
       const perm = await Notification.requestPermission();
-      if (perm !== "granted") { setStatus(perm === "denied" ? "denied" : "disabled"); return false; }
+      if (perm !== "granted") {
+        setStatus(perm === "denied" ? "denied" : "disabled");
+        return false;
+      }
 
       const { publicKey } = await fetchKey({});
       if (!publicKey) throw new Error("VAPID public key not configured");

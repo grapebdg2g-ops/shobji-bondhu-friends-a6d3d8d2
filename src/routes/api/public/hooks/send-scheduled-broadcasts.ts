@@ -20,7 +20,9 @@ async function resolveRecipients(b: Broadcast): Promise<string[]> {
   else if (b.target_type === "crop" && b.target_value) q = q.contains("crops", [b.target_value]);
   else if (b.target_type === "pro") {
     const { data: subs } = await supabaseAdmin
-      .from("pro_subscriptions").select("user_id").eq("status", "active");
+      .from("pro_subscriptions")
+      .select("user_id")
+      .eq("status", "active");
     return (subs ?? []).map((s) => s.user_id as string);
   }
   const { data, error } = await q;
@@ -43,7 +45,8 @@ export const Route = createFileRoute("/api/public/hooks/send-scheduled-broadcast
           .limit(50);
         if (error) {
           return new Response(JSON.stringify({ error: error.message }), {
-            status: 500, headers: { "content-type": "application/json" },
+            status: 500,
+            headers: { "content-type": "application/json" },
           });
         }
         const results: Array<{ id: string; sent: number }> = [];
@@ -51,20 +54,29 @@ export const Route = createFileRoute("/api/public/hooks/send-scheduled-broadcast
           try {
             const ids = await resolveRecipients(b);
             const rows = ids.map((uid) => ({
-              user_id: uid, type: "broadcast",
-              title: b.title, body: b.body,
-              ref_type: "broadcast", ref_id: b.id,
+              user_id: uid,
+              type: "broadcast",
+              title: b.title,
+              body: b.body,
+              ref_type: "broadcast",
+              ref_id: b.id,
             }));
             for (let i = 0; i < rows.length; i += 500) {
               const slice = rows.slice(i, i + 500);
               if (slice.length) await supabaseAdmin.from("notifications").insert(slice);
             }
-            await supabaseAdmin.from("notification_broadcasts").update({
-              sent_at: new Date().toISOString(), sent_count: ids.length,
-            }).eq("id", b.id);
+            await supabaseAdmin
+              .from("notification_broadcasts")
+              .update({
+                sent_at: new Date().toISOString(),
+                sent_count: ids.length,
+              })
+              .eq("id", b.id);
             await supabaseAdmin.from("admin_actions").insert({
-              admin_id: b.admin_id, action_type: "scheduled_broadcast_sent",
-              target_id: b.id, details: { count: ids.length } as never,
+              admin_id: b.admin_id,
+              action_type: "scheduled_broadcast_sent",
+              target_id: b.id,
+              details: { count: ids.length } as never,
             });
             results.push({ id: b.id, sent: ids.length });
           } catch (e) {
@@ -72,7 +84,8 @@ export const Route = createFileRoute("/api/public/hooks/send-scheduled-broadcast
           }
         }
         return new Response(JSON.stringify({ processed: results.length, results }), {
-          status: 200, headers: { "content-type": "application/json" },
+          status: 200,
+          headers: { "content-type": "application/json" },
         });
       },
     },

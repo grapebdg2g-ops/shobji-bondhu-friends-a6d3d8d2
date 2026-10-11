@@ -5,10 +5,26 @@ import { getWeatherForecast } from "@/lib/weather.functions";
 import { useUser } from "@/contexts/user-context";
 import { FARMING_STAGES } from "@/data/farming-guide";
 import { groupKey } from "@/data/crop-knowledge";
-import { evaluateSprayWeather, parseDosePerLiter, tankPlan, mixRank, MIX_LABELS, tankMixWarnings, maxPhiDays, phiConflict, TANK_LITERS, LITERS_PER_SHOTOK } from "@/lib/spray-tools";
+import {
+  evaluateSprayWeather,
+  parseDosePerLiter,
+  tankPlan,
+  mixRank,
+  MIX_LABELS,
+  tankMixWarnings,
+  maxPhiDays,
+  phiConflict,
+  TANK_LITERS,
+  LITERS_PER_SHOTOK,
+} from "@/lib/spray-tools";
 import { Bell, Check, SprayCan, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
-import { applyGapSchedule, buildSpraySchedule, syncSprayReminders, type SprayEvent } from "@/lib/spray-schedule";
+import {
+  applyGapSchedule,
+  buildSpraySchedule,
+  syncSprayReminders,
+  type SprayEvent,
+} from "@/lib/spray-schedule";
 import { TOMATO_SPRAY_NOTES } from "@/lib/tomato-spray-schedule";
 import { addDays, formatBnDate } from "@/lib/bn-date";
 import { toBn } from "@/lib/bn";
@@ -26,8 +42,20 @@ type Props = {
   isGap?: boolean;
 };
 
-export function SprayScheduleSection({ userId, planId, cropType, plantingDate, days, completions, onComplete, isGap }: Props) {
-  const events = useMemo(() => buildSpraySchedule(cropType, plantingDate), [cropType, plantingDate]);
+export function SprayScheduleSection({
+  userId,
+  planId,
+  cropType,
+  plantingDate,
+  days,
+  completions,
+  onComplete,
+  isGap,
+}: Props) {
+  const events = useMemo(
+    () => buildSpraySchedule(cropType, plantingDate),
+    [cropType, plantingDate],
+  );
   const main = events.filter((e) => e.kind !== "nutrient");
   const nutrients = events.filter((e) => e.kind === "nutrient");
   const [showNutrients, setShowNutrients] = useState(false);
@@ -41,7 +69,8 @@ export function SprayScheduleSection({ userId, planId, cropType, plantingDate, d
     queryKey: ["spray-weather", user?.district, user?.upazila],
     enabled: !!user?.district,
     staleTime: 30 * 60 * 1000,
-    queryFn: () => fetchWeather({ data: { district: user!.district!, upazila: user?.upazila ?? null } }),
+    queryFn: () =>
+      fetchWeather({ data: { district: user!.district!, upazila: user?.upazila ?? null } }),
   });
   useEffect(() => {
     const v = localStorage.getItem(`spray-land:${planId}`);
@@ -53,12 +82,13 @@ export function SprayScheduleSection({ userId, planId, cropType, plantingDate, d
   }
   const land = parseFloat(shotok.replace(/[০-৯]/g, (d) => String("০১২৩৪৫৬৭৮৯".indexOf(d)))) || 0;
   const [doseEdits, setDoseEdits] = useState<Record<string, string>>({});
-  const toNum = (s: string) => parseFloat(s.replace(/[০-৯]/g, (d) => String("০১২৩৪৫৬৭৮৯".indexOf(d)))) || 0;
+  const toNum = (s: string) =>
+    parseFloat(s.replace(/[০-৯]/g, (d) => String("০১২৩৪৫৬৭৮৯".indexOf(d)))) || 0;
   function doseFor(e: SprayEvent | undefined) {
     if (!e?.problem) return null;
     const def = parseDosePerLiter(e.problem.chemicals[0]?.dose ?? "");
     const raw = doseEdits[e.id];
-    const amount = raw !== undefined ? toNum(raw) : def?.amount ?? 0;
+    const amount = raw !== undefined ? toNum(raw) : (def?.amount ?? 0);
     return { amount, unit: def?.unit ?? "মিলি", raw: raw ?? (def ? String(def.amount) : "") };
   }
   const doseInput = (e: SprayEvent) => {
@@ -66,26 +96,45 @@ export function SprayScheduleSection({ userId, planId, cropType, plantingDate, d
     return (
       <label className="flex items-center gap-2">
         <span className="font-semibold text-foreground">💧 ওষুধের মাত্রা</span>
-        <input inputMode="decimal" value={d.raw} onChange={(ev) => setDoseEdits((m) => ({ ...m, [e.id]: ev.target.value }))} placeholder="যেমন ২" className="w-16 rounded-lg bg-card ring-1 ring-border px-2 py-1.5 text-sm" />
+        <input
+          inputMode="decimal"
+          value={d.raw}
+          onChange={(ev) => setDoseEdits((m) => ({ ...m, [e.id]: ev.target.value }))}
+          placeholder="যেমন ২"
+          className="w-16 rounded-lg bg-card ring-1 ring-border px-2 py-1.5 text-sm"
+        />
         <span className="text-muted-foreground">{d.unit} / লিটার পানি</span>
       </label>
     );
   };
   const harvestDay = FARMING_STAGES[cropType]?.totalDays ?? 0;
   // GAP mode: chemical sprays inside the PHI window are replaced by safe bio alternatives.
-  const displayMain = useMemo(() => (isGap ? applyGapSchedule(main, cropType) : main), [isGap, main, cropType]);
+  const displayMain = useMemo(
+    () => (isGap ? applyGapSchedule(main, cropType) : main),
+    [isGap, main, cropType],
+  );
   if (events.length === 0) return null;
   const sw = weather.data?.forecast ? evaluateSprayWeather(weather.data.forecast) : null;
 
   function rotationWarning(e: SprayEvent): string | null {
     if (!e.problem) return null;
     const idx = displayMain.indexOf(e);
-    const prev = [...displayMain.slice(0, idx)].reverse().find((p) => completions.has(p.id) && p.problem);
+    const prev = [...displayMain.slice(0, idx)]
+      .reverse()
+      .find((p) => completions.has(p.id) && p.problem);
     if (!prev?.problem) return null;
-    const prevGroups = new Set(getAllChemicalInfo(prev.problem.chemicals[0]?.name ?? "").filter((a) => !a.group.startsWith("M")).map(groupKey));
-    const mine = getAllChemicalInfo(e.problem.chemicals[0]?.name ?? "").filter((a) => prevGroups.has(groupKey(a)));
+    const prevGroups = new Set(
+      getAllChemicalInfo(prev.problem.chemicals[0]?.name ?? "")
+        .filter((a) => !a.group.startsWith("M"))
+        .map(groupKey),
+    );
+    const mine = getAllChemicalInfo(e.problem.chemicals[0]?.name ?? "").filter((a) =>
+      prevGroups.has(groupKey(a)),
+    );
     if (mine.length === 0) return null;
-    const alt = e.problem.chemicals.find((c) => getAllChemicalInfo(c.name).every((a) => !prevGroups.has(groupKey(a))));
+    const alt = e.problem.chemicals.find((c) =>
+      getAllChemicalInfo(c.name).every((a) => !prevGroups.has(groupKey(a))),
+    );
     return `গত স্প্রেতে ${mine[0].system} ${mine[0].group} গ্রুপ দিয়েছেন — একই গ্রুপ পরপর দিলে পোকা/রোগ ওষুধ সহ্য করতে শেখে।${alt ? ` এবার দিন: ${alt.name}` : " এবার অন্য গ্রুপের ওষুধ দিন।"}`;
   }
 
@@ -96,7 +145,11 @@ export function SprayScheduleSection({ userId, planId, cropType, plantingDate, d
     setBusy(true);
     try {
       const n = await syncSprayReminders(userId, planId, cropType, plantingDate, !!isGap);
-      toast.success(n > 0 ? `${toBn(n)}টি স্প্রে রিমাইন্ডার সেট হয়েছে` : "সব স্প্রে রিমাইন্ডার আগেই সেট করা আছে");
+      toast.success(
+        n > 0
+          ? `${toBn(n)}টি স্প্রে রিমাইন্ডার সেট হয়েছে`
+          : "সব স্প্রে রিমাইন্ডার আগেই সেট করা আছে",
+      );
     } catch {
       toast.error("রিমাইন্ডার সেট করা যায়নি");
     } finally {
@@ -110,19 +163,38 @@ export function SprayScheduleSection({ userId, planId, cropType, plantingDate, d
     const isOpen = open === e.id;
     return (
       <li key={e.id} className="rounded-xl bg-muted/50">
-        <button onClick={() => setOpen(isOpen ? null : e.id)} className="w-full p-3 flex items-center gap-3 text-left">
-          <span className="text-xl">{e.kind === "nutrient" ? "🌿" : e.kind === "disease" ? "🍂" : "🐛"}</span>
+        <button
+          onClick={() => setOpen(isOpen ? null : e.id)}
+          className="w-full p-3 flex items-center gap-3 text-left"
+        >
+          <span className="text-xl">
+            {e.kind === "nutrient" ? "🌿" : e.kind === "disease" ? "🍂" : "🐛"}
+          </span>
           <div className="flex-1 min-w-0">
-            <p className={`font-semibold text-sm truncate ${done ? "line-through text-muted-foreground" : "text-foreground"}`}>{e.title}</p>
+            <p
+              className={`font-semibold text-sm truncate ${done ? "line-through text-muted-foreground" : "text-foreground"}`}
+            >
+              {e.title}
+            </p>
             <p className="text-[11px] text-muted-foreground">
               {formatBnDate(addDays(plantingDate, e.day))} · {e.stageIcon} {e.stageName}
-              {overdue && <span className="text-destructive font-semibold"> · তারিখ পেরিয়েছে</span>}
+              {overdue && (
+                <span className="text-destructive font-semibold"> · তারিখ পেরিয়েছে</span>
+              )}
             </p>
           </div>
           {isGap && e.problem && isSprayAllowedUnderGap(cropType, harvestDay - e.day) && (
-            <span className="shrink-0 rounded bg-primary/10 text-primary text-[10px] font-bold px-1.5 py-0.5">GAP ✓</span>
+            <span className="shrink-0 rounded bg-primary/10 text-primary text-[10px] font-bold px-1.5 py-0.5">
+              GAP ✓
+            </span>
           )}
-          {done ? <Check className="h-5 w-5 text-primary" /> : isOpen ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+          {done ? (
+            <Check className="h-5 w-5 text-primary" />
+          ) : isOpen ? (
+            <ChevronUp className="h-4 w-4 text-muted-foreground" />
+          ) : (
+            <ChevronDown className="h-4 w-4 text-muted-foreground" />
+          )}
         </button>
         {isOpen && (
           <div className="px-3 pb-3 space-y-2 text-sm">
@@ -133,15 +205,22 @@ export function SprayScheduleSection({ userId, planId, cropType, plantingDate, d
                   const info = getAllChemicalInfo(c.name);
                   return (
                     <div key={c.name} className="text-xs space-y-0.5">
-                      <p><strong>{c.name}</strong> — {c.dose} ({c.method})</p>
+                      <p>
+                        <strong>{c.name}</strong> — {c.dose} ({c.method})
+                      </p>
                       {info.map((a) => (
                         <div key={a.id} className="space-y-0.5">
                           <p className="text-[11px] text-muted-foreground">
-                            <span className="inline-block rounded bg-primary/10 text-primary font-semibold px-1.5 mr-1">{a.system} {a.group}</span>
-                            {a.ingredient} {a.formulation} · ফসল তোলার {toBn(a.phiDays)} দিন আগে বন্ধ · বিষাক্ততা {a.toxicity} · {a.safety}
+                            <span className="inline-block rounded bg-primary/10 text-primary font-semibold px-1.5 mr-1">
+                              {a.system} {a.group}
+                            </span>
+                            {a.ingredient} {a.formulation} · ফসল তোলার {toBn(a.phiDays)} দিন আগে
+                            বন্ধ · বিষাক্ততা {a.toxicity} · {a.safety}
                           </p>
                           <p className="text-[11px] text-foreground/80">
-                            <span className="inline-block rounded bg-primary/10 text-primary font-semibold px-1.5 mr-1">🌱 জৈব</span>
+                            <span className="inline-block rounded bg-primary/10 text-primary font-semibold px-1.5 mr-1">
+                              🌱 জৈব
+                            </span>
                             {a.organic}
                           </p>
                         </div>
@@ -151,54 +230,109 @@ export function SprayScheduleSection({ userId, planId, cropType, plantingDate, d
                 })}
                 {getBioOptions(`${e.title} ${e.desc} ${e.problem.name}`).length > 0 && (
                   <div className="rounded-lg bg-primary/5 p-2.5 space-y-1.5">
-                    <p className="text-xs font-bold text-primary">🧪 জৈব রাসায়নিক (একই সমস্যায় জৈব অপশন)</p>
+                    <p className="text-xs font-bold text-primary">
+                      🧪 জৈব রাসায়নিক (একই সমস্যায় জৈব অপশন)
+                    </p>
                     {getBioOptions(`${e.title} ${e.desc} ${e.problem.name}`).map((b) => (
                       <div key={b.id} className="text-xs space-y-0.5">
-                        <p className="text-foreground/90"><strong>{b.name}</strong> — {b.dose}</p>
-                        <p className="text-[11px] text-muted-foreground">{b.method} · {b.note}{b.phiDays > 0 && ` · ফসল তোলার ${toBn(b.phiDays)} দিন আগে বন্ধ`}</p>
+                        <p className="text-foreground/90">
+                          <strong>{b.name}</strong> — {b.dose}
+                        </p>
+                        <p className="text-[11px] text-muted-foreground">
+                          {b.method} · {b.note}
+                          {b.phiDays > 0 && ` · ফসল তোলার ${toBn(b.phiDays)} দিন আগে বন্ধ`}
+                        </p>
                       </div>
                     ))}
                   </div>
                 )}
-                {e.problem.organic[0] && <p className="text-xs text-muted-foreground">জৈব বিকল্প: {e.problem.organic[0]}</p>}
-                {e.problem.phi && <p className="text-xs text-destructive">ফসল তোলার অন্তত {e.problem.phi} আগে স্প্রে বন্ধ করুন</p>}
+                {e.problem.organic[0] && (
+                  <p className="text-xs text-muted-foreground">
+                    জৈব বিকল্প: {e.problem.organic[0]}
+                  </p>
+                )}
+                {e.problem.phi && (
+                  <p className="text-xs text-destructive">
+                    ফসল তোলার অন্তত {e.problem.phi} আগে স্প্রে বন্ধ করুন
+                  </p>
+                )}
               </div>
             )}
-            {!done && e.problem && (() => {
-              const names = e.problem.chemicals.map((c) => c.name);
-              const phi = maxPhiDays(names.slice(0, 1));
-              const pc = phiConflict(e.day, harvestDay, phi);
-              const rot = rotationWarning(e);
-              const dose = doseFor(e);
-              const mix = [...names].sort((a, b) => mixRank(a) - mixRank(b));
-              const mixW = tankMixWarnings(names);
-              return (
-                <div className="space-y-2">
-                  {pc.conflict && (
-                    <p className="rounded-lg bg-destructive/10 p-2 text-xs text-destructive font-semibold">⛔ ফসল তোলার মাত্র {toBn(Math.max(0, pc.daysLeft))} দিন বাকি, কিন্তু এই ওষুধের বিষ কাটতে {toBn(phi)} দিন লাগে। এই স্প্রের পর {toBn(phi)} দিন ফসল তুলবেন না/খাবেন না, অথবা জৈব বিকল্প ব্যবহার করুন।</p>
-                  )}
-                  {rot && <p className="rounded-lg bg-accent/50 p-2 text-xs text-foreground">🔄 {rot}</p>}
-                  {dose && (
-                    <div className="rounded-lg bg-primary/5 p-2 text-xs space-y-1">
-                      {doseInput(e)}
-                      <p className="font-bold text-primary">🪣 ড্রাম হিসাব ({toBn(TANK_LITERS)} লিটার স্প্রেয়ার)</p>
-                      <p>প্রতি ড্রামে: <strong>{toBn(tankPlan(0, dose.amount).perTank)} {dose.unit}</strong> {e.problem.chemicals[0].name.split(" (")[0]}</p>
-                      {land > 0 ? (
-                        <p>{toBn(land)} শতকে লাগবে ≈ {toBn(tankPlan(land, dose.amount).waterLiters)} লিটার পানি = <strong>{toBn(tankPlan(land, dose.amount).tanks)} ড্রাম</strong>, মোট ওষুধ {toBn(tankPlan(land, dose.amount).total)} {dose.unit}</p>
-                      ) : <p className="text-muted-foreground">উপরে জমির পরিমাণ দিলে মোট ড্রাম দেখাবে।</p>}
-                    </div>
-                  )}
-                  {names.length > 1 && (
-                    <div className="rounded-lg bg-muted p-2 text-xs space-y-0.5">
-                      <p className="font-bold">🧴 একসাথে মেশালে এই ক্রমে দিন</p>
-                      {mix.map((n, i) => <p key={n}>{toBn(i + 1)}. {n} <span className="text-muted-foreground">({MIX_LABELS[mixRank(n)]})</span></p>)}
-                      {mixW.map((w) => <p key={w} className="text-destructive font-semibold">⚠️ {w}</p>)}
-                    </div>
-                  )}
-                </div>
-              );
-            })()}
-            <p className="text-[11px] text-muted-foreground">⚠️ লেবেলের নির্দেশনা মেনে, সকাল/বিকেলে বাতাসহীন সময়ে স্প্রে করুন।</p>
+            {!done &&
+              e.problem &&
+              (() => {
+                const names = e.problem.chemicals.map((c) => c.name);
+                const phi = maxPhiDays(names.slice(0, 1));
+                const pc = phiConflict(e.day, harvestDay, phi);
+                const rot = rotationWarning(e);
+                const dose = doseFor(e);
+                const mix = [...names].sort((a, b) => mixRank(a) - mixRank(b));
+                const mixW = tankMixWarnings(names);
+                return (
+                  <div className="space-y-2">
+                    {pc.conflict && (
+                      <p className="rounded-lg bg-destructive/10 p-2 text-xs text-destructive font-semibold">
+                        ⛔ ফসল তোলার মাত্র {toBn(Math.max(0, pc.daysLeft))} দিন বাকি, কিন্তু এই
+                        ওষুধের বিষ কাটতে {toBn(phi)} দিন লাগে। এই স্প্রের পর {toBn(phi)} দিন ফসল
+                        তুলবেন না/খাবেন না, অথবা জৈব বিকল্প ব্যবহার করুন।
+                      </p>
+                    )}
+                    {rot && (
+                      <p className="rounded-lg bg-accent/50 p-2 text-xs text-foreground">
+                        🔄 {rot}
+                      </p>
+                    )}
+                    {dose && (
+                      <div className="rounded-lg bg-primary/5 p-2 text-xs space-y-1">
+                        {doseInput(e)}
+                        <p className="font-bold text-primary">
+                          🪣 ড্রাম হিসাব ({toBn(TANK_LITERS)} লিটার স্প্রেয়ার)
+                        </p>
+                        <p>
+                          প্রতি ড্রামে:{" "}
+                          <strong>
+                            {toBn(tankPlan(0, dose.amount).perTank)} {dose.unit}
+                          </strong>{" "}
+                          {e.problem.chemicals[0].name.split(" (")[0]}
+                        </p>
+                        {land > 0 ? (
+                          <p>
+                            {toBn(land)} শতকে লাগবে ≈{" "}
+                            {toBn(tankPlan(land, dose.amount).waterLiters)} লিটার পানি ={" "}
+                            <strong>{toBn(tankPlan(land, dose.amount).tanks)} ড্রাম</strong>, মোট
+                            ওষুধ {toBn(tankPlan(land, dose.amount).total)} {dose.unit}
+                          </p>
+                        ) : (
+                          <p className="text-muted-foreground">
+                            উপরে জমির পরিমাণ দিলে মোট ড্রাম দেখাবে।
+                          </p>
+                        )}
+                      </div>
+                    )}
+                    {names.length > 1 && (
+                      <div className="rounded-lg bg-muted p-2 text-xs space-y-0.5">
+                        <p className="font-bold">🧴 একসাথে মেশালে এই ক্রমে দিন</p>
+                        {mix.map((n, i) => (
+                          <p key={n}>
+                            {toBn(i + 1)}. {n}{" "}
+                            <span className="text-muted-foreground">
+                              ({MIX_LABELS[mixRank(n)]})
+                            </span>
+                          </p>
+                        ))}
+                        {mixW.map((w) => (
+                          <p key={w} className="text-destructive font-semibold">
+                            ⚠️ {w}
+                          </p>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+            <p className="text-[11px] text-muted-foreground">
+              ⚠️ লেবেলের নির্দেশনা মেনে, সকাল/বিকেলে বাতাসহীন সময়ে স্প্রে করুন।
+            </p>
             <button
               onClick={() => onComplete(e.id)}
               disabled={done}
@@ -221,7 +355,8 @@ export function SprayScheduleSection({ userId, planId, cropType, plantingDate, d
               <SprayCan className="h-5 w-5 text-primary" /> স্প্রে শিডিউল
             </h2>
             <p className="text-xs text-muted-foreground mt-0.5">
-              মোট {toBn(events.length)}টি স্প্রে · সম্পন্ন {toBn(events.filter((e) => completions.has(e.id)).length)}টি
+              মোট {toBn(events.length)}টি স্প্রে · সম্পন্ন{" "}
+              {toBn(events.filter((e) => completions.has(e.id)).length)}টি
             </p>
           </div>
           <button
@@ -237,38 +372,75 @@ export function SprayScheduleSection({ userId, planId, cropType, plantingDate, d
           <div className="mx-4 mb-3 rounded-xl bg-primary/10 p-3 text-sm">
             <p className="text-xs font-semibold text-primary">পরবর্তী স্প্রে</p>
             <p className="font-bold text-foreground">{next.title}</p>
-            <p className="text-xs text-muted-foreground">{formatBnDate(addDays(plantingDate, next.day))} ({toBn(next.day)}তম দিন)</p>
+            <p className="text-xs text-muted-foreground">
+              {formatBnDate(addDays(plantingDate, next.day))} ({toBn(next.day)}তম দিন)
+            </p>
           </div>
         )}
 
         <div className="mx-4 mb-3 grid gap-2">
           {sw ? (
-            <div className={`rounded-xl p-3 text-xs ${sw.ok ? "bg-primary/10" : "bg-destructive/10"}`}>
-              <p className={`font-bold text-sm ${sw.ok ? "text-primary" : "text-destructive"}`}>{sw.ok ? "✅ আজ স্প্রে করার উপযোগী" : "⛔ আজ স্প্রে করবেন না"}</p>
-              {sw.reasons.map((r) => <p key={r} className="text-foreground">• {r}</p>)}
-              <p className="text-muted-foreground mt-0.5">সেরা সময়: {sw.bestTime} (বাতাস কম থাকে)</p>
+            <div
+              className={`rounded-xl p-3 text-xs ${sw.ok ? "bg-primary/10" : "bg-destructive/10"}`}
+            >
+              <p className={`font-bold text-sm ${sw.ok ? "text-primary" : "text-destructive"}`}>
+                {sw.ok ? "✅ আজ স্প্রে করার উপযোগী" : "⛔ আজ স্প্রে করবেন না"}
+              </p>
+              {sw.reasons.map((r) => (
+                <p key={r} className="text-foreground">
+                  • {r}
+                </p>
+              ))}
+              <p className="text-muted-foreground mt-0.5">
+                সেরা সময়: {sw.bestTime} (বাতাস কম থাকে)
+              </p>
             </div>
           ) : !user?.district ? (
-            <p className="rounded-xl bg-muted p-3 text-xs text-muted-foreground">প্রোফাইলে জেলা দিলে আজকের আবহাওয়া দেখে স্প্রে পরামর্শ পাবেন।</p>
+            <p className="rounded-xl bg-muted p-3 text-xs text-muted-foreground">
+              প্রোফাইলে জেলা দিলে আজকের আবহাওয়া দেখে স্প্রে পরামর্শ পাবেন।
+            </p>
           ) : weather.isLoading ? (
-            <p className="rounded-xl bg-muted p-3 text-xs text-muted-foreground">আবহাওয়া দেখা হচ্ছে…</p>
+            <p className="rounded-xl bg-muted p-3 text-xs text-muted-foreground">
+              আবহাওয়া দেখা হচ্ছে…
+            </p>
           ) : null}
           <label className="rounded-xl bg-muted p-3 text-xs flex items-center gap-2">
             <span className="font-semibold text-foreground">🌾 জমির পরিমাণ</span>
-            <input inputMode="decimal" value={shotok} onChange={(ev) => saveLand(ev.target.value)} placeholder="যেমন ২০" className="w-20 rounded-lg bg-card ring-1 ring-border px-2 py-1.5 text-sm" />
+            <input
+              inputMode="decimal"
+              value={shotok}
+              onChange={(ev) => saveLand(ev.target.value)}
+              placeholder="যেমন ২০"
+              className="w-20 rounded-lg bg-card ring-1 ring-border px-2 py-1.5 text-sm"
+            />
             <span className="text-muted-foreground">শতক — ড্রাম হিসাবের জন্য</span>
           </label>
           {land > 0 && (
             <div className="rounded-xl bg-primary/5 ring-1 ring-primary/15 p-3 text-xs space-y-1">
               <p className="font-bold text-primary">🪣 ড্রাম হিসাব — {toBn(land)} শতক</p>
-              <p className="text-foreground">প্রতিটি স্প্রের জন্য পানি লাগবে ≈ <strong>{toBn(tankPlan(land, 0).waterLiters)} লিটার</strong> = <strong>{toBn(tankPlan(land, 0).tanks)} ড্রাম</strong> ({toBn(TANK_LITERS)} লিটার স্প্রেয়ার)</p>
+              <p className="text-foreground">
+                প্রতিটি স্প্রের জন্য পানি লাগবে ≈{" "}
+                <strong>{toBn(tankPlan(land, 0).waterLiters)} লিটার</strong> ={" "}
+                <strong>{toBn(tankPlan(land, 0).tanks)} ড্রাম</strong> ({toBn(TANK_LITERS)} লিটার
+                স্প্রেয়ার)
+              </p>
               {next && nextDose && doseInput(next)}
               {next && nextDose && nextDose.amount > 0 ? (
-                <p className="text-foreground">পরবর্তী স্প্রে ({next.title}): মোট ওষুধ <strong>{toBn(tankPlan(land, nextDose.amount).total)} {nextDose.unit}</strong> {next.problem!.chemicals[0].name.split(" (")[0]}</p>
+                <p className="text-foreground">
+                  পরবর্তী স্প্রে ({next.title}): মোট ওষুধ{" "}
+                  <strong>
+                    {toBn(tankPlan(land, nextDose.amount).total)} {nextDose.unit}
+                  </strong>{" "}
+                  {next.problem!.chemicals[0].name.split(" (")[0]}
+                </p>
               ) : next && nextDose ? (
-                <p className="text-muted-foreground">ওষুধের মাত্রা দিলে মোট ওষুধ দেখাবে (লেবেলে লেখা মাত্রা দিন)।</p>
+                <p className="text-muted-foreground">
+                  ওষুধের মাত্রা দিলে মোট ওষুধ দেখাবে (লেবেলে লেখা মাত্রা দিন)।
+                </p>
               ) : null}
-              <p className="text-muted-foreground">প্রতিটি স্প্রে খুললে সেই ওষুধের ড্রাম-ভিত্তিক হিসাব দেখা যাবে।</p>
+              <p className="text-muted-foreground">
+                প্রতিটি স্প্রে খুললে সেই ওষুধের ড্রাম-ভিত্তিক হিসাব দেখা যাবে।
+              </p>
             </div>
           )}
         </div>
@@ -276,7 +448,9 @@ export function SprayScheduleSection({ userId, planId, cropType, plantingDate, d
         {cropType === "টমেটো" && (
           <div className="mx-4 mb-3 rounded-xl bg-accent/40 p-3 text-xs text-foreground space-y-1">
             <p className="font-bold">📝 জরুরি নোট</p>
-            {TOMATO_SPRAY_NOTES.map((n) => <p key={n}>• {n}</p>)}
+            {TOMATO_SPRAY_NOTES.map((n) => (
+              <p key={n}>• {n}</p>
+            ))}
           </div>
         )}
 
@@ -298,7 +472,11 @@ export function SprayScheduleSection({ userId, planId, cropType, plantingDate, d
               className="w-full flex items-center justify-between rounded-xl bg-primary/10 px-3 py-2.5 text-sm font-bold text-primary"
             >
               <span>🌿 অন্যান্য পুষ্টিজনিত স্প্রে ({toBn(nutrients.length)}টি)</span>
-              {showNutrients ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              {showNutrients ? (
+                <ChevronUp className="h-4 w-4" />
+              ) : (
+                <ChevronDown className="h-4 w-4" />
+              )}
             </button>
             {showNutrients && <ol className="mt-2 space-y-2">{nutrients.map(renderEvent)}</ol>}
           </div>

@@ -32,14 +32,24 @@ export function useConnectionState(targetUserId: string | null) {
     const { data, error } = await supabase
       .from("connections")
       .select("*")
-      .or(`and(requester_id.eq.${user.id},addressee_id.eq.${targetUserId}),and(requester_id.eq.${targetUserId},addressee_id.eq.${user.id})`)
+      .or(
+        `and(requester_id.eq.${user.id},addressee_id.eq.${targetUserId}),and(requester_id.eq.${targetUserId},addressee_id.eq.${user.id})`,
+      )
       .order("updated_at", { ascending: false })
       .limit(1)
       .maybeSingle();
     if (!error && data) {
       const row = data as ConnectionRow;
       setConnection(row);
-      setState(row.status === "accepted" ? "accepted" : row.status === "pending" ? (row.requester_id === user.id ? "outgoing_pending" : "incoming_pending") : null);
+      setState(
+        row.status === "accepted"
+          ? "accepted"
+          : row.status === "pending"
+            ? row.requester_id === user.id
+              ? "outgoing_pending"
+              : "incoming_pending"
+            : null,
+      );
     } else if (!error) {
       setConnection(null);
       setState(null);
@@ -54,30 +64,44 @@ export function useConnectionState(targetUserId: string | null) {
   const request = useCallback(async () => {
     if (!targetUserId || !user || busy) return;
     setBusy(true);
-    const { data, error } = await supabase.rpc("request_connection", { target_user_id: targetUserId });
+    const { data, error } = await supabase.rpc("request_connection", {
+      target_user_id: targetUserId,
+    });
     if (error) {
       toast.error("সংযোগ অনুরোধ পাঠানো যায়নি");
     } else {
       setConnection((data as ConnectionRow) ?? null);
       setState((data as ConnectionRow)?.status === "accepted" ? "accepted" : "outgoing_pending");
-      toast.success((data as ConnectionRow)?.status === "accepted" ? "এখন আপনারা সংযুক্ত" : "সংযোগ অনুরোধ পাঠানো হয়েছে");
+      toast.success(
+        (data as ConnectionRow)?.status === "accepted"
+          ? "এখন আপনারা সংযুক্ত"
+          : "সংযোগ অনুরোধ পাঠানো হয়েছে",
+      );
     }
     setBusy(false);
   }, [targetUserId, user, busy]);
 
-  const respond = useCallback(async (nextStatus: "accepted" | "declined") => {
-    if (!connection?.id || busy) return;
-    setBusy(true);
-    const { error } = await supabase.rpc("respond_connection", { connection_id: connection.id, next_status: nextStatus });
-    if (error) {
-      toast.error("সংযোগ অনুরোধ আপডেট করা যায়নি");
-    } else {
-      setState(nextStatus === "accepted" ? "accepted" : null);
-      setConnection((row) => row ? { ...row, status: nextStatus } : row);
-      toast.success(nextStatus === "accepted" ? "সংযোগ গ্রহণ করা হয়েছে" : "অনুরোধ প্রত্যাখ্যান করা হয়েছে");
-    }
-    setBusy(false);
-  }, [connection, busy]);
+  const respond = useCallback(
+    async (nextStatus: "accepted" | "declined") => {
+      if (!connection?.id || busy) return;
+      setBusy(true);
+      const { error } = await supabase.rpc("respond_connection", {
+        connection_id: connection.id,
+        next_status: nextStatus,
+      });
+      if (error) {
+        toast.error("সংযোগ অনুরোধ আপডেট করা যায়নি");
+      } else {
+        setState(nextStatus === "accepted" ? "accepted" : null);
+        setConnection((row) => (row ? { ...row, status: nextStatus } : row));
+        toast.success(
+          nextStatus === "accepted" ? "সংযোগ গ্রহণ করা হয়েছে" : "অনুরোধ প্রত্যাখ্যান করা হয়েছে",
+        );
+      }
+      setBusy(false);
+    },
+    [connection, busy],
+  );
 
   const cancel = useCallback(async () => {
     if (!connection?.id || busy) return;
@@ -87,7 +111,7 @@ export function useConnectionState(targetUserId: string | null) {
       toast.error("অনুরোধ বাতিল করা যায়নি");
     } else {
       setState(null);
-      setConnection((row) => row ? { ...row, status: "cancelled" } : row);
+      setConnection((row) => (row ? { ...row, status: "cancelled" } : row));
       toast.success("সংযোগ অনুরোধ বাতিল হয়েছে");
     }
     setBusy(false);

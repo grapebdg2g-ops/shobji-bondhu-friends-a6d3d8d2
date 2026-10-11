@@ -1,20 +1,56 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Plus, Trash2, Printer, Wallet, ChevronDown, ChevronUp, Pencil, Check, X, BarChart3, CheckCircle2 } from "lucide-react";
+import {
+  Plus,
+  Trash2,
+  Printer,
+  Wallet,
+  ChevronDown,
+  ChevronUp,
+  Pencil,
+  Check,
+  X,
+  BarChart3,
+  CheckCircle2,
+} from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import { ENTRY_TYPES, HINT, LABEL, summarize, type EntryType, type FinanceEntry as Entry } from "@/lib/crop-finance";
+import {
+  ENTRY_TYPES,
+  HINT,
+  LABEL,
+  summarize,
+  type EntryType,
+  type FinanceEntry as Entry,
+} from "@/lib/crop-finance";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { fmtBdt, toBn } from "@/lib/bn";
 import { formatBnDate } from "@/lib/bn-date";
 import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
 const SUGGESTIONS: Record<EntryType, string[]> = {
   capital: ["নিজস্ব মূলধন", "ঋণ/ধার"],
-  expense: ["জমি চাষ/হালচাষ", "বীজ/চারা", "সার", "কীটনাশক/বালাইনাশক", "সেচ", "শ্রমিক মজুরি", "জমি লিজ/ভাড়া", "পরিবহন", "মাচা/সাপোর্ট", "বীজতলা তৈরি"],
+  expense: [
+    "জমি চাষ/হালচাষ",
+    "বীজ/চারা",
+    "সার",
+    "কীটনাশক/বালাইনাশক",
+    "সেচ",
+    "শ্রমিক মজুরি",
+    "জমি লিজ/ভাড়া",
+    "পরিবহন",
+    "মাচা/সাপোর্ট",
+    "বীজতলা তৈরি",
+  ],
   income: ["ফসল বিক্রি", "পাশাপাশি ফসল বিক্রি", "বীজ/চারা বিক্রি"],
   credit_purchase: ["সার (বাকি)", "কীটনাশক (বাকি)", "বীজ/চারা (বাকি)", "সেচ (বাকি)"],
   credit_sale: ["ফসল বিক্রি (পাইকার)", "ফসল বিক্রি (আড়ত)"],
@@ -28,13 +64,27 @@ function todayIso() {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
-export function CropFinanceSection({ userId, planId, cropType, full = false }: { userId: string; planId: string; cropType: string; full?: boolean }) {
+export function CropFinanceSection({
+  userId,
+  planId,
+  cropType,
+  full = false,
+}: {
+  userId: string;
+  planId: string;
+  cropType: string;
+  full?: boolean;
+}) {
   const qc = useQueryClient();
   const key = ["crop-finances", planId];
   const { data: rows = [], isLoading } = useQuery({
     queryKey: key,
     queryFn: async () => {
-      const { data, error } = await supabase.from("crop_plan_finances").select("*").eq("plan_id", planId).order("created_at");
+      const { data, error } = await supabase
+        .from("crop_plan_finances")
+        .select("*")
+        .eq("plan_id", planId)
+        .order("created_at");
       if (error) throw error;
       return (data ?? []) as Entry[];
     },
@@ -68,7 +118,10 @@ export function CropFinanceSection({ userId, planId, cropType, full = false }: {
       last = y;
       const stuck = y > 8 && (barRef.current?.getBoundingClientRect().top ?? 0) <= 1;
       setBarStuck(stuck);
-      if (!stuck) { setBarShown(true); return; }
+      if (!stuck) {
+        setBarShown(true);
+        return;
+      }
       if (idle) clearTimeout(idle);
       if (delta < 0) {
         setBarShown(true);
@@ -85,7 +138,6 @@ export function CropFinanceSection({ userId, planId, cropType, full = false }: {
   }, [open]);
   const barHidden = !open && barStuck && !barShown;
 
-
   const totals = useMemo(() => summarize(rows), [rows]);
   const profit = totals.profit;
   const tabRows = rows.filter((r) => r.entry_type === tab);
@@ -94,8 +146,14 @@ export function CropFinanceSection({ userId, planId, cropType, full = false }: {
   async function saveEdit(r: Entry) {
     const amt = Math.max(0, Number(editAmount) || 0);
     const date = editDate || r.entry_date;
-    if (amt === Number(r.amount) && date === r.entry_date) { setEditId(null); return; }
-    const { error } = await supabase.from("crop_plan_finances").update({ amount: amt, entry_date: date }).eq("id", r.id);
+    if (amt === Number(r.amount) && date === r.entry_date) {
+      setEditId(null);
+      return;
+    }
+    const { error } = await supabase
+      .from("crop_plan_finances")
+      .update({ amount: amt, entry_date: date })
+      .eq("id", r.id);
     if (error) return toast.error("সংরক্ষণ ব্যর্থ");
     setEditId(null);
     qc.invalidateQueries({ queryKey: key });
@@ -104,17 +162,36 @@ export function CropFinanceSection({ userId, planId, cropType, full = false }: {
   async function add() {
     const title = (pick === CUSTOM ? customTitle : pick).trim();
     if (!title) return toast.error("তালিকা থেকে নির্বাচন করুন বা নিজের নাম লিখুন");
-    const { error } = await supabase.from("crop_plan_finances").insert({ user_id: userId, plan_id: planId, entry_type: tab, title: title.slice(0, 80), amount: Math.max(0, Number(amount) || 0), entry_date: entryDate || todayIso() });
+    const { error } = await supabase.from("crop_plan_finances").insert({
+      user_id: userId,
+      plan_id: planId,
+      entry_type: tab,
+      title: title.slice(0, 80),
+      amount: Math.max(0, Number(amount) || 0),
+      entry_date: entryDate || todayIso(),
+    });
     if (error) return toast.error("যোগ করা যায়নি");
-    setPick(""); setCustomTitle(""); setAmount(""); setEntryDate(todayIso());
+    setPick("");
+    setCustomTitle("");
+    setAmount("");
+    setEntryDate(todayIso());
     qc.invalidateQueries({ queryKey: key });
     toast.success("যোগ হয়েছে");
   }
   async function toggleSettled(r: Entry) {
-    const { error } = await supabase.from("crop_plan_finances").update({ is_settled: !r.is_settled }).eq("id", r.id);
+    const { error } = await supabase
+      .from("crop_plan_finances")
+      .update({ is_settled: !r.is_settled })
+      .eq("id", r.id);
     if (error) return toast.error("সংরক্ষণ ব্যর্থ");
     qc.invalidateQueries({ queryKey: key });
-    toast.success(!r.is_settled ? (r.entry_type === "credit_sale" ? "টাকা পেয়েছেন" : "বাকি শোধ হয়েছে") : "আবার বাকি হিসেবে রাখা হলো");
+    toast.success(
+      !r.is_settled
+        ? r.entry_type === "credit_sale"
+          ? "টাকা পেয়েছেন"
+          : "বাকি শোধ হয়েছে"
+        : "আবার বাকি হিসেবে রাখা হলো",
+    );
   }
   async function remove(id: string) {
     const { error } = await supabase.from("crop_plan_finances").delete().eq("id", id);
@@ -125,50 +202,105 @@ export function CropFinanceSection({ userId, planId, cropType, full = false }: {
   }
 
   function printReport() {
-    const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
-    const table = (t: EntryType) => `<h3>${LABEL[t]}</h3><table><tr><th>আইটেম</th><th>তারিখ</th><th>টাকা</th></tr>${rows.filter((r) => r.entry_type === t).map((r) => `<tr><td>${esc(r.title)}</td><td>${formatBnDate(r.entry_date)}${t === "credit_purchase" || t === "credit_sale" ? (r.is_settled ? " (পরিশোধিত)" : " (বাকি)") : ""}</td><td class="r">${fmtBdt(Number(r.amount))}</td></tr>`).join("")}<tr><th colspan="2">মোট</th><th class="r">${fmtBdt(totals[t])}</th></tr></table>`;
+    const esc = (s: string) =>
+      s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
+    const table = (t: EntryType) =>
+      `<h3>${LABEL[t]}</h3><table><tr><th>আইটেম</th><th>তারিখ</th><th>টাকা</th></tr>${rows
+        .filter((r) => r.entry_type === t)
+        .map(
+          (r) =>
+            `<tr><td>${esc(r.title)}</td><td>${formatBnDate(r.entry_date)}${t === "credit_purchase" || t === "credit_sale" ? (r.is_settled ? " (পরিশোধিত)" : " (বাকি)") : ""}</td><td class="r">${fmtBdt(Number(r.amount))}</td></tr>`,
+        )
+        .join("")}<tr><th colspan="2">মোট</th><th class="r">${fmtBdt(totals[t])}</th></tr></table>`;
     const w = window.open("", "_blank");
     if (!w) return toast.error("পপআপ চালু করুন");
-    w.document.write(`<html><head><meta charset="utf-8"><title>${esc(cropType)} আয়-ব্যয় রিপোর্ট</title><link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&display=swap" rel="stylesheet"><style>body{font-family:'Tiro Bangla',serif;padding:24px;color:#111}table{width:100%;border-collapse:collapse;margin-bottom:12px}td,th{border:1px solid #999;padding:6px;text-align:left}.r{text-align:right}h1{margin:0}.sum td{font-weight:bold}</style></head><body>
+    w.document
+      .write(`<html><head><meta charset="utf-8"><title>${esc(cropType)} আয়-ব্যয় রিপোর্ট</title><link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&display=swap" rel="stylesheet"><style>body{font-family:'Tiro Bangla',serif;padding:24px;color:#111}table{width:100%;border-collapse:collapse;margin-bottom:12px}td,th{border:1px solid #999;padding:6px;text-align:left}.r{text-align:right}h1{margin:0}.sum td{font-weight:bold}</style></head><body>
 <h1>কৃষক বন্ধু — আয়-ব্যয় রিপোর্ট</h1><p>ফসল: <b>${esc(cropType)}</b> · তারিখ: ${formatBnDate(new Date().toISOString().slice(0, 10))}</p>
-${ENTRY_TYPES.filter((t) => totals[t] > 0).map(table).join("")}
+${ENTRY_TYPES.filter((t) => totals[t] > 0)
+  .map(table)
+  .join("")}
 <h3>সারসংক্ষেপ</h3><table class="sum"><tr><td>মূলধন</td><td class="r">${fmtBdt(totals.capital)}</td></tr><tr><td>মোট খরচ (নগদ + বাকি)</td><td class="r">${fmtBdt(totals.totalCost)}</td></tr><tr><td>মোট আয় (নগদ + বাকি)</td><td class="r">${fmtBdt(totals.totalIncome)}</td></tr><tr><td>দোকানে দিতে হবে</td><td class="r">${fmtBdt(totals.payable)}</td></tr><tr><td>বাজারে পাওনা</td><td class="r">${fmtBdt(totals.receivable)}</td></tr><tr><td>উত্তোলন</td><td class="r">${fmtBdt(totals.withdrawal)}</td></tr><tr><td>হাতে নগদ</td><td class="r">${totals.cashInHand < 0 ? "-" : ""}${fmtBdt(Math.abs(totals.cashInHand))}</td></tr><tr><td>নীট ${profit >= 0 ? "লাভ" : "ক্ষতি"}</td><td class="r">${fmtBdt(Math.abs(profit))}</td></tr></table>
 <p style="margin-top:48px">স্বাক্ষর: ____________________</p><script>setTimeout(()=>print(),600)</script></body></html>`);
     w.document.close();
   }
 
   return (
-    <section ref={barRef} className={`px-5 mt-5 ${open || full ? "relative" : "sticky top-0 z-30 transition-all duration-300 ease-out"} ${barHidden ? "-translate-y-full opacity-0 pointer-events-none" : "translate-y-0 opacity-100"}`}>
+    <section
+      ref={barRef}
+      className={`px-5 mt-5 ${open || full ? "relative" : "sticky top-0 z-30 transition-all duration-300 ease-out"} ${barHidden ? "-translate-y-full opacity-0 pointer-events-none" : "translate-y-0 opacity-100"}`}
+    >
       <div className="bg-white rounded-2xl shadow-md ring-1 ring-emerald-100 overflow-hidden">
         {/* Always-visible collapsed bar */}
-        <button onClick={() => !full && setOpen((o) => !o)} className="w-full px-4 py-3 flex items-center justify-between gap-2 text-left">
+        <button
+          onClick={() => !full && setOpen((o) => !o)}
+          className="w-full px-4 py-3 flex items-center justify-between gap-2 text-left"
+        >
           <span className="inline-flex items-center gap-2 text-base font-bold text-gray-900 min-w-0">
             <Wallet className="h-5 w-5 text-emerald-600 shrink-0" />
             <span className="truncate">এই ফসলের আয়-ব্যয়ের হিসাব রাখুন</span>
           </span>
           <span className="inline-flex items-center gap-2 shrink-0">
-            <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${profit >= 0 ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"}`}>
+            <span
+              className={`px-2 py-0.5 rounded-full text-xs font-bold ${profit >= 0 ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"}`}
+            >
               নীট {profit >= 0 ? "লাভ" : "ক্ষতি"} {fmtBdt(Math.abs(profit))}
             </span>
-            {!full && (open ? <ChevronUp className="h-5 w-5 text-gray-400" /> : <ChevronDown className="h-5 w-5 text-gray-400" />)}
+            {!full &&
+              (open ? (
+                <ChevronUp className="h-5 w-5 text-gray-400" />
+              ) : (
+                <ChevronDown className="h-5 w-5 text-gray-400" />
+              ))}
           </span>
         </button>
 
         {open && (
           <div className="px-4 pb-4">
             <div className="grid grid-cols-2 gap-2 text-xs mb-3">
-              <div className={`rounded-xl p-2 ${profit >= 0 ? "bg-emerald-100" : "bg-rose-100"}`}>🟢 আসল {profit >= 0 ? "লাভ" : "ক্ষতি"}<br /><b className="text-base">{fmtBdt(Math.abs(profit))}</b></div>
-              <div className="rounded-xl bg-sky-50 p-2">💵 হাতে নগদ<br /><b className="text-base">{totals.cashInHand < 0 ? "-" : ""}{fmtBdt(Math.abs(totals.cashInHand))}</b></div>
-              <div className="rounded-xl bg-rose-50 p-2">🔴 দোকানে দিতে হবে<br /><b className="text-base">{fmtBdt(totals.payable)}</b></div>
-              <div className="rounded-xl bg-amber-50 p-2">🟡 বাজারে পাওনা<br /><b className="text-base">{fmtBdt(totals.receivable)}</b></div>
+              <div className={`rounded-xl p-2 ${profit >= 0 ? "bg-emerald-100" : "bg-rose-100"}`}>
+                🟢 আসল {profit >= 0 ? "লাভ" : "ক্ষতি"}
+                <br />
+                <b className="text-base">{fmtBdt(Math.abs(profit))}</b>
+              </div>
+              <div className="rounded-xl bg-sky-50 p-2">
+                💵 হাতে নগদ
+                <br />
+                <b className="text-base">
+                  {totals.cashInHand < 0 ? "-" : ""}
+                  {fmtBdt(Math.abs(totals.cashInHand))}
+                </b>
+              </div>
+              <div className="rounded-xl bg-rose-50 p-2">
+                🔴 দোকানে দিতে হবে
+                <br />
+                <b className="text-base">{fmtBdt(totals.payable)}</b>
+              </div>
+              <div className="rounded-xl bg-amber-50 p-2">
+                🟡 বাজারে পাওনা
+                <br />
+                <b className="text-base">{fmtBdt(totals.receivable)}</b>
+              </div>
             </div>
-            <p className="text-[11px] text-gray-500 mb-3">মোট খরচ {fmtBdt(totals.totalCost)} · মোট আয় {fmtBdt(totals.totalIncome)} · মূলধন {fmtBdt(totals.capital)} · উত্তোলন {fmtBdt(totals.withdrawal)}</p>
+            <p className="text-[11px] text-gray-500 mb-3">
+              মোট খরচ {fmtBdt(totals.totalCost)} · মোট আয় {fmtBdt(totals.totalIncome)} · মূলধন{" "}
+              {fmtBdt(totals.capital)} · উত্তোলন {fmtBdt(totals.withdrawal)}
+            </p>
 
             {/* Type tabs */}
             <div className="flex gap-2 mb-2 overflow-x-auto no-scrollbar">
               {ENTRY_TYPES.map((t) => (
-                <button key={t} onClick={() => { setTab(t); setPick(""); setCustomTitle(""); setEditId(null); setShowCount(PAGE); }}
-                  className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-bold ring-1 transition ${tab === t ? "bg-emerald-600 text-white ring-emerald-600" : "bg-gray-50 text-gray-700 ring-gray-200"}`}>
+                <button
+                  key={t}
+                  onClick={() => {
+                    setTab(t);
+                    setPick("");
+                    setCustomTitle("");
+                    setEditId(null);
+                    setShowCount(PAGE);
+                  }}
+                  className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-bold ring-1 transition ${tab === t ? "bg-emerald-600 text-white ring-emerald-600" : "bg-gray-50 text-gray-700 ring-gray-200"}`}
+                >
                   {LABEL[t]} ({toBn(rows.filter((r) => r.entry_type === t).length)})
                 </button>
               ))}
@@ -178,22 +310,57 @@ ${ENTRY_TYPES.filter((t) => totals[t] > 0).map(table).join("")}
             {/* Add item: dropdown select or custom name */}
             <div className="mb-3 rounded-xl bg-gray-50 p-3 space-y-2">
               <p className="text-sm font-semibold text-gray-800">নতুন {LABEL[tab]} যোগ করুন</p>
-              <select value={pick} onChange={(e) => setPick(e.target.value)} className="w-full rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-sm">
+              <select
+                value={pick}
+                onChange={(e) => setPick(e.target.value)}
+                className="w-full rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-sm"
+              >
                 <option value="">— তালিকা থেকে নির্বাচন করুন —</option>
-                {SUGGESTIONS[tab].map((s) => <option key={s} value={s}>{s}</option>)}
+                {SUGGESTIONS[tab].map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ))}
                 <option value={CUSTOM}>অন্য কিছু (নিজে নাম লিখুন)</option>
               </select>
               {pick === CUSTOM && (
-                <input value={customTitle} onChange={(e) => setCustomTitle(e.target.value)} maxLength={80} placeholder="আইটেমের নাম" className="w-full rounded-lg border border-gray-200 px-2 py-1.5 text-sm" />
+                <input
+                  value={customTitle}
+                  onChange={(e) => setCustomTitle(e.target.value)}
+                  maxLength={80}
+                  placeholder="আইটেমের নাম"
+                  className="w-full rounded-lg border border-gray-200 px-2 py-1.5 text-sm"
+                />
               )}
               <div className="flex gap-2">
-                <input type="number" min={0} value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="টাকা" className="flex-[2] min-w-0 rounded-lg border border-gray-200 px-2 py-1.5 text-sm" />
-                <input type="date" value={entryDate} onChange={(e) => setEntryDate(e.target.value)} className="w-[6.5rem] shrink-0 rounded-lg border border-gray-200 px-1 py-1.5 text-xs" />
-                <button onClick={add} className="inline-flex items-center gap-1 px-3 rounded-lg bg-emerald-600 text-white text-sm font-bold shrink-0"><Plus className="h-4 w-4" /> যোগ</button>
+                <input
+                  type="number"
+                  min={0}
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  placeholder="টাকা"
+                  className="flex-[2] min-w-0 rounded-lg border border-gray-200 px-2 py-1.5 text-sm"
+                />
+                <input
+                  type="date"
+                  value={entryDate}
+                  onChange={(e) => setEntryDate(e.target.value)}
+                  className="w-[6.5rem] shrink-0 rounded-lg border border-gray-200 px-1 py-1.5 text-xs"
+                />
+                <button
+                  onClick={add}
+                  className="inline-flex items-center gap-1 px-3 rounded-lg bg-emerald-600 text-white text-sm font-bold shrink-0"
+                >
+                  <Plus className="h-4 w-4" /> যোগ
+                </button>
               </div>
             </div>
-            {isLoading ? <p className="text-sm text-gray-500">লোড হচ্ছে…</p> : tabRows.length === 0 ? (
-              <p className="text-sm text-gray-500 py-2">এই খাতে এখনো কিছু নেই — উপর থেকে যোগ করুন।</p>
+            {isLoading ? (
+              <p className="text-sm text-gray-500">লোড হচ্ছে…</p>
+            ) : tabRows.length === 0 ? (
+              <p className="text-sm text-gray-500 py-2">
+                এই খাতে এখনো কিছু নেই — উপর থেকে যোগ করুন।
+              </p>
             ) : (
               <>
                 {visibleRows.map((r) => (
@@ -202,12 +369,34 @@ ${ENTRY_TYPES.filter((t) => totals[t] > 0).map(table).join("")}
                       <div className="space-y-1.5">
                         <p className="text-sm font-semibold text-gray-800 truncate">{r.title}</p>
                         <div className="flex items-center gap-2">
-                          <input type="number" min={0} value={editAmount} onChange={(e) => setEditAmount(e.target.value)} placeholder="টাকা"
-                            className="w-24 rounded-lg border border-gray-200 px-2 py-1 text-sm text-right" />
-                          <input type="date" value={editDate} onChange={(e) => setEditDate(e.target.value)}
-                            className="flex-1 min-w-0 rounded-lg border border-gray-200 px-2 py-1 text-sm" />
-                          <button onClick={() => saveEdit(r)} aria-label="সংরক্ষণ" className="text-emerald-600 hover:text-emerald-700"><Check className="h-4 w-4" /></button>
-                          <button onClick={() => setEditId(null)} aria-label="বাতিল" className="text-gray-400 hover:text-gray-600"><X className="h-4 w-4" /></button>
+                          <input
+                            type="number"
+                            min={0}
+                            value={editAmount}
+                            onChange={(e) => setEditAmount(e.target.value)}
+                            placeholder="টাকা"
+                            className="w-24 rounded-lg border border-gray-200 px-2 py-1 text-sm text-right"
+                          />
+                          <input
+                            type="date"
+                            value={editDate}
+                            onChange={(e) => setEditDate(e.target.value)}
+                            className="flex-1 min-w-0 rounded-lg border border-gray-200 px-2 py-1 text-sm"
+                          />
+                          <button
+                            onClick={() => saveEdit(r)}
+                            aria-label="সংরক্ষণ"
+                            className="text-emerald-600 hover:text-emerald-700"
+                          >
+                            <Check className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => setEditId(null)}
+                            aria-label="বাতিল"
+                            className="text-gray-400 hover:text-gray-600"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
                         </div>
                       </div>
                     ) : (
@@ -216,33 +405,74 @@ ${ENTRY_TYPES.filter((t) => totals[t] > 0).map(table).join("")}
                           <p className="text-sm text-gray-700 truncate">{r.title}</p>
                           <p className="text-[11px] text-gray-400">{formatBnDate(r.entry_date)}</p>
                         </div>
-                        <span className="text-sm font-bold text-gray-900 shrink-0">{fmtBdt(Number(r.amount))}</span>
+                        <span className="text-sm font-bold text-gray-900 shrink-0">
+                          {fmtBdt(Number(r.amount))}
+                        </span>
                         {(r.entry_type === "credit_purchase" || r.entry_type === "credit_sale") && (
-                          <button onClick={() => toggleSettled(r)} className={`shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold ring-1 ${r.is_settled ? "bg-emerald-50 text-emerald-700 ring-emerald-200" : "bg-amber-50 text-amber-700 ring-amber-200"}`}>
-                            {r.is_settled ? <span className="inline-flex items-center gap-0.5"><CheckCircle2 className="h-3 w-3" />{r.entry_type === "credit_sale" ? "পেয়েছি" : "শোধ"}</span> : r.entry_type === "credit_sale" ? "টাকা পেলাম?" : "শোধ করলাম?"}
+                          <button
+                            onClick={() => toggleSettled(r)}
+                            className={`shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold ring-1 ${r.is_settled ? "bg-emerald-50 text-emerald-700 ring-emerald-200" : "bg-amber-50 text-amber-700 ring-amber-200"}`}
+                          >
+                            {r.is_settled ? (
+                              <span className="inline-flex items-center gap-0.5">
+                                <CheckCircle2 className="h-3 w-3" />
+                                {r.entry_type === "credit_sale" ? "পেয়েছি" : "শোধ"}
+                              </span>
+                            ) : r.entry_type === "credit_sale" ? (
+                              "টাকা পেলাম?"
+                            ) : (
+                              "শোধ করলাম?"
+                            )}
                           </button>
                         )}
-                        <button onClick={() => { setEditId(r.id); setEditAmount(String(Number(r.amount) || "")); setEditDate(r.entry_date); }} aria-label="এডিট" className="text-gray-400 hover:text-emerald-600 shrink-0"><Pencil className="h-4 w-4" /></button>
-                        <button onClick={() => setDelTarget(r)} aria-label="মুছুন" className="text-gray-400 hover:text-rose-600 shrink-0"><Trash2 className="h-4 w-4" /></button>
+                        <button
+                          onClick={() => {
+                            setEditId(r.id);
+                            setEditAmount(String(Number(r.amount) || ""));
+                            setEditDate(r.entry_date);
+                          }}
+                          aria-label="এডিট"
+                          className="text-gray-400 hover:text-emerald-600 shrink-0"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => setDelTarget(r)}
+                          aria-label="মুছুন"
+                          className="text-gray-400 hover:text-rose-600 shrink-0"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
                       </div>
                     )}
                   </div>
                 ))}
                 {tabRows.length > showCount && (
-                  <button onClick={() => setShowCount((c) => c + PAGE)} className="mt-2 w-full inline-flex items-center justify-center gap-1 py-1.5 rounded-full bg-gray-50 text-gray-600 text-xs font-bold ring-1 ring-gray-200">
-                    <ChevronDown className="h-3.5 w-3.5" /> আরও {toBn(Math.min(PAGE, tabRows.length - showCount))}টি দেখুন (মোট {toBn(tabRows.length)}টি)
+                  <button
+                    onClick={() => setShowCount((c) => c + PAGE)}
+                    className="mt-2 w-full inline-flex items-center justify-center gap-1 py-1.5 rounded-full bg-gray-50 text-gray-600 text-xs font-bold ring-1 ring-gray-200"
+                  >
+                    <ChevronDown className="h-3.5 w-3.5" /> আরও{" "}
+                    {toBn(Math.min(PAGE, tabRows.length - showCount))}টি দেখুন (মোট{" "}
+                    {toBn(tabRows.length)}টি)
                   </button>
                 )}
               </>
             )}
 
-
             {!full && (
-              <Link to="/crop-finance/$planId" params={{ planId }} className="mt-3 w-full inline-flex items-center justify-center gap-1 py-2 rounded-full bg-sky-50 text-sky-700 text-xs font-bold ring-1 ring-sky-200">
+              <Link
+                to="/crop-finance/$planId"
+                params={{ planId }}
+                className="mt-3 w-full inline-flex items-center justify-center gap-1 py-2 rounded-full bg-sky-50 text-sky-700 text-xs font-bold ring-1 ring-sky-200"
+              >
                 <BarChart3 className="h-4 w-4" /> পূর্ণ হিসাব: শতক/কেজি প্রতি খরচ ও চার্ট
               </Link>
             )}
-            <button onClick={printReport} className="mt-2 w-full inline-flex items-center justify-center gap-1 py-2 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold ring-1 ring-emerald-200">
+            <button
+              onClick={printReport}
+              className="mt-2 w-full inline-flex items-center justify-center gap-1 py-2 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold ring-1 ring-emerald-200"
+            >
               <Printer className="h-4 w-4" /> প্রিন্ট / PDF
             </button>
           </div>
@@ -256,14 +486,34 @@ ${ENTRY_TYPES.filter((t) => totals[t] > 0).map(table).join("")}
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-rose-100">
               <Trash2 className="h-6 w-6 text-rose-600" />
             </div>
-            <AlertDialogTitle className="text-base font-bold text-gray-900">আপনি কি নিশ্চিত মুছে ফেলতে চান?</AlertDialogTitle>
+            <AlertDialogTitle className="text-base font-bold text-gray-900">
+              আপনি কি নিশ্চিত মুছে ফেলতে চান?
+            </AlertDialogTitle>
             <AlertDialogDescription className="text-sm text-gray-500">
-              <span className="font-bold text-gray-700">“{delTarget?.title}”</span> আইটেমটি{delTarget && Number(delTarget.amount) > 0 ? <> এবং এতে লেখা <span className="font-bold text-gray-700">{fmtBdt(Number(delTarget.amount))}</span> টাকাও</> : null} হিসাব থেকে মুছে যাবে। এটি আর ফেরানো যাবে না।
+              <span className="font-bold text-gray-700">“{delTarget?.title}”</span> আইটেমটি
+              {delTarget && Number(delTarget.amount) > 0 ? (
+                <>
+                  {" "}
+                  এবং এতে লেখা{" "}
+                  <span className="font-bold text-gray-700">
+                    {fmtBdt(Number(delTarget.amount))}
+                  </span>{" "}
+                  টাকাও
+                </>
+              ) : null}{" "}
+              হিসাব থেকে মুছে যাবে। এটি আর ফেরানো যাবে না।
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex-row gap-2 sm:justify-center">
-            <AlertDialogCancel className="flex-1 mt-0 rounded-full border-gray-200 bg-gray-50 text-gray-700 font-bold">বাতিল</AlertDialogCancel>
-            <AlertDialogAction onClick={() => remove(delTarget!.id)} className="flex-1 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-bold">মুছে ফেলুন</AlertDialogAction>
+            <AlertDialogCancel className="flex-1 mt-0 rounded-full border-gray-200 bg-gray-50 text-gray-700 font-bold">
+              বাতিল
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => remove(delTarget!.id)}
+              className="flex-1 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-bold"
+            >
+              মুছে ফেলুন
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

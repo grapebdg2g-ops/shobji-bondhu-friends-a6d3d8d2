@@ -83,12 +83,12 @@ export const FARMING_STAGES: Record<string, CropGuide> = Object.fromEntries(
 );
 
 export const TASK_TYPE_CONFIG: Record<TaskType, { color: string; label: string; icon: string }> = {
-  preparation:    { color: "#0EA5E9", label: "প্রস্তুতি", icon: "🛠️" },
-  task:           { color: "#2D6A4F", label: "কাজ",      icon: "✅" },
-  fertilizer:     { color: "#0891B2", label: "সার",       icon: "💊" },
-  irrigation:     { color: "#0284C7", label: "সেচ",       icon: "💧" },
-  disease:        { color: "#DC2626", label: "রোগ",       icon: "🔴" },
-  pest:           { color: "#D97706", label: "পোকা",      icon: "🐛" },
-  harvest:        { color: "#CA8A04", label: "সংগ্রহ",    icon: "🌾" },
-  "post-harvest": { color: "#7C3AED", label: "বিপণন",    icon: "🏪" },
+  preparation: { color: "#0EA5E9", label: "প্রস্তুতি", icon: "🛠️" },
+  task: { color: "#2D6A4F", label: "কাজ", icon: "✅" },
+  fertilizer: { color: "#0891B2", label: "সার", icon: "💊" },
+  irrigation: { color: "#0284C7", label: "সেচ", icon: "💧" },
+  disease: { color: "#DC2626", label: "রোগ", icon: "🔴" },
+  pest: { color: "#D97706", label: "পোকা", icon: "🐛" },
+  harvest: { color: "#CA8A04", label: "সংগ্রহ", icon: "🌾" },
+  "post-harvest": { color: "#7C3AED", label: "বিপণন", icon: "🏪" },
 };

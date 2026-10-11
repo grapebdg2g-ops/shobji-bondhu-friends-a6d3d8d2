@@ -48,7 +48,9 @@ export function DistrictUpazilaPicker({
         >
           <option value="">— নির্বাচন করুন —</option>
           {districts.map((d) => (
-            <option key={d} value={d}>{d}</option>
+            <option key={d} value={d}>
+              {d}
+            </option>
           ))}
         </select>
       </label>
@@ -62,11 +64,11 @@ export function DistrictUpazilaPicker({
           onChange={(e) => onUpazilaChange(e.target.value)}
           className="w-full h-11 px-3 rounded-xl border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          <option value="">
-            {district ? "— উপজেলা বেছে নিন —" : "আগে জেলা বেছে নিন"}
-          </option>
+          <option value="">{district ? "— উপজেলা বেছে নিন —" : "আগে জেলা বেছে নিন"}</option>
           {upazilas.map((u) => (
-            <option key={u} value={u}>{u}</option>
+            <option key={u} value={u}>
+              {u}
+            </option>
           ))}
         </select>
       </label>

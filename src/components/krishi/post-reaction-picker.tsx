@@ -40,7 +40,12 @@ export function PostReactionPicker({
   };
 
   return (
-    <div ref={rootRef} className="relative min-w-0" onMouseEnter={keepOpen} onMouseLeave={closeSoon}>
+    <div
+      ref={rootRef}
+      className="relative min-w-0"
+      onMouseEnter={keepOpen}
+      onMouseLeave={closeSoon}
+    >
       {open && (
         <div
           role="menu"
@@ -58,10 +63,19 @@ export function PostReactionPicker({
                 role="menuitem"
                 title={meta.label}
                 aria-label={`${meta.label} reaction দিন`}
-                onClick={() => { onChange(value === reaction ? null : reaction); setOpen(false); }}
+                onClick={() => {
+                  onChange(value === reaction ? null : reaction);
+                  setOpen(false);
+                }}
                 className={`reaction-option h-10 w-full min-w-0 rounded-full p-1 ${value === reaction ? "bg-primary/10 ring-2 ring-primary" : "hover:bg-muted"}`}
               >
-                <img src={meta.image} alt="" aria-hidden="true" className="h-8 w-8 select-none object-contain" draggable={false} />
+                <img
+                  src={meta.image}
+                  alt=""
+                  aria-hidden="true"
+                  className="h-8 w-8 select-none object-contain"
+                  draggable={false}
+                />
               </Button>
             );
           })}
@@ -79,7 +93,9 @@ export function PostReactionPicker({
         {value ? (
           <img src={active.image} alt="" aria-hidden="true" className="h-5 w-5 object-contain" />
         ) : (
-          <span className="text-base leading-none" aria-hidden="true">👍</span>
+          <span className="text-base leading-none" aria-hidden="true">
+            👍
+          </span>
         )}
         <span className="hidden min-[360px]:inline">{value ? active.label : "প্রতিক্রিয়া"}</span>
       </Button>

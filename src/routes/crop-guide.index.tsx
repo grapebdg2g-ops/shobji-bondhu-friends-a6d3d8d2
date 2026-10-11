@@ -72,7 +72,10 @@ function CropGuideIndex() {
     setBusy(p.id);
     const next = !p.is_active;
     setPlans((ps) => ps.map((x) => (x.id === p.id ? { ...x, is_active: next } : x)));
-    const { error } = await supabase.from("user_crop_plans").update({ is_active: next }).eq("id", p.id);
+    const { error } = await supabase
+      .from("user_crop_plans")
+      .update({ is_active: next })
+      .eq("id", p.id);
     setBusy(null);
     if (error) {
       setPlans((ps) => ps.map((x) => (x.id === p.id ? { ...x, is_active: p.is_active } : x)));
@@ -90,7 +93,10 @@ function CropGuideIndex() {
     await supabase.from("crop_diary_entries").update({ plan_id: null }).eq("plan_id", p.id);
     const { error } = await supabase.from("user_crop_plans").delete().eq("id", p.id);
     setBusy(null);
-    if (error) { toast.error("মুছতে ব্যর্থ, আবার চেষ্টা করুন"); return; }
+    if (error) {
+      toast.error("মুছতে ব্যর্থ, আবার চেষ্টা করুন");
+      return;
+    }
     setPlans((ps) => ps.filter((x) => x.id !== p.id));
     toast.success("মুছে ফেলা হয়েছে");
   }
@@ -102,9 +108,16 @@ function CropGuideIndex() {
 
   return (
     <main className="min-h-screen bg-[#F0FFF4] pb-24 md:max-w-[560px] md:mx-auto">
-      <header className="px-5 pt-8 pb-6 rounded-b-3xl text-white" style={{ background: "var(--gradient-brand)" }}>
+      <header
+        className="px-5 pt-8 pb-6 rounded-b-3xl text-white"
+        style={{ background: "var(--gradient-brand)" }}
+      >
         <div className="flex items-center gap-3 mb-4">
-          <Link to="/dashboard" aria-label="ফিরে যান" className="h-9 w-9 rounded-full bg-white/15 flex items-center justify-center">
+          <Link
+            to="/dashboard"
+            aria-label="ফিরে যান"
+            className="h-9 w-9 rounded-full bg-white/15 flex items-center justify-center"
+          >
             <ArrowLeft className="h-5 w-5" />
           </Link>
         </div>
@@ -141,11 +154,18 @@ function CropGuideIndex() {
               const guide = FARMING_STAGES[p.crop_type];
               if (!guide) return null;
               const days = Math.max(0, daysSince(p.planting_date));
-              const pct = p.is_active ? Math.min(100, Math.round((days / guide.totalDays) * 100)) : 100;
-              const currentStage = guide.stages.find((s) => days >= s.startDay && days < s.endDay) ?? guide.stages[guide.stages.length - 1];
+              const pct = p.is_active
+                ? Math.min(100, Math.round((days / guide.totalDays) * 100))
+                : 100;
+              const currentStage =
+                guide.stages.find((s) => days >= s.startDay && days < s.endDay) ??
+                guide.stages[guide.stages.length - 1];
               const done = !p.is_active;
               return (
-                <div key={p.id} className={`bg-white rounded-2xl p-4 shadow-sm ${p.is_gap ? "ring-2 ring-emerald-500" : `ring-1 ${done ? "ring-emerald-300" : "ring-emerald-100"}`}`}>
+                <div
+                  key={p.id}
+                  className={`bg-white rounded-2xl p-4 shadow-sm ${p.is_gap ? "ring-2 ring-emerald-500" : `ring-1 ${done ? "ring-emerald-300" : "ring-emerald-100"}`}`}
+                >
                   <Link to="/crop-guide/plan/$planId" params={{ planId: p.id }} className="block">
                     {p.is_gap && (
                       <div className="mb-3 -mt-1 flex items-center gap-2 rounded-xl bg-emerald-600 text-white px-3 py-1.5">
@@ -155,19 +175,38 @@ function CropGuideIndex() {
                     )}
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        <span className="text-2xl"><CropIcon crop={p.crop_type} /></span>
-                        <span className={`font-bold ${done ? "text-gray-500 line-through" : "text-gray-900"}`}>{p.crop_type}</span>
-                        {done && <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700">চাষ সম্পন্ন ✅</span>}
+                        <span className="text-2xl">
+                          <CropIcon crop={p.crop_type} />
+                        </span>
+                        <span
+                          className={`font-bold ${done ? "text-gray-500 line-through" : "text-gray-900"}`}
+                        >
+                          {p.crop_type}
+                        </span>
+                        {done && (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700">
+                            চাষ সম্পন্ন ✅
+                          </span>
+                        )}
                       </div>
                       <span className="text-xs text-gray-500">{toBn(days)} দিন</span>
                     </div>
-                    {!done && <p className="text-xs text-gray-600 mb-2">{currentStage.icon} {currentStage.name}</p>}
+                    {!done && (
+                      <p className="text-xs text-gray-600 mb-2">
+                        {currentStage.icon} {currentStage.name}
+                      </p>
+                    )}
                     <div className="h-2 bg-emerald-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${pct}%` }} />
+                      <div
+                        className="h-full bg-emerald-500 rounded-full"
+                        style={{ width: `${pct}%` }}
+                      />
                     </div>
                     <div className="mt-2 flex items-center justify-between">
                       <span className="text-xs text-gray-500">{toBn(pct)}%</span>
-                      <span className="text-emerald-600 text-sm font-semibold inline-flex items-center gap-1">দেখুন <ChevronRight className="h-4 w-4" /></span>
+                      <span className="text-emerald-600 text-sm font-semibold inline-flex items-center gap-1">
+                        দেখুন <ChevronRight className="h-4 w-4" />
+                      </span>
                     </div>
                   </Link>
                   <div className="mt-3 flex gap-2">
@@ -176,7 +215,15 @@ function CropGuideIndex() {
                       onClick={() => toggleDone(p)}
                       className={`flex-1 py-2 rounded-lg text-xs font-bold inline-flex items-center justify-center gap-1 disabled:opacity-50 ${done ? "bg-gray-100 text-gray-700" : "bg-emerald-600 text-white"}`}
                     >
-                      {done ? <><RotateCcw className="h-3.5 w-3.5" /> আবার চলমান করুন</> : <><Check className="h-3.5 w-3.5" /> চাষ সম্পন্ন</>}
+                      {done ? (
+                        <>
+                          <RotateCcw className="h-3.5 w-3.5" /> আবার চলমান করুন
+                        </>
+                      ) : (
+                        <>
+                          <Check className="h-3.5 w-3.5" /> চাষ সম্পন্ন
+                        </>
+                      )}
                     </button>
                     <button
                       disabled={busy === p.id}
@@ -213,7 +260,9 @@ function CropGuideIndex() {
                     <ShieldCheck className="h-3 w-3" /> GAP
                   </span>
                 )}
-                <span className="text-4xl mb-2"><CropIcon crop={crop} /></span>
+                <span className="text-4xl mb-2">
+                  <CropIcon crop={crop} />
+                </span>
                 <span className="font-bold text-gray-900 text-sm">{crop}</span>
                 <span className="text-[11px] text-gray-500 mt-1 line-clamp-1">{g.season}</span>
               </Link>

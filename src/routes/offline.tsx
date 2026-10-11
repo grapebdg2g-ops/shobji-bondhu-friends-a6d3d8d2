@@ -6,7 +6,10 @@ export const Route = createFileRoute("/offline")({
   head: () => ({
     meta: [
       { title: "অফলাইন — কৃষক বন্ধু" },
-      { name: "description", content: "ইন্টারনেট সংযোগ নেই। অফলাইন মোডে সীমিত সুবিধা পাওয়া যাচ্ছে।" },
+      {
+        name: "description",
+        content: "ইন্টারনেট সংযোগ নেই। অফলাইন মোডে সীমিত সুবিধা পাওয়া যাচ্ছে।",
+      },
     ],
   }),
   component: OfflinePage,
@@ -17,14 +20,8 @@ function OfflinePage() {
     if (typeof window !== "undefined") window.location.reload();
   };
 
-  const works = [
-    "আগের বাজার দর দেখা যাবে",
-    "আগের পোস্ট দেখা যাবে",
-  ];
-  const limits = [
-    "নতুন তথ্য আপডেট হবে না",
-    "রোগ শনাক্ত করা যাবে না",
-  ];
+  const works = ["আগের বাজার দর দেখা যাবে", "আগের পোস্ট দেখা যাবে"];
+  const limits = ["নতুন তথ্য আপডেট হবে না", "রোগ শনাক্ত করা যাবে না"];
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-primary/10 via-background to-background px-6 py-10">
@@ -34,9 +31,7 @@ function OfflinePage() {
         </div>
 
         <div>
-          <h1 className="text-2xl font-bold text-primary">
-            আপনি অফলাইনে আছেন
-          </h1>
+          <h1 className="text-2xl font-bold text-primary">আপনি অফলাইনে আছেন</h1>
           <p className="mt-1 text-muted-foreground">ইন্টারনেট সংযোগ নেই</p>
         </div>
 

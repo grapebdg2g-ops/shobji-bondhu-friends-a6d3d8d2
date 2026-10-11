@@ -18,7 +18,13 @@ export function ErrorMessage({
       <h3 className="text-base font-bold text-foreground">{title}</h3>
       {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
       {onRetry && (
-        <BengaliButton variant="outline" size="md" onClick={onRetry} className="mt-4" leftIcon={<RefreshCw className="h-4 w-4" />}>
+        <BengaliButton
+          variant="outline"
+          size="md"
+          onClick={onRetry}
+          className="mt-4"
+          leftIcon={<RefreshCw className="h-4 w-4" />}
+        >
           আবার চেষ্টা করুন
         </BengaliButton>
       )}

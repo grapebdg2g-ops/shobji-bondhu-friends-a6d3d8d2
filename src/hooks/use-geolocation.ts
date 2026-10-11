@@ -3,7 +3,14 @@ import { useCallback, useEffect, useState } from "react";
 const STORAGE_KEY = "geo:lastpos";
 
 export type GeoPos = { lat: number; lng: number; accuracy: number; ts: number };
-export type GeoStatus = "idle" | "prompt" | "loading" | "granted" | "denied" | "unavailable" | "error";
+export type GeoStatus =
+  | "idle"
+  | "prompt"
+  | "loading"
+  | "granted"
+  | "denied"
+  | "unavailable"
+  | "error";
 
 export function useGeolocation(autoRequest = true) {
   const [pos, setPos] = useState<GeoPos | null>(() => {
@@ -39,7 +46,9 @@ export function useGeolocation(autoRequest = true) {
         };
         setPos(next);
         setStatus("granted");
-        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); } catch {}
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+        } catch {}
       },
       (err) => {
         if (err.code === err.PERMISSION_DENIED) setStatus("denied");
@@ -54,7 +63,8 @@ export function useGeolocation(autoRequest = true) {
     if (!autoRequest || typeof navigator === "undefined") return;
     const perms = (navigator as any).permissions;
     if (perms?.query) {
-      perms.query({ name: "geolocation" as PermissionName })
+      perms
+        .query({ name: "geolocation" as PermissionName })
         .then((res: PermissionStatus) => {
           if (res.state === "denied") {
             setStatus("denied");

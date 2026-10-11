@@ -14,10 +14,7 @@ export function useMutedIds() {
     staleTime: 60_000,
     queryFn: async () => {
       if (!user) return [] as string[];
-      const { data } = await supabase
-        .from("muted_users")
-        .select("muted_id")
-        .eq("user_id", user.id);
+      const { data } = await supabase.from("muted_users").select("muted_id").eq("user_id", user.id);
       return ((data ?? []) as { muted_id: string }[]).map((r) => r.muted_id);
     },
   });

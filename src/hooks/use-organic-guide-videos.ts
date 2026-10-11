@@ -37,11 +37,17 @@ export function useOrganicGuideVideos(includeInactive = false) {
   useEffect(() => {
     const channel = supabase
       .channel(`organic-guide-videos-${includeInactive ? "admin" : "app"}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "organic_guide_videos" }, () => {
-        void queryClient.invalidateQueries({ queryKey: organicGuideVideosKey });
-      })
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "organic_guide_videos" },
+        () => {
+          void queryClient.invalidateQueries({ queryKey: organicGuideVideosKey });
+        },
+      )
       .subscribe();
-    return () => { void supabase.removeChannel(channel); };
+    return () => {
+      void supabase.removeChannel(channel);
+    };
   }, [includeInactive, queryClient]);
 
   return query;

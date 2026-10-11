@@ -1,5 +1,14 @@
 import { useReducer, useRef, useState, type ReactNode } from "react";
-import { Camera, Sprout, Leaf, Wrench, HardHat, X as XIcon, ArrowLeft, CheckCircle2 } from "lucide-react";
+import {
+  Camera,
+  Sprout,
+  Leaf,
+  Wrench,
+  HardHat,
+  X as XIcon,
+  ArrowLeft,
+  CheckCircle2,
+} from "lucide-react";
 import imageCompression from "browser-image-compression";
 import confetti from "canvas-confetti";
 import { toast } from "sonner";
@@ -51,11 +60,16 @@ const initial = (defaults: Partial<State>): State => ({
 
 function reducer(s: State, a: Action): State {
   switch (a.type) {
-    case "set": return { ...s, ...a.patch };
-    case "next": return { ...s, step: Math.min(4, s.step + 1) as State["step"] };
-    case "prev": return { ...s, step: Math.max(1, s.step - 1) as State["step"] };
-    case "goto": return { ...s, step: a.step };
-    case "reset": return initial(a.defaults);
+    case "set":
+      return { ...s, ...a.patch };
+    case "next":
+      return { ...s, step: Math.min(4, s.step + 1) as State["step"] };
+    case "prev":
+      return { ...s, step: Math.max(1, s.step - 1) as State["step"] };
+    case "goto":
+      return { ...s, step: a.step };
+    case "reset":
+      return initial(a.defaults);
   }
 }
 
@@ -67,11 +81,20 @@ const CATEGORIES: { type: ExchangeType; label: string; icon: typeof Sprout }[] =
 ];
 
 const TYPE_LABELS: Record<ExchangeType, string> = {
-  seed: "বীজ", sapling: "চারা", tool: "যন্ত্র", labor: "শ্রমিক",
+  seed: "বীজ",
+  sapling: "চারা",
+  tool: "যন্ত্র",
+  labor: "শ্রমিক",
 };
 
 export function NewAdWizard({
-  open, onClose, defaultDistrict, defaultUpazila, userId, userName, userPhone,
+  open,
+  onClose,
+  defaultDistrict,
+  defaultUpazila,
+  userId,
+  userName,
+  userPhone,
   onCreated,
 }: {
   open: boolean;
@@ -95,12 +118,20 @@ export function NewAdWizard({
     onClose();
     // reset only on successful close (step 4) or explicit close
     if (state.step === 4) {
-      dispatch({ type: "reset", defaults: { district: defaultDistrict, upazila: defaultUpazila ?? "", phone: userPhone ?? "" } });
+      dispatch({
+        type: "reset",
+        defaults: {
+          district: defaultDistrict,
+          upazila: defaultUpazila ?? "",
+          phone: userPhone ?? "",
+        },
+      });
     }
   };
 
   const pickImage = async (file: File) => {
-    if (file.size > 2 * 1024 * 1024 * 4) { // accept up to 8MB raw, compress
+    if (file.size > 2 * 1024 * 1024 * 4) {
+      // accept up to 8MB raw, compress
       toast.error("ছবি খুব বড়, ছোট ছবি দিন");
       return;
     }
@@ -121,13 +152,17 @@ export function NewAdWizard({
     if (!state.imageFile || !userId) return null;
     setUploadProgress(10);
     const mime = state.imageFile.type || "image/jpeg";
-    const ext = (mime.split("/")[1] || "jpg").replace("jpeg", "jpg").replace(/[^a-z0-9]/gi, "") || "jpg";
+    const ext =
+      (mime.split("/")[1] || "jpg").replace("jpeg", "jpg").replace(/[^a-z0-9]/gi, "") || "jpg";
     const path = `${userId}/${crypto.randomUUID()}.${ext}`;
     setUploadProgress(40);
     const { error } = await supabase.storage
       .from("exchange-images")
       .upload(path, state.imageFile, { upsert: false, contentType: mime });
-    if (error) { setUploadProgress(0); return null; }
+    if (error) {
+      setUploadProgress(0);
+      return null;
+    }
     setUploadProgress(80);
     const { data } = supabase.storage.from("exchange-images").getPublicUrl(path);
     setUploadProgress(100);
@@ -151,14 +186,23 @@ export function NewAdWizard({
 
   const goNext = () => {
     const err = validateStep(state.step);
-    if (err) { toast.error(err); return; }
+    if (err) {
+      toast.error(err);
+      return;
+    }
     dispatch({ type: "next" });
   };
 
   const submit = async () => {
-    if (!userId) { toast.error("লগইন করুন"); return; }
+    if (!userId) {
+      toast.error("লগইন করুন");
+      return;
+    }
     const err = validateStep(3);
-    if (err) { toast.error(err); return; }
+    if (err) {
+      toast.error(err);
+      return;
+    }
     setSubmitting(true);
     let imageUrl = state.imageUrl;
     if (state.imageFile && !imageUrl) {
@@ -169,20 +213,26 @@ export function NewAdWizard({
         return;
       }
     }
-    const { data, error } = await supabase.from("exchanges").insert({
-      title: sanitize(state.title),
-      description: sanitizeOptional(state.description),
-      type: state.type!,
-      is_free: state.isFree,
-      price: state.isFree ? null : Number(state.price),
-      unit: state.isFree ? null : state.unit,
-      image_url: imageUrl,
-      district: state.district,
-      upazila: sanitizeOptional(state.upazila),
-      user_id: userId,
-      user_name: sanitize(userName),
-      user_phone: state.phone,
-    }).select("id,created_at,title,description,type,is_free,price,unit,image_url,district,upazila,user_id,user_name,is_active").single();
+    const { data, error } = await supabase
+      .from("exchanges")
+      .insert({
+        title: sanitize(state.title),
+        description: sanitizeOptional(state.description),
+        type: state.type!,
+        is_free: state.isFree,
+        price: state.isFree ? null : Number(state.price),
+        unit: state.isFree ? null : state.unit,
+        image_url: imageUrl,
+        district: state.district,
+        upazila: sanitizeOptional(state.upazila),
+        user_id: userId,
+        user_name: sanitize(userName),
+        user_phone: state.phone,
+      })
+      .select(
+        "id,created_at,title,description,type,is_free,price,unit,image_url,district,upazila,user_id,user_name,is_active",
+      )
+      .single();
     setSubmitting(false);
     if (error || !data) {
       toast.error("সংরক্ষণ ব্যর্থ হয়েছে, আবার চেষ্টা করুন");
@@ -192,16 +242,22 @@ export function NewAdWizard({
     dispatch({ type: "goto", step: 4 });
     try {
       confetti({ particleCount: 120, spread: 75, origin: { y: 0.6 } });
-    } catch { /* no-op */ }
+    } catch {
+      /* no-op */
+    }
   };
 
   return (
-    <BottomSheet open={open} onClose={handleClose} title={state.step === 4 ? undefined : "নতুন বিজ্ঞাপন"}>
+    <BottomSheet
+      open={open}
+      onClose={handleClose}
+      title={state.step === 4 ? undefined : "নতুন বিজ্ঞাপন"}
+    >
       {state.step !== 4 && (
         <div className="flex items-center justify-between mb-4 -mt-2">
           <button
             type="button"
-            onClick={() => state.step > 1 ? dispatch({ type: "prev" }) : handleClose()}
+            onClick={() => (state.step > 1 ? dispatch({ type: "prev" }) : handleClose())}
             className="h-9 w-9 rounded-full bg-muted flex items-center justify-center"
             aria-label="পেছনে"
           >
@@ -225,8 +281,14 @@ export function NewAdWizard({
                   onClick={() => dispatch({ type: "set", patch: { type } })}
                   className={`flex flex-col items-center justify-center gap-2 h-24 rounded-2xl border-2 transition-all ${active ? "border-primary bg-primary/10" : "border-border bg-card"}`}
                 >
-                  <Icon className={`h-8 w-8 ${active ? "text-primary" : "text-muted-foreground"}`} />
-                  <span className={`text-base font-bold ${active ? "text-primary" : "text-foreground"}`}>{label}</span>
+                  <Icon
+                    className={`h-8 w-8 ${active ? "text-primary" : "text-muted-foreground"}`}
+                  />
+                  <span
+                    className={`text-base font-bold ${active ? "text-primary" : "text-foreground"}`}
+                  >
+                    {label}
+                  </span>
                 </button>
               );
             })}
@@ -246,7 +308,9 @@ export function NewAdWizard({
                 <textarea
                   value={state.description}
                   maxLength={300}
-                  onChange={(e) => dispatch({ type: "set", patch: { description: e.target.value } })}
+                  onChange={(e) =>
+                    dispatch({ type: "set", patch: { description: e.target.value } })
+                  }
                   placeholder="পরিমাণ, মান, শর্ত সম্পর্কে লিখুন"
                   rows={3}
                   className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm resize-none"
@@ -254,7 +318,9 @@ export function NewAdWizard({
               </Field>
             </>
           )}
-          <BengaliButton fullWidth onClick={goNext} disabled={!state.type || !state.title.trim()}>পরবর্তী</BengaliButton>
+          <BengaliButton fullWidth onClick={goNext} disabled={!state.type || !state.title.trim()}>
+            পরবর্তী
+          </BengaliButton>
         </div>
       )}
 
@@ -287,7 +353,11 @@ export function NewAdWizard({
                   onChange={(e) => dispatch({ type: "set", patch: { unit: e.target.value } })}
                   className="w-full h-11 px-3 rounded-lg border border-border bg-background text-sm"
                 >
-                  {["কেজি", "মণ", "পিস", "দিন", "লিটার"].map((u) => <option key={u} value={u}>{u}</option>)}
+                  {["কেজি", "মণ", "পিস", "দিন", "লিটার"].map((u) => (
+                    <option key={u} value={u}>
+                      {u}
+                    </option>
+                  ))}
                 </select>
               </Field>
             </div>
@@ -298,7 +368,9 @@ export function NewAdWizard({
                 <img src={state.imagePreview} alt="preview" className="w-full h-48 object-cover" />
                 <button
                   type="button"
-                  onClick={() => dispatch({ type: "set", patch: { imageFile: null, imagePreview: null } })}
+                  onClick={() =>
+                    dispatch({ type: "set", patch: { imageFile: null, imagePreview: null } })
+                  }
                   className="absolute top-2 right-2 h-9 w-9 rounded-full bg-black/60 flex items-center justify-center"
                   aria-label="ছবি সরান"
                 >
@@ -330,11 +402,16 @@ export function NewAdWizard({
             />
             {uploadProgress > 0 && uploadProgress < 100 && (
               <div className="mt-2 h-2 rounded-full bg-muted overflow-hidden">
-                <div className="h-full bg-primary transition-all" style={{ width: `${uploadProgress}%` }} />
+                <div
+                  className="h-full bg-primary transition-all"
+                  style={{ width: `${uploadProgress}%` }}
+                />
               </div>
             )}
           </Field>
-          <BengaliButton fullWidth onClick={goNext}>পরবর্তী</BengaliButton>
+          <BengaliButton fullWidth onClick={goNext}>
+            পরবর্তী
+          </BengaliButton>
         </div>
       )}
 
@@ -344,10 +421,16 @@ export function NewAdWizard({
           <Field label="জেলা">
             <select
               value={state.district}
-              onChange={(e) => dispatch({ type: "set", patch: { district: e.target.value, upazila: "" } })}
+              onChange={(e) =>
+                dispatch({ type: "set", patch: { district: e.target.value, upazila: "" } })
+              }
               className="w-full h-11 px-3 rounded-lg border border-border bg-background text-sm"
             >
-              {DISTRICTS.map((d) => <option key={d} value={d}>{d}</option>)}
+              {DISTRICTS.map((d) => (
+                <option key={d} value={d}>
+                  {d}
+                </option>
+              ))}
             </select>
           </Field>
           <Field label="উপজেলা">
@@ -359,14 +442,18 @@ export function NewAdWizard({
             >
               <option value="">— উপজেলা বেছে নিন —</option>
               {getUpazilas(state.district).map((u) => (
-                <option key={u} value={u}>{u}</option>
+                <option key={u} value={u}>
+                  {u}
+                </option>
               ))}
             </select>
           </Field>
           <Field label="ফোন নম্বর">
             <input
               value={state.phone}
-              onChange={(e) => dispatch({ type: "set", patch: { phone: e.target.value.replace(/\D/g, "") } })}
+              onChange={(e) =>
+                dispatch({ type: "set", patch: { phone: e.target.value.replace(/\D/g, "") } })
+              }
               inputMode="tel"
               maxLength={11}
               placeholder="01XXXXXXXXX"
@@ -378,19 +465,32 @@ export function NewAdWizard({
           <div className="rounded-xl border border-border bg-muted/30 p-3">
             <div className="flex gap-3">
               {state.imagePreview && (
-                <img src={state.imagePreview} alt="" className="h-16 w-16 rounded-lg object-cover" />
+                <img
+                  src={state.imagePreview}
+                  alt=""
+                  className="h-16 w-16 rounded-lg object-cover"
+                />
               )}
               <div className="flex-1 min-w-0">
                 <p className="font-bold text-sm truncate">{state.title}</p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  ধরন: {state.type ? TYPE_LABELS[state.type] : "—"} · মূল্য: {state.isFree ? "বিনামূল্যে" : `৳${state.price}/${state.unit}`}
+                  ধরন: {state.type ? TYPE_LABELS[state.type] : "—"} · মূল্য:{" "}
+                  {state.isFree ? "বিনামূল্যে" : `৳${state.price}/${state.unit}`}
                 </p>
-                <p className="text-xs text-muted-foreground mt-0.5">📍 {state.district}{state.upazila ? `, ${state.upazila}` : ""}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  📍 {state.district}
+                  {state.upazila ? `, ${state.upazila}` : ""}
+                </p>
               </div>
             </div>
           </div>
 
-          <BengaliButton fullWidth loading={submitting} onClick={submit} className="bg-[#22A55F] hover:bg-[#1e9456]">
+          <BengaliButton
+            fullWidth
+            loading={submitting}
+            onClick={submit}
+            className="bg-[#22A55F] hover:bg-[#1e9456]"
+          >
             বিজ্ঞাপন প্রকাশ করুন
           </BengaliButton>
         </div>
@@ -403,17 +503,30 @@ export function NewAdWizard({
           </div>
           <div>
             <h3 className="text-xl font-bold">আপনার বিজ্ঞাপন প্রকাশিত হয়েছে!</h3>
-            <p className="text-sm text-muted-foreground mt-1">কৃষকরা আপনার সাথে যোগাযোগ করতে পারবেন।</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              কৃষকরা আপনার সাথে যোগাযোগ করতে পারবেন।
+            </p>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <BengaliButton
               variant="outline"
               fullWidth
-              onClick={() => dispatch({ type: "reset", defaults: { district: defaultDistrict, upazila: defaultUpazila ?? "", phone: userPhone ?? "" } })}
+              onClick={() =>
+                dispatch({
+                  type: "reset",
+                  defaults: {
+                    district: defaultDistrict,
+                    upazila: defaultUpazila ?? "",
+                    phone: userPhone ?? "",
+                  },
+                })
+              }
             >
               আরো দিন
             </BengaliButton>
-            <BengaliButton fullWidth onClick={handleClose}>তালিকা দেখুন</BengaliButton>
+            <BengaliButton fullWidth onClick={handleClose}>
+              তালিকা দেখুন
+            </BengaliButton>
           </div>
         </div>
       )}

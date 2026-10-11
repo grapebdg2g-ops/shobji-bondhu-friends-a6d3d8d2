@@ -4,7 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 
 type Completion = { plan_id: string; task_id: string };
 
-export const cropCompletionsKey = (userId: string | null) => ["crop-task-completions", userId] as const;
+export const cropCompletionsKey = (userId: string | null) =>
+  ["crop-task-completions", userId] as const;
 
 export function useCropCompletions(userId: string | null) {
   const queryClient = useQueryClient();
@@ -18,7 +19,7 @@ export function useCropCompletions(userId: string | null) {
         .select("plan_id, task_id")
         .eq("user_id", userId!);
       if (error) throw error;
-      return ((data as Completion[] | null) ?? []);
+      return (data as Completion[] | null) ?? [];
     },
     staleTime: 30_000,
   });
@@ -27,21 +28,37 @@ export function useCropCompletions(userId: string | null) {
     if (!userId) return;
     const channel = supabase
       .channel(`crop-completions-${userId}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "crop_task_completions", filter: `user_id=eq.${userId}` }, () => {
-        void queryClient.invalidateQueries({ queryKey });
-      })
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "crop_task_completions",
+          filter: `user_id=eq.${userId}`,
+        },
+        () => {
+          void queryClient.invalidateQueries({ queryKey });
+        },
+      )
       .subscribe();
-    return () => { void supabase.removeChannel(channel); };
+    return () => {
+      void supabase.removeChannel(channel);
+    };
   }, [queryClient, queryKey, userId]);
 
-  const keys = useMemo(() => new Set((query.data ?? []).map((row) => `${row.plan_id}::${row.task_id}`)), [query.data]);
+  const keys = useMemo(
+    () => new Set((query.data ?? []).map((row) => `${row.plan_id}::${row.task_id}`)),
+    [query.data],
+  );
 
   const complete = useMutation({
     mutationFn: async ({ planId, taskId }: { planId: string; taskId: string }) => {
       if (!userId) throw new Error("not-authenticated");
       const { error } = await supabase
         .from("crop_task_completions" as never)
-        .upsert({ user_id: userId, plan_id: planId, task_id: taskId } as never, { onConflict: "user_id,plan_id,task_id" });
+        .upsert({ user_id: userId, plan_id: planId, task_id: taskId } as never, {
+          onConflict: "user_id,plan_id,task_id",
+        });
       if (error) throw error;
       return { plan_id: planId, task_id: taskId };
     },
@@ -49,11 +66,15 @@ export function useCropCompletions(userId: string | null) {
       await queryClient.cancelQueries({ queryKey });
       const previous = queryClient.getQueryData<Completion[]>(queryKey) ?? [];
       if (!previous.some((row) => row.plan_id === planId && row.task_id === taskId)) {
-        queryClient.setQueryData<Completion[]>(queryKey, [...previous, { plan_id: planId, task_id: taskId }]);
+        queryClient.setQueryData<Completion[]>(queryKey, [
+          ...previous,
+          { plan_id: planId, task_id: taskId },
+        ]);
       }
       return { previous };
     },
-    onError: (_error, _value, context) => queryClient.setQueryData(queryKey, context?.previous ?? []),
+    onError: (_error, _value, context) =>
+      queryClient.setQueryData(queryKey, context?.previous ?? []),
     onSettled: () => void queryClient.invalidateQueries({ queryKey }),
   });
 

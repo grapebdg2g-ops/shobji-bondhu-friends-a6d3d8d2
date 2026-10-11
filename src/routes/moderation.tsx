@@ -11,10 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 export const Route = createFileRoute("/moderation")({
   component: ModerationPage,
   head: () => ({
-    meta: [
-      { title: "মডারেশন — কৃষক বন্ধু" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "মডারেশন — কৃষক বন্ধু" }, { name: "robots", content: "noindex" }],
   }),
 });
 
@@ -128,7 +125,10 @@ function ModerationPage() {
 
   return (
     <main className="min-h-screen bg-background pb-20">
-      <header className="px-4 pt-6 pb-6 rounded-b-3xl" style={{ background: "var(--gradient-brand)" }}>
+      <header
+        className="px-4 pt-6 pb-6 rounded-b-3xl"
+        style={{ background: "var(--gradient-brand)" }}
+      >
         <button
           onClick={() => navigate({ to: "/dashboard" })}
           aria-label="ফিরে যান"
@@ -146,7 +146,9 @@ function ModerationPage() {
         <h2 className="text-sm font-bold text-muted-foreground mb-2">সাম্প্রতিক পোস্ট</h2>
         <div className="space-y-2">
           {postsLoading ? (
-            Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-20 rounded-xl" />)
+            Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-20 rounded-xl" />
+            ))
           ) : posts.length === 0 ? (
             <p className="text-xs text-muted-foreground">কোনো পোস্ট নেই</p>
           ) : (
@@ -180,12 +182,17 @@ function ModerationPage() {
         <h2 className="text-sm font-bold text-muted-foreground mb-2">সাম্প্রতিক বিনিময়</h2>
         <div className="space-y-2">
           {exLoading ? (
-            Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-xl" />)
+            Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-16 rounded-xl" />
+            ))
           ) : exchanges.length === 0 ? (
             <p className="text-xs text-muted-foreground">কোনো বিনিময় নেই</p>
           ) : (
             exchanges.map((e) => (
-              <article key={e.id} className="bg-card rounded-xl border border-border p-3 flex items-center gap-2">
+              <article
+                key={e.id}
+                className="bg-card rounded-xl border border-border p-3 flex items-center gap-2"
+              >
                 <div className="min-w-0 flex-1">
                   <p className="text-xs font-bold truncate">{e.title}</p>
                   <p className="text-[11px] text-muted-foreground truncate">

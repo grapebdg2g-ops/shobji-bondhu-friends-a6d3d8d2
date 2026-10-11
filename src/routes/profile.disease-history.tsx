@@ -23,7 +23,10 @@ function DiseaseHistoryPage() {
     (async () => {
       const { data } = await supabase.auth.getSession();
       const id = data.session?.user.id;
-      if (!id) { navigate({ to: "/login" }); return; }
+      if (!id) {
+        navigate({ to: "/login" });
+        return;
+      }
       setUid(id);
     })();
   }, [navigate]);
@@ -47,7 +50,11 @@ function DiseaseHistoryPage() {
       </header>
 
       <div className="px-4 pt-4">
-        {uid ? <DiseaseHistoryView userId={uid} /> : <Skeleton className="h-40 w-full rounded-2xl" />}
+        {uid ? (
+          <DiseaseHistoryView userId={uid} />
+        ) : (
+          <Skeleton className="h-40 w-full rounded-2xl" />
+        )}
       </div>
     </main>
   );

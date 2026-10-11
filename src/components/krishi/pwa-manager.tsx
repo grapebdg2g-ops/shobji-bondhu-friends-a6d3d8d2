@@ -19,7 +19,7 @@ function isPreviewOrIframe() {
   return (
     h.includes("id-preview--") ||
     h.includes("lovableproject.com") ||
-    h.includes("lovable.app") && h.includes("id-preview")
+    (h.includes("lovable.app") && h.includes("id-preview"))
   );
 }
 
@@ -97,12 +97,8 @@ export function PWAManager() {
 
       try {
         const visits = parseInt(localStorage.getItem("visitCount") || "0", 10);
-        const dismissedAt = parseInt(
-          localStorage.getItem("installDismissedAt") || "0",
-          10
-        );
-        const dismissedRecently =
-          dismissedAt && Date.now() - dismissedAt < 7 * 24 * 60 * 60 * 1000;
+        const dismissedAt = parseInt(localStorage.getItem("installDismissedAt") || "0", 10);
+        const dismissedRecently = dismissedAt && Date.now() - dismissedAt < 7 * 24 * 60 * 60 * 1000;
 
         if (visits >= 1 && !dismissedRecently) {
           setShowInstall(true);
@@ -174,9 +170,7 @@ export function PWAManager() {
               <Smartphone className="h-7 w-7" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-foreground">
-                কৃষক বন্ধু ইনস্টল করুন
-              </h3>
+              <h3 className="text-lg font-bold text-foreground">কৃষক বন্ধু ইনস্টল করুন</h3>
               <p className="text-xs text-muted-foreground">হোম স্ক্রিনে যোগ করুন</p>
             </div>
           </div>

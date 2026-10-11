@@ -35,8 +35,11 @@ export function CropAdvisoryWidget() {
         const days = Math.max(0, daysSince(p.planting_date));
         const stage = guide.stages.find((s) => days >= s.startDay && days < s.endDay);
         if (!stage || stage.tasks.length === 0) continue;
-        const pendingIndex = stage.tasks.findIndex((_task, index) => !completions.has(`${p.id}::${stage.id}::${index}`));
-        if (pendingIndex >= 0) urgent.push({ plan: p, task: stage.tasks[pendingIndex], stageName: stage.name });
+        const pendingIndex = stage.tasks.findIndex(
+          (_task, index) => !completions.has(`${p.id}::${stage.id}::${index}`),
+        );
+        if (pendingIndex >= 0)
+          urgent.push({ plan: p, task: stage.tasks[pendingIndex], stageName: stage.name });
         if (urgent.length >= 2) break;
       }
       setItems(urgent);
@@ -52,7 +55,14 @@ export function CropAdvisoryWidget() {
         <h2 className="text-base font-bold text-gray-900 inline-flex items-center gap-1.5">
           <ClipboardList className="h-5 w-5 text-emerald-600" /> আজকের ফসল পরামর্শ
         </h2>
-        <div className="flex items-center gap-3"><Link to="/crop-diary" className="text-emerald-600 text-sm font-semibold">ডায়েরি</Link><Link to="/crop-guide" className="text-emerald-600 text-sm font-semibold">সব দেখুন</Link></div>
+        <div className="flex items-center gap-3">
+          <Link to="/crop-diary" className="text-emerald-600 text-sm font-semibold">
+            ডায়েরি
+          </Link>
+          <Link to="/crop-guide" className="text-emerald-600 text-sm font-semibold">
+            সব দেখুন
+          </Link>
+        </div>
       </div>
       <div className="space-y-2">
         {items.map(({ plan, task, stageName }) => {
@@ -66,9 +76,13 @@ export function CropAdvisoryWidget() {
               className="block bg-white rounded-2xl p-3.5 shadow-sm ring-1 ring-emerald-100 active:scale-[0.99] transition"
             >
               <div className="flex items-center gap-3">
-                <span className="text-3xl"><CropIcon crop={plan.crop_type} /></span>
+                <span className="text-3xl">
+                  <CropIcon crop={plan.crop_type} />
+                </span>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs text-emerald-700 font-semibold">{plan.crop_type} · {stageName} · {toBn(days)} দিন</p>
+                  <p className="text-xs text-emerald-700 font-semibold">
+                    {plan.crop_type} · {stageName} · {toBn(days)} দিন
+                  </p>
                   <p className="text-sm font-bold text-gray-900 truncate">{task.title}</p>
                 </div>
                 <ChevronRight className="h-5 w-5 text-gray-400 shrink-0" />

@@ -6,7 +6,9 @@ import { usePushNotifications } from "@/hooks/use-push-notifications";
 export function NotificationToggle() {
   const { status, supported, busy, enable, disable } = usePushNotifications();
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Render a stable, SSR-safe placeholder until client mount to avoid hydration mismatch.
   if (!mounted || status === "loading") {
@@ -26,7 +28,6 @@ export function NotificationToggle() {
       </div>
     );
   }
-
 
   if (status === "denied") {
     return (

@@ -5,7 +5,13 @@ import logo from "@/assets/logo.webp";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { DISTRICTS, CROPS, getUpazilas } from "@/lib/bd-data";
 import { toast } from "sonner";
@@ -40,10 +46,16 @@ function RegisterPage() {
       return toast.error("সব তথ্য পূরণ করুন");
     }
     setSaving(true);
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) return navigate({ to: "/login" });
     const { error } = await supabase.from("profiles").upsert({
-      id: user.id, name, district, upazila, crops,
+      id: user.id,
+      name,
+      district,
+      upazila,
+      crops,
     });
     if (error) {
       setSaving(false);
@@ -58,9 +70,19 @@ function RegisterPage() {
 
   return (
     <main className="min-h-screen bg-background">
-      <header className="flex items-center gap-3 px-6 pt-10 pb-6" style={{ background: "var(--gradient-brand)" }}>
+      <header
+        className="flex items-center gap-3 px-6 pt-10 pb-6"
+        style={{ background: "var(--gradient-brand)" }}
+      >
         <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/15 ring-2 ring-white/20 overflow-hidden">
-          <img src={logo} alt="কৃষক বন্ধু লোগো" width={40} height={40} decoding="async" className="h-10 w-10 object-contain" />
+          <img
+            src={logo}
+            alt="কৃষক বন্ধু লোগো"
+            width={40}
+            height={40}
+            decoding="async"
+            className="h-10 w-10 object-contain"
+          />
         </div>
         <div>
           <h1 className="text-xl font-bold text-white">নিবন্ধন করুন</h1>
@@ -70,20 +92,37 @@ function RegisterPage() {
 
       <form onSubmit={submit} className="px-6 py-6 space-y-5 max-w-md mx-auto">
         <div>
-          <Label htmlFor="name" className="text-base font-semibold">আপনার নাম</Label>
-          <Input id="name" required value={name} onChange={(e) => setName(e.target.value)}
-            className="h-13 text-base mt-1.5" placeholder="পূর্ণ নাম লিখুন" />
+          <Label htmlFor="name" className="text-base font-semibold">
+            আপনার নাম
+          </Label>
+          <Input
+            id="name"
+            required
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="h-13 text-base mt-1.5"
+            placeholder="পূর্ণ নাম লিখুন"
+          />
         </div>
 
         <div>
           <Label className="text-base font-semibold">জেলা</Label>
           <Select
             value={district}
-            onValueChange={(v) => { setDistrict(v); setUpazila(""); }}
+            onValueChange={(v) => {
+              setDistrict(v);
+              setUpazila("");
+            }}
           >
-            <SelectTrigger className="h-13 text-base mt-1.5"><SelectValue placeholder="জেলা নির্বাচন করুন" /></SelectTrigger>
+            <SelectTrigger className="h-13 text-base mt-1.5">
+              <SelectValue placeholder="জেলা নির্বাচন করুন" />
+            </SelectTrigger>
             <SelectContent className="max-h-72">
-              {DISTRICTS.map((d) => <SelectItem key={d} value={d} className="text-base">{d}</SelectItem>)}
+              {DISTRICTS.map((d) => (
+                <SelectItem key={d} value={d} className="text-base">
+                  {d}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -96,7 +135,9 @@ function RegisterPage() {
             </SelectTrigger>
             <SelectContent className="max-h-72">
               {getUpazilas(district).map((u) => (
-                <SelectItem key={u} value={u} className="text-base">{u}</SelectItem>
+                <SelectItem key={u} value={u} className="text-base">
+                  {u}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>

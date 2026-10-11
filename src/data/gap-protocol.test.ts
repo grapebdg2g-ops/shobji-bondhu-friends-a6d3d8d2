@@ -3,7 +3,22 @@ import assert from "node:assert/strict";
 import { GAP_CROPS, buildGapTasks, isSprayAllowedUnderGap } from "./gap-protocol";
 import { getAllCrops } from "./master-crop-data";
 
-const REQUESTED = ["টমেটো", "বেগুন", "শসা", "মরিচ", "ক্যাপসিকাম", "আলু", "লাউ", "মিষ্টি কুমড়া", "বাঁধাকপি", "ফুলকপি", "ব্রকলি", "বরবটি", "শিম", "করলা"];
+const REQUESTED = [
+  "টমেটো",
+  "বেগুন",
+  "শসা",
+  "মরিচ",
+  "ক্যাপসিকাম",
+  "আলু",
+  "লাউ",
+  "মিষ্টি কুমড়া",
+  "বাঁধাকপি",
+  "ফুলকপি",
+  "ব্রকলি",
+  "বরবটি",
+  "শিম",
+  "করলা",
+];
 
 test("every requested GAP crop exists in master catalog and has a GAP profile", () => {
   const names = new Set(getAllCrops().map((c) => c.name));

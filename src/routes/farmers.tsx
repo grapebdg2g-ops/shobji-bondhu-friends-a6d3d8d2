@@ -14,7 +14,10 @@ export const Route = createFileRoute("/farmers")({
       { title: "সকল কৃষক — কৃষক বন্ধু" },
       { name: "description", content: "কৃষক বন্ধুতে নিবন্ধিত কৃষকদের খুঁজুন এবং সংযুক্ত হন।" },
       { property: "og:title", content: "সকল কৃষক — কৃষক বন্ধু" },
-      { property: "og:description", content: "কৃষক বন্ধুতে নিবন্ধিত কৃষকদের ফসল দেখে খুঁজুন এবং সংযুক্ত হন।" },
+      {
+        property: "og:description",
+        content: "কৃষক বন্ধুতে নিবন্ধিত কৃষকদের ফসল দেখে খুঁজুন এবং সংযুক্ত হন।",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -111,9 +114,7 @@ function FarmersPage() {
       <header className="rounded-b-[30px] bg-primary px-4 pb-7 pt-8 text-primary-foreground sm:px-6">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-[11px] font-extrabold uppercase">
-              কৃষক নেটওয়ার্ক
-            </p>
+            <p className="text-[11px] font-extrabold uppercase">কৃষক নেটওয়ার্ক</p>
             <h1 className="mt-1 text-2xl font-black">সকল কৃষক</h1>
             <p className="mt-2 max-w-sm text-sm leading-relaxed">
               বাংলাদেশের কৃষকদের খুঁজুন, সংযোগ তৈরি করুন এবং একসঙ্গে চাষাবাদ শিখুন।

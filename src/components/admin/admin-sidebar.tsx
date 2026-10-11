@@ -60,9 +60,7 @@ export function AdminSidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
                   to={it.to as never}
                   onClick={onNavigate}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
-                    active
-                      ? "bg-purple-100 text-purple-800"
-                      : "text-gray-700 hover:bg-gray-50"
+                    active ? "bg-purple-100 text-purple-800" : "text-gray-700 hover:bg-gray-50"
                   }`}
                 >
                   <it.icon className="h-4 w-4 shrink-0" />

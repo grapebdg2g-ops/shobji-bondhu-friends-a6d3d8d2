@@ -28,11 +28,16 @@ type State = {
   preview: string | null;
 };
 
-type Action =
-  | { type: "set"; patch: Partial<State> }
-  | { type: "reset" };
+type Action = { type: "set"; patch: Partial<State> } | { type: "reset" };
 
-const initial: State = { step: 1, type: null, content: "", crop: "সব ফসল", imageFile: null, preview: null };
+const initial: State = {
+  step: 1,
+  type: null,
+  content: "",
+  crop: "সব ফসল",
+  imageFile: null,
+  preview: null,
+};
 function reducer(s: State, a: Action): State {
   if (a.type === "reset") return initial;
   return { ...s, ...a.patch };
@@ -40,7 +45,10 @@ function reducer(s: State, a: Action): State {
 
 function reportPrices(kind: "post" | "comment", id: string) {
   void capturePricesFromContent({ data: { kind, id } })
-    .then((r) => { if (r.added > 0) toast.success(`আপনার জানানো দাম বাজারদরে যোগ হয়েছে: ${(r.products ?? []).join(", ")}`); })
+    .then((r) => {
+      if (r.added > 0)
+        toast.success(`আপনার জানানো দাম বাজারদরে যোগ হয়েছে: ${(r.products ?? []).join(", ")}`);
+    })
     .catch(() => {});
 }
 
@@ -58,7 +66,10 @@ export function CreatePostSheet({
   const [submitting, setSubmitting] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const close = () => { dispatch({ type: "reset" }); onClose(); };
+  const close = () => {
+    dispatch({ type: "reset" });
+    onClose();
+  };
 
   const onFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
@@ -73,17 +84,28 @@ export function CreatePostSheet({
   };
 
   const submit = async () => {
-    if (!user) { toast.error("পোস্ট করতে লগইন করুন"); return; }
+    if (!user) {
+      toast.error("পোস্ট করতে লগইন করুন");
+      return;
+    }
     if (!s.type) return;
     const text = sanitize(s.content);
-    if (!text) { toast.error("কিছু লিখুন"); return; }
-    if (text.length > 500) { toast.error("৫০০ অক্ষরের মধ্যে রাখুন"); return; }
+    if (!text) {
+      toast.error("কিছু লিখুন");
+      return;
+    }
+    if (text.length > 500) {
+      toast.error("৫০০ অক্ষরের মধ্যে রাখুন");
+      return;
+    }
     setSubmitting(true);
 
     let imageUrl: string | null = null;
     if (s.imageFile) {
       const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.jpg`;
-      const { error: upErr } = await supabase.storage.from("feed-images").upload(path, s.imageFile, { contentType: "image/jpeg" });
+      const { error: upErr } = await supabase.storage
+        .from("feed-images")
+        .upload(path, s.imageFile, { contentType: "image/jpeg" });
       if (upErr) {
         toast.error("ছবি আপলোড ব্যর্থ");
         setSubmitting(false);
@@ -139,12 +161,16 @@ export function CreatePostSheet({
           <div className="relative">
             <textarea
               value={s.content}
-              onChange={(e) => dispatch({ type: "set", patch: { content: e.target.value.slice(0, 500) } })}
+              onChange={(e) =>
+                dispatch({ type: "set", patch: { content: e.target.value.slice(0, 500) } })
+              }
               placeholder="আপনার মনের কথা লিখুন..."
               rows={4}
               className="w-full p-3 rounded-xl border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
             />
-            <span className="absolute bottom-2 right-3 text-[10px] text-muted-foreground">{s.content.length}/৫০০</span>
+            <span className="absolute bottom-2 right-3 text-[10px] text-muted-foreground">
+              {s.content.length}/৫০০
+            </span>
           </div>
 
           <div>
@@ -167,10 +193,16 @@ export function CreatePostSheet({
             <p className="text-xs font-semibold text-muted-foreground mb-2">ছবি (ঐচ্ছিক)</p>
             {s.preview ? (
               <div className="relative">
-                <img src={s.preview} alt="" className="w-full rounded-xl aspect-[4/3] object-cover" />
+                <img
+                  src={s.preview}
+                  alt=""
+                  className="w-full rounded-xl aspect-[4/3] object-cover"
+                />
                 <button
                   type="button"
-                  onClick={() => dispatch({ type: "set", patch: { imageFile: null, preview: null } })}
+                  onClick={() =>
+                    dispatch({ type: "set", patch: { imageFile: null, preview: null } })
+                  }
                   className="absolute top-2 right-2 h-8 w-8 rounded-full bg-black/60 text-white flex items-center justify-center"
                   aria-label="মুছুন"
                 >
@@ -187,12 +219,26 @@ export function CreatePostSheet({
                 <span className="text-xs">ছবি যোগ করুন</span>
               </button>
             )}
-            <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onFile} />
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={onFile}
+            />
           </div>
 
           <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <span>জেলা: <span className="font-semibold text-foreground">{user?.district ?? "—"}</span></span>
-            <button type="button" onClick={() => dispatch({ type: "set", patch: { step: 1 } })} className="font-semibold">← আগে</button>
+            <span>
+              জেলা: <span className="font-semibold text-foreground">{user?.district ?? "—"}</span>
+            </span>
+            <button
+              type="button"
+              onClick={() => dispatch({ type: "set", patch: { step: 1 } })}
+              className="font-semibold"
+            >
+              ← আগে
+            </button>
           </div>
 
           <button

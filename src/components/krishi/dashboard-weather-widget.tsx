@@ -1,7 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Link } from "@tanstack/react-router";
-import { AlertTriangle, ArrowRight, CheckCircle2, Lightbulb, MapPin, Navigation, RefreshCw, ShieldAlert } from "lucide-react";
+import {
+  AlertTriangle,
+  ArrowRight,
+  CheckCircle2,
+  Lightbulb,
+  MapPin,
+  Navigation,
+  RefreshCw,
+  ShieldAlert,
+} from "lucide-react";
 import { getWeatherForecast } from "@/lib/weather.functions";
 import { weatherCodeBn } from "@/lib/weather-rules";
 import { useGeolocation } from "@/hooks/use-geolocation";
@@ -9,8 +18,7 @@ import type { Forecast, DailyPoint, CurrentWeather } from "@/lib/weather-types";
 
 const BN_DAYS = ["রবি", "সোম", "মঙ্গল", "বুধ", "বৃহঃ", "শুক্র", "শনি"];
 
-const toBn = (n: number | string) =>
-  String(n).replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[Number(d)]);
+const toBn = (n: number | string) => String(n).replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[Number(d)]);
 
 function weatherEmoji(code: number): string {
   if (code === 0) return "☀️";
@@ -26,25 +34,34 @@ function weatherEmoji(code: number): string {
   return "🌤️";
 }
 
-function farmingAdvice(c: CurrentWeather, today: DailyPoint | undefined): {
+function farmingAdvice(
+  c: CurrentWeather,
+  today: DailyPoint | undefined,
+): {
   text: string;
   tone: "good" | "warn" | "danger";
 } {
   if (c.weather_code === 95 || c.weather_code >= 96)
     return { text: "⛈️ বজ্রপাতের সম্ভাবনা — মাঠে যাবেন না", tone: "danger" };
-  if (c.wind_speed > 30)
-    return { text: "💨 ঝড়ো বাতাস — ফসল বেঁধে রাখুন", tone: "danger" };
+  if (c.wind_speed > 30) return { text: "💨 ঝড়ো বাতাস — ফসল বেঁধে রাখুন", tone: "danger" };
   const rainProb = Math.max(c.precipitation_prob, today?.precipitation_probability_max ?? 0);
   if (rainProb > 70)
     return { text: "⚠️ আজ সেচ দেওয়ার প্রয়োজন নেই — বৃষ্টির সম্ভাবনা", tone: "warn" };
-  if (c.temperature > 35)
-    return { text: "🌡️ গরম বেশি — ফসলে সকালে পানি দিন", tone: "warn" };
+  if (c.temperature > 35) return { text: "🌡️ গরম বেশি — ফসলে সকালে পানি দিন", tone: "warn" };
   return { text: "✅ আজকের আবহাওয়া চাষের জন্য ভালো", tone: "good" };
 }
 
 const tonePresentation: Record<
   "good" | "warn" | "danger",
-  { label: string; badge: string; icon: typeof CheckCircle2; card: string; iconWrap: string; iconColor: string; badgeColor: string }
+  {
+    label: string;
+    badge: string;
+    icon: typeof CheckCircle2;
+    card: string;
+    iconWrap: string;
+    iconColor: string;
+    badgeColor: string;
+  }
 > = {
   good: {
     label: "আবহাওয়া চাষের জন্য ভালো",
@@ -116,7 +133,9 @@ export function DashboardWeatherWidget({
       <section className="w-full px-4 pt-4 sm:px-5 sm:pt-5">
         <div className="rounded-2xl bg-card border border-border p-4 text-sm text-muted-foreground">
           আবহাওয়া তথ্য আনা যায়নি।{" "}
-          <button onClick={() => refetch()} className="text-primary font-semibold">আবার চেষ্টা</button>
+          <button onClick={() => refetch()} className="text-primary font-semibold">
+            আবার চেষ্টা
+          </button>
         </div>
       </section>
     );
@@ -127,9 +146,7 @@ export function DashboardWeatherWidget({
   const today = f.daily[0];
   const advice = farmingAdvice(c, today);
   const usingGps = !!pos;
-  const loc = usingGps
-    ? "আপনার লোকেশন"
-    : upazila ? `${upazila}, ${district}` : district;
+  const loc = usingGps ? "আপনার লোকেশন" : upazila ? `${upazila}, ${district}` : district;
 
   return (
     <section className="w-full space-y-4 px-4 pt-4 sm:space-y-5 sm:px-5 sm:pt-5">
@@ -151,12 +168,20 @@ export function DashboardWeatherWidget({
           <div className="flex min-w-0 items-center gap-1.5 text-sm font-semibold text-foreground">
             <MapPin className="h-4 w-4 shrink-0 text-primary" />
             <span className="truncate">{loc}</span>
-            {usingGps && <span className="shrink-0 rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold text-primary">GPS</span>}
+            {usingGps && (
+              <span className="shrink-0 rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold text-primary">
+                GPS
+              </span>
+            )}
           </div>
           <div className="ml-auto flex shrink-0 items-center gap-2.5">
             {!usingGps && geoStatus !== "loading" && (
               <button
-                onClick={(e) => { e.preventDefault(); e.stopPropagation(); requestGeo(); }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  requestGeo();
+                }}
                 aria-label="লাইভ লোকেশন"
                 className="flex items-center gap-1 rounded-full px-2 py-1 text-xs font-semibold text-primary transition hover:bg-primary/10"
               >
@@ -164,7 +189,11 @@ export function DashboardWeatherWidget({
               </button>
             )}
             <button
-              onClick={(e) => { e.preventDefault(); e.stopPropagation(); refetch(); }}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                refetch();
+              }}
               aria-label="আপডেট"
               className="flex items-center gap-1 rounded-full px-2 py-1 text-xs text-muted-foreground transition hover:bg-muted"
             >
@@ -179,11 +208,25 @@ export function DashboardWeatherWidget({
             {weatherEmoji(c.weather_code)}
           </div>
           <div className="grid min-w-0 grid-cols-2 gap-x-3 gap-y-1 text-xs sm:grid-cols-2 sm:text-sm">
-            <div className="col-span-2 truncate font-semibold text-muted-foreground">{weatherCodeBn(c.weather_code)}</div>
-            <div><span className="text-muted-foreground">তাপমাত্রা:</span> <span className="font-bold">{toBn(Math.round(c.temperature))}°C</span></div>
-            <div><span className="text-muted-foreground">আর্দ্রতা:</span> <span className="font-bold">{toBn(Math.round(c.humidity))}%</span></div>
-            <div><span className="text-muted-foreground">বাতাস:</span> <span className="font-bold">{toBn(Math.round(c.wind_speed))} km/h</span></div>
-            <div><span className="text-muted-foreground">বৃষ্টি:</span> <span className="font-bold">{toBn(c.precipitation_prob)}%</span></div>
+            <div className="col-span-2 truncate font-semibold text-muted-foreground">
+              {weatherCodeBn(c.weather_code)}
+            </div>
+            <div>
+              <span className="text-muted-foreground">তাপমাত্রা:</span>{" "}
+              <span className="font-bold">{toBn(Math.round(c.temperature))}°C</span>
+            </div>
+            <div>
+              <span className="text-muted-foreground">আর্দ্রতা:</span>{" "}
+              <span className="font-bold">{toBn(Math.round(c.humidity))}%</span>
+            </div>
+            <div>
+              <span className="text-muted-foreground">বাতাস:</span>{" "}
+              <span className="font-bold">{toBn(Math.round(c.wind_speed))} km/h</span>
+            </div>
+            <div>
+              <span className="text-muted-foreground">বৃষ্টি:</span>{" "}
+              <span className="font-bold">{toBn(c.precipitation_prob)}%</span>
+            </div>
           </div>
         </div>
 
@@ -194,10 +237,15 @@ export function DashboardWeatherWidget({
               const date = new Date(d.date);
               const label = i === 0 ? "আজ" : i === 1 ? "কাল" : BN_DAYS[date.getDay()];
               return (
-                <div key={d.date} className="min-w-0 rounded-xl bg-muted/30 px-1 py-2 text-center sm:py-2.5">
+                <div
+                  key={d.date}
+                  className="min-w-0 rounded-xl bg-muted/30 px-1 py-2 text-center sm:py-2.5"
+                >
                   <p className="truncate text-[10px] font-semibold sm:text-xs">{label}</p>
                   <p className="text-xl leading-7 sm:text-2xl">{weatherEmoji(d.weather_code)}</p>
-                  <p className="text-[11px] font-bold sm:text-xs">{toBn(Math.round(d.temp_max))}°</p>
+                  <p className="text-[11px] font-bold sm:text-xs">
+                    {toBn(Math.round(d.temp_max))}°
+                  </p>
                 </div>
               );
             })}
@@ -217,18 +265,30 @@ export function DashboardWeatherWidget({
             className={`home-rise-in rounded-[22px] border p-3.5 shadow-[var(--shadow-card)] sm:p-4 ${presentation.card}`}
           >
             <div className="flex items-start gap-3">
-              <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ${presentation.iconWrap}`}>
+              <span
+                className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ${presentation.iconWrap}`}
+              >
                 <AdviceIcon className={`h-5 w-5 ${presentation.iconColor}`} strokeWidth={2.4} />
               </span>
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <p className="text-[11px] font-extrabold uppercase tracking-[0.1em] text-muted-foreground">আজকের কৃষি পরামর্শ</p>
-                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-extrabold ${presentation.badgeColor}`}>{presentation.badge}</span>
+                  <p className="text-[11px] font-extrabold uppercase tracking-[0.1em] text-muted-foreground">
+                    আজকের কৃষি পরামর্শ
+                  </p>
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-[10px] font-extrabold ${presentation.badgeColor}`}
+                  >
+                    {presentation.badge}
+                  </span>
                 </div>
-                <h3 className="mt-1 text-sm font-extrabold leading-snug text-foreground sm:text-base">{presentation.label}</h3>
+                <h3 className="mt-1 text-sm font-extrabold leading-snug text-foreground sm:text-base">
+                  {presentation.label}
+                </h3>
                 <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{adviceTitle}</p>
               </div>
-              <Lightbulb className={`mt-1 hidden h-4 w-4 shrink-0 sm:block ${presentation.iconColor}`} />
+              <Lightbulb
+                className={`mt-1 hidden h-4 w-4 shrink-0 sm:block ${presentation.iconColor}`}
+              />
             </div>
             <Link
               to="/weather"

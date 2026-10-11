@@ -1,6 +1,11 @@
 export function Avatar({ name, url }: { name: string; url: string | null }) {
   return url ? (
-    <img src={url} alt={name} className="h-10 w-10 shrink-0 rounded-full object-cover" loading="lazy" />
+    <img
+      src={url}
+      alt={name}
+      className="h-10 w-10 shrink-0 rounded-full object-cover"
+      loading="lazy"
+    />
   ) : (
     <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary font-black text-primary">
       {name.charAt(0) || "ক"}
@@ -17,7 +22,10 @@ export function FriendPicker({
   picked: string[];
   setPicked: (v: string[]) => void;
 }) {
-  if (!friends.length) return <p className="py-6 text-center text-sm text-muted-foreground">যোগ করার মতো কোনো বন্ধু নেই</p>;
+  if (!friends.length)
+    return (
+      <p className="py-6 text-center text-sm text-muted-foreground">যোগ করার মতো কোনো বন্ধু নেই</p>
+    );
   return (
     <div className="max-h-[50vh] divide-y divide-border overflow-y-auto">
       {friends.map((f) => {

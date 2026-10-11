@@ -36,20 +36,14 @@ function AuditPage() {
     queryKey: ["admin", "audit", "admins", adminIds.join(",")],
     enabled: adminIds.length > 0,
     queryFn: async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("id, name")
-        .in("id", adminIds);
+      const { data } = await supabase.from("profiles").select("id, name").in("id", adminIds);
       return data ?? [];
     },
   });
 
   const nameOf = (id: string) => admins.find((a) => a.id === id)?.name || id.slice(0, 8);
 
-  const types = useMemo(
-    () => Array.from(new Set(actions.map((a) => a.action_type))),
-    [actions],
-  );
+  const types = useMemo(() => Array.from(new Set(actions.map((a) => a.action_type))), [actions]);
 
   const filtered = useMemo(() => {
     const t = q.trim().toLowerCase();
@@ -104,23 +98,27 @@ function AuditPage() {
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
-        {isLoading && <div className="p-3"><Skeleton className="h-20 w-full" /></div>}
+        {isLoading && (
+          <div className="p-3">
+            <Skeleton className="h-20 w-full" />
+          </div>
+        )}
         {!isLoading && filtered.length === 0 && (
           <p className="text-center text-gray-400 py-10 text-sm">কোনো লগ নেই</p>
         )}
         {filtered.map((a) => (
           <div key={a.id} className="p-3">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${actionColor(a.action_type)}`}>
+              <span
+                className={`text-[10px] font-bold px-2 py-0.5 rounded ${actionColor(a.action_type)}`}
+              >
                 {a.action_type}
               </span>
               <p className="text-xs text-gray-500">
                 {nameOf(a.admin_id)} • {format(new Date(a.created_at), "d MMM, HH:mm")}
               </p>
             </div>
-            {a.target_id && (
-              <p className="text-[11px] text-gray-400 mt-1">Target: {a.target_id}</p>
-            )}
+            {a.target_id && <p className="text-[11px] text-gray-400 mt-1">Target: {a.target_id}</p>}
             {a.details && Object.keys(a.details as object).length > 0 && (
               <pre className="mt-1 text-[11px] bg-gray-50 rounded p-2 text-gray-600 overflow-x-auto">
                 {JSON.stringify(a.details, null, 2)}

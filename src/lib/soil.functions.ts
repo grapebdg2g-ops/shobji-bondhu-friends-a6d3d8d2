@@ -65,19 +65,17 @@ export type SoilAnalysisResult = {
   warnings: string[];
 };
 
-
 // ── Deterministic agronomy helpers ───────────────────────
 
 const UNIT_TO_BIGHA: Record<string, number> = {
-  "শতক": 1 / 33,
-  "বিঘা": 1,
-  "একর": 3.03,
-  "হেক্টর": 7.48,
+  শতক: 1 / 33,
+  বিঘা: 1,
+  একর: 3.03,
+  হেক্টর: 7.48,
 };
 
 const BN_DIGITS = "০১২৩৪৫৬৭৮৯";
-const toBn = (v: number | string) =>
-  String(v).replace(/\d/g, (d) => BN_DIGITS[Number(d)]);
+const toBn = (v: number | string) => String(v).replace(/\d/g, (d) => BN_DIGITS[Number(d)]);
 
 const round1 = (n: number) => Math.round(n * 10) / 10;
 
@@ -89,12 +87,25 @@ function phInfo(ph?: number) {
       penalty: 8,
     };
   }
-  if (ph < 5.0) return { label: "তীব্র অম্লীয়", advice: "চুন প্রয়োগ ছাড়া অধিকাংশ ফসলে ফলন কমবে।", penalty: 30 };
-  if (ph < 5.5) return { label: "অম্লীয়", advice: "ডলোচুন প্রয়োগ করে pH ৬.০–৬.৫ এ আনুন।", penalty: 20 };
-  if (ph < 6.0) return { label: "সামান্য অম্লীয়", advice: "হালকা চুন ও জৈব সার দিলেই যথেষ্ট।", penalty: 8 };
-  if (ph <= 7.5) return { label: "উপযুক্ত", advice: "pH আদর্শ মাত্রায় আছে, বজায় রাখুন।", penalty: 0 };
-  if (ph <= 8.5) return { label: "ক্ষারীয়", advice: "জিপসাম ও জৈব সার প্রয়োগে ক্ষারত্ব কমান।", penalty: 18 };
-  return { label: "তীব্র ক্ষারীয়", advice: "জিপসাম প্রয়োগ ও পর্যাপ্ত সেচে লবণ ধুয়ে ফেলুন।", penalty: 28 };
+  if (ph < 5.0)
+    return {
+      label: "তীব্র অম্লীয়",
+      advice: "চুন প্রয়োগ ছাড়া অধিকাংশ ফসলে ফলন কমবে।",
+      penalty: 30,
+    };
+  if (ph < 5.5)
+    return { label: "অম্লীয়", advice: "ডলোচুন প্রয়োগ করে pH ৬.০–৬.৫ এ আনুন।", penalty: 20 };
+  if (ph < 6.0)
+    return { label: "সামান্য অম্লীয়", advice: "হালকা চুন ও জৈব সার দিলেই যথেষ্ট।", penalty: 8 };
+  if (ph <= 7.5)
+    return { label: "উপযুক্ত", advice: "pH আদর্শ মাত্রায় আছে, বজায় রাখুন।", penalty: 0 };
+  if (ph <= 8.5)
+    return { label: "ক্ষারীয়", advice: "জিপসাম ও জৈব সার প্রয়োগে ক্ষারত্ব কমান।", penalty: 18 };
+  return {
+    label: "তীব্র ক্ষারীয়",
+    advice: "জিপসাম প্রয়োগ ও পর্যাপ্ত সেচে লবণ ধুয়ে ফেলুন।",
+    penalty: 28,
+  };
 }
 
 function limeRecommendation(soilType: string, ph?: number) {
@@ -102,7 +113,8 @@ function limeRecommendation(soilType: string, ph?: number) {
     return {
       needed: false,
       amount: "প্রয়োজন নেই",
-      note: ph == null ? "pH জানা গেলে সঠিক চুনের পরিমাণ বলা যাবে।" : "মাটির pH সহনীয় মাত্রায় আছে।",
+      note:
+        ph == null ? "pH জানা গেলে সঠিক চুনের পরিমাণ বলা যাবে।" : "মাটির pH সহনীয় মাত্রায় আছে।",
     };
   }
   const base = ph < 5.0 ? 120 : ph < 5.5 ? 80 : 45; // kg/বিঘা
@@ -117,8 +129,14 @@ function limeRecommendation(soilType: string, ph?: number) {
 
 // ── লবণাক্ততা (EC) ───────────────────────────────────────
 const SALT_TOLERANT_CROPS = [
-  "বার্লি", "সরিষা", "সূর্যমুখী", "খেসারি", "গম (বিনা গম-১)",
-  "লবণসহিষ্ণু ধান (ব্রি ধান৪৭/৬৭/৯৭/৯৯)", "মিষ্টি আলু", "টমেটো (BINA টমেটো-১০)",
+  "বার্লি",
+  "সরিষা",
+  "সূর্যমুখী",
+  "খেসারি",
+  "গম (বিনা গম-১)",
+  "লবণসহিষ্ণু ধান (ব্রি ধান৪৭/৬৭/৯৭/৯৯)",
+  "মিষ্টি আলু",
+  "টমেটো (BINA টমেটো-১০)",
 ];
 
 function salinityInfo(ec?: number): SoilAnalysisResult["salinity"] {
@@ -181,8 +199,7 @@ function salinityInfo(ec?: number): SoilAnalysisResult["salinity"] {
     value: ec,
     label: "তীব্র লবণাক্ত",
     severity: "high",
-    advice:
-      "সাধারণ ফসল টিকবে না। আগে লবণ ধোয়ানো ও জিপসাম প্রয়োগ করে মাটি সংশোধন করতে হবে।",
+    advice: "সাধারণ ফসল টিকবে না। আগে লবণ ধোয়ানো ও জিপসাম প্রয়োগ করে মাটি সংশোধন করতে হবে।",
     actions: [
       "প্রতি বিঘায় ১২০–১৫০ কেজি জিপসাম প্রয়োগ করে ভালোভাবে চাষ দিন, তারপর পানি দিয়ে ধুয়ে নিন।",
       "টানা ২–৩ দফা লিচিং করে নিকাশ নালা দিয়ে লবণ পানি বের করে দিন।",
@@ -243,8 +260,7 @@ function secondaryNutrientPlan(data: z.infer<typeof SoilInputSchema>, bigha: num
       note:
         (ph != null && ph < 6.0
           ? "চুন হিসেবে ডলোচুন নিলে অতিরিক্ত ম্যাগনেসিয়াম এমনিতেই মিলবে। "
-          : "") +
-        "শেষ চাষের সময় বেসাল দিন; পাতা হলুদ হলে ২% ম্যাগনেসিয়াম সালফেট স্প্রে করুন।",
+          : "") + "শেষ চাষের সময় বেসাল দিন; পাতা হলুদ হলে ২% ম্যাগনেসিয়াম সালফেট স্প্রে করুন।",
     });
   }
 
@@ -260,7 +276,6 @@ function secondaryNutrientPlan(data: z.infer<typeof SoilInputSchema>, bigha: num
 
   return items;
 }
-
 
 const LEVEL_FACTOR: Record<string, number> = { low: 1.25, medium: 1, high: 0.75 };
 
@@ -463,7 +478,8 @@ function fallbackNarrative(
       : data.soilType.includes("এঁটেল")
         ? ["ধান", "পাট", "গম", "ভুট্টা"]
         : ["ধান", "টমেটো", "আলু", "বেগুন", "মরিচ", "ফুলকপি"],
-    warnings: ph.penalty >= 18 ? ["pH সংশোধন না করে অতিরিক্ত রাসায়নিক সার দিলে অর্থ অপচয় হবে।"] : [],
+    warnings:
+      ph.penalty >= 18 ? ["pH সংশোধন না করে অতিরিক্ত রাসায়নিক সার দিলে অর্থ অপচয় হবে।"] : [],
   };
 }
 
@@ -479,7 +495,8 @@ export const analyzeSoil = createServerFn({ method: "POST" })
     const secondaryNutrients = secondaryNutrientPlan(data, bigha);
 
     const narrative =
-      (await callGeminiNarrative(data, score, ph, lime, doses)) ?? fallbackNarrative(data, score, ph);
+      (await callGeminiNarrative(data, score, ph, lime, doses)) ??
+      fallbackNarrative(data, score, ph);
 
     const timings: Record<string, string> = Object.fromEntries(doses.map((d) => [d.name, d.note]));
 
@@ -505,7 +522,9 @@ export const analyzeSoil = createServerFn({ method: "POST" })
       },
       suitableCrops:
         salinity.severity === "high" || salinity.severity === "moderate"
-          ? Array.from(new Set([...salinity.tolerantCrops, ...(narrative.suitableCrops ?? [])])).slice(0, 10)
+          ? Array.from(
+              new Set([...salinity.tolerantCrops, ...(narrative.suitableCrops ?? [])]),
+            ).slice(0, 10)
           : (narrative.suitableCrops ?? []),
       warnings: [
         ...(salinity.severity === "high"
@@ -517,7 +536,9 @@ export const analyzeSoil = createServerFn({ method: "POST" })
         ...(matched
           ? []
           : data.plannedCrop
-            ? [`"${data.plannedCrop}" ফসলের নির্দিষ্ট সুপারিশ না থাকায় সাধারণ সবজির মাত্রা ধরা হয়েছে।`]
+            ? [
+                `"${data.plannedCrop}" ফসলের নির্দিষ্ট সুপারিশ না থাকায় সাধারণ সবজির মাত্রা ধরা হয়েছে।`,
+              ]
             : []),
       ],
     };
@@ -656,7 +677,10 @@ ecValue: EC মান ডিএস/মিটার (dS/m) এককে সংখ
           .join("")
           .trim();
         if (!attemptText && attempt === 0) {
-          console.error("Gemini soil extract empty output, retrying", attemptJson?.candidates?.[0]?.finishReason);
+          console.error(
+            "Gemini soil extract empty output, retrying",
+            attemptJson?.candidates?.[0]?.finishReason,
+          );
           continue;
         }
         json = attemptJson;
@@ -668,7 +692,11 @@ ecValue: EC মান ডিএস/মিটার (dS/m) এককে সংখ
       }
     }
     if (!json) {
-      throw new Error(lastStatus ? "ফাইলটি পড়া যায়নি, পরিষ্কার ছবি দিয়ে আবার চেষ্টা করুন।" : "ফাইল বিশ্লেষণে সমস্যা হয়েছে, আবার চেষ্টা করুন।");
+      throw new Error(
+        lastStatus
+          ? "ফাইলটি পড়া যায়নি, পরিষ্কার ছবি দিয়ে আবার চেষ্টা করুন।"
+          : "ফাইল বিশ্লেষণে সমস্যা হয়েছে, আবার চেষ্টা করুন।",
+      );
     }
 
     const candidate = json?.candidates?.[0];
@@ -692,7 +720,10 @@ ecValue: EC মান ডিএস/মিটার (dS/m) এককে সংখ
       throw new Error("ফাইল থেকে মাটির তথ্য পাওয়া যায়নি — পরিষ্কার ছবি দিয়ে আবার চেষ্টা করুন।");
     }
 
-    const cleaned = text.replace(/^```(?:json)?/i, "").replace(/```$/, "").trim();
+    const cleaned = text
+      .replace(/^```(?:json)?/i, "")
+      .replace(/```$/, "")
+      .trim();
     const match = cleaned.match(/\{[\s\S]*\}/);
 
     let parsed: any;
@@ -703,9 +734,7 @@ ecValue: EC মান ডিএস/মিটার (dS/m) এককে সংখ
       throw new Error("ফাইল থেকে মাটির তথ্য পাওয়া যায়নি — পরিষ্কার ছবি দিয়ে আবার চেষ্টা করুন।");
     }
 
-
-    const lvl = (v: unknown) =>
-      v === "low" || v === "medium" || v === "high" ? v : undefined;
+    const lvl = (v: unknown) => (v === "low" || v === "medium" || v === "high" ? v : undefined);
     const ph = Number(parsed?.phLevel);
 
     return {
@@ -737,6 +766,8 @@ ecValue: EC মান ডিএস/মিটার (dS/m) এককে সংখ
         ? parsed.notes.filter((n: unknown) => typeof n === "string").slice(0, 5)
         : [],
       confidence:
-        parsed?.confidence === "high" || parsed?.confidence === "low" ? parsed.confidence : "medium",
+        parsed?.confidence === "high" || parsed?.confidence === "low"
+          ? parsed.confidence
+          : "medium",
     };
   });

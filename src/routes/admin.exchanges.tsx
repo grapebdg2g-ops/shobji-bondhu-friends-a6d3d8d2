@@ -63,7 +63,9 @@ function ExchangesPage() {
     onMutate: async ({ id, val }) => {
       await qc.cancelQueries({ queryKey: ["admin", "exchanges"] });
       const previous = qc.getQueryData<any[]>(["admin", "exchanges"]);
-      qc.setQueryData<any[]>(["admin", "exchanges"], (current = []) => current.map((item) => item.id === id ? { ...item, is_active: val } : item));
+      qc.setQueryData<any[]>(["admin", "exchanges"], (current = []) =>
+        current.map((item) => (item.id === id ? { ...item, is_active: val } : item)),
+      );
       return { previous };
     },
     onSuccess: () => {
@@ -113,14 +115,22 @@ function ExchangesPage() {
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
-        {isLoading && <div className="p-3"><Skeleton className="h-20 w-full" /></div>}
+        {isLoading && (
+          <div className="p-3">
+            <Skeleton className="h-20 w-full" />
+          </div>
+        )}
         {!isLoading && filtered.length === 0 && (
           <p className="text-center text-gray-400 py-10 text-sm">কোনো পোস্ট নেই</p>
         )}
         {filtered.map((e) => (
           <div key={e.id} className="p-3 flex items-start gap-3">
             {e.image_url ? (
-              <img src={e.image_url} alt={e.title} className="h-14 w-14 rounded-lg object-cover bg-gray-100 shrink-0" />
+              <img
+                src={e.image_url}
+                alt={e.title}
+                className="h-14 w-14 rounded-lg object-cover bg-gray-100 shrink-0"
+              />
             ) : (
               <div className="h-14 w-14 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">
                 <Repeat2 className="h-5 w-5 text-gray-400" />

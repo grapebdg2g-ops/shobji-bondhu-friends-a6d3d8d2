@@ -1,6 +1,14 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, TrendingUp, TrendingDown, ArrowRight, CheckCircle2, XCircle, Clock } from "lucide-react";
+import {
+  ArrowLeft,
+  TrendingUp,
+  TrendingDown,
+  ArrowRight,
+  CheckCircle2,
+  XCircle,
+  Clock,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/contexts/user-context";
 import { formatDistanceToNow } from "date-fns";
@@ -50,7 +58,9 @@ function HistoryPage() {
     (async () => {
       const { data } = await supabase
         .from("price_predictions")
-        .select("id, product_name, district, prediction_json, was_correct, actual_price, checked_at, created_at")
+        .select(
+          "id, product_name, district, prediction_json, was_correct, actual_price, checked_at, created_at",
+        )
         .eq("user_id", user.id)
         .order("created_at", { ascending: false })
         .limit(50);
@@ -58,7 +68,9 @@ function HistoryPage() {
       setRows((data ?? []) as unknown as Row[]);
       setLoading(false);
     })();
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
   }, [user, userLoading, navigate]);
 
   const stats = useMemo(() => {
@@ -72,7 +84,11 @@ function HistoryPage() {
     <div className="min-h-screen bg-gray-50 pb-20">
       <header className="bg-gradient-to-r from-emerald-600 to-green-700 text-white px-4 py-4 sticky top-0 z-10 shadow">
         <div className="flex items-center gap-3">
-          <button onClick={() => navigate({ to: "/price-prediction", search: {} })} className="p-1 -ml-1" aria-label="ফিরে যান">
+          <button
+            onClick={() => navigate({ to: "/price-prediction", search: {} })}
+            className="p-1 -ml-1"
+            aria-label="ফিরে যান"
+          >
             <ArrowLeft className="w-6 h-6" />
           </button>
           <div className="flex-1">
@@ -85,9 +101,24 @@ function HistoryPage() {
       <div className="p-4 space-y-4">
         {/* Stats grid */}
         <div className="grid grid-cols-3 gap-2">
-          <StatCard label="মোট" value={toBn(stats.total)} suffix="টি" tint="bg-blue-50 text-blue-700" />
-          <StatCard label="সঠিক" value={toBn(stats.correct)} suffix="টি" tint="bg-green-50 text-green-700" />
-          <StatCard label="নির্ভুলতা" value={toBn(stats.accuracy)} suffix="%" tint="bg-purple-50 text-purple-700" />
+          <StatCard
+            label="মোট"
+            value={toBn(stats.total)}
+            suffix="টি"
+            tint="bg-blue-50 text-blue-700"
+          />
+          <StatCard
+            label="সঠিক"
+            value={toBn(stats.correct)}
+            suffix="টি"
+            tint="bg-green-50 text-green-700"
+          />
+          <StatCard
+            label="নির্ভুলতা"
+            value={toBn(stats.accuracy)}
+            suffix="%"
+            tint="bg-purple-50 text-purple-700"
+          />
         </div>
 
         {stats.checked < stats.total && (
@@ -112,7 +143,9 @@ function HistoryPage() {
           </div>
         ) : (
           <div className="space-y-2">
-            {rows.map((r) => <PredictionCard key={r.id} row={r} />)}
+            {rows.map((r) => (
+              <PredictionCard key={r.id} row={r} />
+            ))}
           </div>
         )}
       </div>
@@ -120,12 +153,23 @@ function HistoryPage() {
   );
 }
 
-function StatCard({ label, value, suffix, tint }: { label: string; value: string; suffix: string; tint: string }) {
+function StatCard({
+  label,
+  value,
+  suffix,
+  tint,
+}: {
+  label: string;
+  value: string;
+  suffix: string;
+  tint: string;
+}) {
   return (
     <div className={`rounded-xl border border-gray-200 p-3 text-center ${tint}`}>
       <p className="text-[11px] font-semibold opacity-80">{label}</p>
       <p className="text-2xl font-extrabold leading-none mt-1">
-        {value}<span className="text-xs font-bold opacity-70 ml-0.5">{suffix}</span>
+        {value}
+        <span className="text-xs font-bold opacity-70 ml-0.5">{suffix}</span>
       </p>
     </div>
   );
@@ -140,30 +184,37 @@ function PredictionCard({ row }: { row: Row }) {
   const actualChange = actual != null && current > 0 ? ((actual - current) / current) * 100 : null;
 
   const ago = formatDistanceToNow(new Date(row.created_at), { addSuffix: true, locale: bn });
-  const dirIcon = direction.includes("বাড়") ? <TrendingUp className="w-4 h-4 text-red-600 inline" />
-    : direction.includes("কম") ? <TrendingDown className="w-4 h-4 text-green-600 inline" />
-    : <ArrowRight className="w-4 h-4 text-gray-500 inline" />;
+  const dirIcon = direction.includes("বাড়") ? (
+    <TrendingUp className="w-4 h-4 text-red-600 inline" />
+  ) : direction.includes("কম") ? (
+    <TrendingDown className="w-4 h-4 text-green-600 inline" />
+  ) : (
+    <ArrowRight className="w-4 h-4 text-gray-500 inline" />
+  );
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-3">
       <div className="flex items-center justify-between">
-        <div className="font-bold text-sm">{row.product_name} • {row.district}</div>
+        <div className="font-bold text-sm">
+          {row.product_name} • {row.district}
+        </div>
         <div className="text-[11px] text-gray-500">{ago}</div>
       </div>
 
       <div className="mt-2 text-sm">
-        <span className="text-gray-500">পূর্বাভাস:</span>{" "}
-        {dirIcon} <span className="font-semibold">{direction}</span>{" "}
+        <span className="text-gray-500">পূর্বাভাস:</span> {dirIcon}{" "}
+        <span className="font-semibold">{direction}</span>{" "}
         {pct ? <span className="text-gray-700">{toBn(pct)}%</span> : null}
       </div>
 
       {actual != null ? (
         <div className="mt-1 text-sm">
-          <span className="text-gray-500">বাস্তবে:</span>{" "}
-          ৳{toBn(current.toFixed(0))} → ৳{toBn(actual.toFixed(0))}{" "}
+          <span className="text-gray-500">বাস্তবে:</span> ৳{toBn(current.toFixed(0))} → ৳
+          {toBn(actual.toFixed(0))}{" "}
           {actualChange != null && (
             <span className={actualChange >= 0 ? "text-red-600" : "text-green-600"}>
-              ({actualChange >= 0 ? "+" : ""}{toBn(actualChange.toFixed(1))}%)
+              ({actualChange >= 0 ? "+" : ""}
+              {toBn(actualChange.toFixed(1))}%)
             </span>
           )}
         </div>

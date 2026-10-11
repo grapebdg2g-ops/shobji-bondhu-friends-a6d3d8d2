@@ -1,9 +1,16 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-const expect = (a: unknown) => ({ toBe: (b: unknown) => assert.equal(a, b), toBeNull: () => assert.equal(a, null) });
+const expect = (a: unknown) => ({
+  toBe: (b: unknown) => assert.equal(a, b),
+  toBeNull: () => assert.equal(a, null),
+});
 import { summarize, perUnit } from "./crop-finance";
 
-const r = (entry_type: any, amount: number, is_settled = false) => ({ entry_type, amount, is_settled });
+const r = (entry_type: any, amount: number, is_settled = false) => ({
+  entry_type,
+  amount,
+  is_settled,
+});
 
 describe("crop finance", () => {
   it("credit purchase counts as cost and stays payable until settled", () => {
@@ -17,7 +24,12 @@ describe("crop finance", () => {
     expect(s.receivable).toBe(2000);
   });
   it("withdrawal reduces cash but not profit", () => {
-    const s = summarize([r("capital", 5000), r("income", 3000), r("expense", 1000), r("withdrawal", 2000)]);
+    const s = summarize([
+      r("capital", 5000),
+      r("income", 3000),
+      r("expense", 1000),
+      r("withdrawal", 2000),
+    ]);
     expect(s.profit).toBe(2000);
     expect(s.cashInHand).toBe(5000);
   });

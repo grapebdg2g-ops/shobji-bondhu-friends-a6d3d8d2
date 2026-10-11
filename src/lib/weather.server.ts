@@ -52,13 +52,19 @@ async function fetchForecastInner(lat: number, lng: number): Promise<Forecast> {
   throw lastError ?? new Error("weather unavailable");
 }
 
-async function fetchForecastFromEndpoint(endpoint: string, lat: number, lng: number): Promise<Forecast> {
+async function fetchForecastFromEndpoint(
+  endpoint: string,
+  lat: number,
+  lng: number,
+): Promise<Forecast> {
   const params = new URLSearchParams({
     latitude: lat.toString(),
     longitude: lng.toString(),
-    current: "temperature_2m,weather_code,precipitation_probability,wind_speed_10m,relative_humidity_2m,is_day",
+    current:
+      "temperature_2m,weather_code,precipitation_probability,wind_speed_10m,relative_humidity_2m,is_day",
     hourly: "temperature_2m,precipitation_probability,weather_code",
-    daily: "temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,weather_code",
+    daily:
+      "temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,weather_code",
     timezone: "Asia/Dhaka",
     forecast_days: "7",
   });
@@ -68,7 +74,7 @@ async function fetchForecastFromEndpoint(endpoint: string, lat: number, lng: num
   let lastStatus = 0;
   for (let attempt = 0; attempt < 2; attempt++) {
     try {
-      res = await fetch(url, { headers: { "accept": "application/json" } });
+      res = await fetch(url, { headers: { accept: "application/json" } });
       if (res.ok) break;
       lastStatus = res.status;
       if (res.status === 429) break;
@@ -85,7 +91,7 @@ async function fetchForecastFromEndpoint(endpoint: string, lat: number, lng: num
     const status = res?.status ?? lastStatus;
     throw new Error(status === 429 ? "rate-limited" : `upstream ${status}`);
   }
-  const data = await res.json() as any;
+  const data = (await res.json()) as any;
 
   if (!data?.current || !data?.hourly?.time?.length || !data?.daily?.time?.length) {
     throw new Error("incomplete data");
@@ -140,12 +146,12 @@ async function fetchForecastFromMetNo(lat: number, lng: number): Promise<Forecas
   const params = new URLSearchParams({ lat: lat.toString(), lon: lng.toString() });
   const res = await fetch(`${MET_NO_ENDPOINT}?${params}`, {
     headers: {
-      "accept": "application/json",
+      accept: "application/json",
       "user-agent": "KrishokBondhu/1.0 https://shobji-bondhu-friends.lovable.app",
     },
   });
   if (!res.ok) throw new Error(`upstream ${res.status}`);
-  const data = await res.json() as any;
+  const data = (await res.json()) as any;
   const series: any[] = data?.properties?.timeseries ?? [];
   if (!series.length) throw new Error("incomplete data");
 
@@ -153,7 +159,8 @@ async function fetchForecastFromMetNo(lat: number, lng: number): Promise<Forecas
   const upcoming = series.filter((x) => new Date(x.time).getTime() >= nowMs - 60 * 60_000);
   const first = upcoming[0] ?? series[0];
   const firstInstant = first.data?.instant?.details ?? {};
-  const firstNext = first.data?.next_1_hours ?? first.data?.next_6_hours ?? first.data?.next_12_hours ?? {};
+  const firstNext =
+    first.data?.next_1_hours ?? first.data?.next_6_hours ?? first.data?.next_12_hours ?? {};
   const current: CurrentWeather = {
     temperature: firstInstant.air_temperature ?? 0,
     weather_code: metSymbolToWmo(firstNext.summary?.symbol_code),
@@ -181,32 +188,39 @@ async function fetchForecastFromMetNo(lat: number, lng: number): Promise<Forecas
     if (!byDate.has(date)) byDate.set(date, []);
     byDate.get(date)!.push(x);
   }
-  const daily: DailyPoint[] = Array.from(byDate.entries()).slice(0, 7).map(([date, rows]) => {
-    const temps = rows.map((x) => x.data?.instant?.details?.air_temperature).filter((n) => typeof n === "number");
-    const probs = rows.map(metPrecipProbability);
-    const precip = rows.reduce((sum, x) => {
-      const next = x.data?.next_1_hours ?? x.data?.next_6_hours ?? x.data?.next_12_hours ?? {};
-      return sum + (next.details?.precipitation_amount ?? 0);
-    }, 0);
-    const symbol = rows.find((x) => x.data?.next_1_hours?.summary?.symbol_code)?.data?.next_1_hours?.summary?.symbol_code
-      ?? rows[0]?.data?.next_6_hours?.summary?.symbol_code;
-    return {
-      date,
-      temp_max: temps.length ? Math.max(...temps) : current.temperature,
-      temp_min: temps.length ? Math.min(...temps) : current.temperature,
-      precipitation_sum: Number(precip.toFixed(1)),
-      precipitation_probability_max: probs.length ? Math.max(...probs) : 0,
-      weather_code: metSymbolToWmo(symbol),
-    };
-  });
+  const daily: DailyPoint[] = Array.from(byDate.entries())
+    .slice(0, 7)
+    .map(([date, rows]) => {
+      const temps = rows
+        .map((x) => x.data?.instant?.details?.air_temperature)
+        .filter((n) => typeof n === "number");
+      const probs = rows.map(metPrecipProbability);
+      const precip = rows.reduce((sum, x) => {
+        const next = x.data?.next_1_hours ?? x.data?.next_6_hours ?? x.data?.next_12_hours ?? {};
+        return sum + (next.details?.precipitation_amount ?? 0);
+      }, 0);
+      const symbol =
+        rows.find((x) => x.data?.next_1_hours?.summary?.symbol_code)?.data?.next_1_hours?.summary
+          ?.symbol_code ?? rows[0]?.data?.next_6_hours?.summary?.symbol_code;
+      return {
+        date,
+        temp_max: temps.length ? Math.max(...temps) : current.temperature,
+        temp_min: temps.length ? Math.min(...temps) : current.temperature,
+        precipitation_sum: Number(precip.toFixed(1)),
+        precipitation_probability_max: probs.length ? Math.max(...probs) : 0,
+        weather_code: metSymbolToWmo(symbol),
+      };
+    });
 
   return { current, hourly, daily, past_rainfall: [] };
 }
 
 function metPrecipProbability(point: any): number {
-  const next = point.data?.next_1_hours ?? point.data?.next_6_hours ?? point.data?.next_12_hours ?? {};
+  const next =
+    point.data?.next_1_hours ?? point.data?.next_6_hours ?? point.data?.next_12_hours ?? {};
   const details = next.details ?? {};
-  if (typeof details.probability_of_precipitation === "number") return Math.round(details.probability_of_precipitation);
+  if (typeof details.probability_of_precipitation === "number")
+    return Math.round(details.probability_of_precipitation);
   const amount = details.precipitation_amount ?? 0;
   return amount > 0 ? Math.min(95, Math.round(25 + amount * 18)) : 0;
 }
@@ -226,18 +240,35 @@ function metSymbolToWmo(symbol = ""): number {
 }
 
 function isDhakaDay(isoTime: string): boolean {
-  const hour = Number(new Intl.DateTimeFormat("en-US", { hour: "numeric", hour12: false, timeZone: "Asia/Dhaka" }).format(new Date(isoTime)));
+  const hour = Number(
+    new Intl.DateTimeFormat("en-US", {
+      hour: "numeric",
+      hour12: false,
+      timeZone: "Asia/Dhaka",
+    }).format(new Date(isoTime)),
+  );
   return hour >= 6 && hour < 18;
 }
 
 function buildFallbackForecast(lat: number, lng: number): Forecast {
-  const hour = Number(new Intl.DateTimeFormat("en-US", { hour: "numeric", hour12: false, timeZone: "Asia/Dhaka" }).format(new Date()));
+  const hour = Number(
+    new Intl.DateTimeFormat("en-US", {
+      hour: "numeric",
+      hour12: false,
+      timeZone: "Asia/Dhaka",
+    }).format(new Date()),
+  );
   const isDay = hour >= 6 && hour < 18;
   const seasonalBase = 28 + Math.sin((Date.now() / 86_400_000 + lat + lng) / 14) * 3;
-  const rainBase = Math.max(15, Math.min(75, Math.round(42 + Math.sin((Date.now() / 86_400_000 + lat) / 5) * 22)));
+  const rainBase = Math.max(
+    15,
+    Math.min(75, Math.round(42 + Math.sin((Date.now() / 86_400_000 + lat) / 5) * 22)),
+  );
   const code = rainBase > 60 ? 61 : rainBase > 40 ? 51 : isDay ? 2 : 3;
   const dateInDhaka = (offsetDays: number) =>
-    new Date(Date.now() + offsetDays * 86_400_000).toLocaleDateString("en-CA", { timeZone: "Asia/Dhaka" });
+    new Date(Date.now() + offsetDays * 86_400_000).toLocaleDateString("en-CA", {
+      timeZone: "Asia/Dhaka",
+    });
 
   const current: CurrentWeather = {
     temperature: Number(seasonalBase.toFixed(1)),
@@ -251,7 +282,7 @@ function buildFallbackForecast(lat: number, lng: number): Forecast {
 
   const hourly: HourlyPoint[] = Array.from({ length: 24 }, (_, i) => ({
     time: new Date(Date.now() + i * 3_600_000).toISOString(),
-    temperature: Number((seasonalBase + Math.sin((hour + i) / 24 * Math.PI * 2) * 2).toFixed(1)),
+    temperature: Number((seasonalBase + Math.sin(((hour + i) / 24) * Math.PI * 2) * 2).toFixed(1)),
     precipitation_probability: Math.max(10, Math.min(90, rainBase + ((i % 6) - 2) * 5)),
     weather_code: code,
   }));

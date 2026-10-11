@@ -43,8 +43,11 @@ function NotifyPage() {
   const { data: history = [] } = useQuery({
     queryKey: ["admin", "notify", "history"],
     queryFn: async () => {
-      const { data } = await supabase.from("notification_broadcasts").select("*")
-        .order("created_at", { ascending: false }).limit(20);
+      const { data } = await supabase
+        .from("notification_broadcasts")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(20);
       return data ?? [];
     },
   });
@@ -54,14 +57,22 @@ function NotifyPage() {
       if (scheduleMode === "later") {
         if (!scheduledAt) throw new Error("সময় দিন");
         const when = new Date(scheduledAt);
-        if (isNaN(when.getTime()) || when.getTime() < Date.now()) throw new Error("ভবিষ্যৎ সময় দিন");
+        if (isNaN(when.getTime()) || when.getTime() < Date.now())
+          throw new Error("ভবিষ্যৎ সময় দিন");
         await supabase.from("notification_broadcasts").insert({
-          admin_id: user!.id, title, body, link, icon,
-          target_type: target, target_value: value || null,
-          scheduled_at: when.toISOString(), sent_count: 0,
+          admin_id: user!.id,
+          title,
+          body,
+          link,
+          icon,
+          target_type: target,
+          target_value: value || null,
+          scheduled_at: when.toISOString(),
+          sent_count: 0,
         });
         await supabase.from("admin_actions").insert({
-          admin_id: user!.id, action_type: "broadcast_scheduled",
+          admin_id: user!.id,
+          action_type: "broadcast_scheduled",
           details: { title, target, value, scheduled_at: when.toISOString() } as never,
         });
         return -1;
@@ -76,7 +87,11 @@ function NotifyPage() {
       const ids = (users ?? []).map((u) => u.id);
 
       const rows = ids.map((id) => ({
-        user_id: id, type: "broadcast", title, body, ref_type: "broadcast",
+        user_id: id,
+        type: "broadcast",
+        title,
+        body,
+        ref_type: "broadcast",
       }));
       for (let i = 0; i < rows.length; i += 500) {
         const slice = rows.slice(i, i + 500);
@@ -84,12 +99,19 @@ function NotifyPage() {
       }
 
       await supabase.from("notification_broadcasts").insert({
-        admin_id: user!.id, title, body, link, icon,
-        target_type: target, target_value: value || null,
-        sent_count: ids.length, sent_at: new Date().toISOString(),
+        admin_id: user!.id,
+        title,
+        body,
+        link,
+        icon,
+        target_type: target,
+        target_value: value || null,
+        sent_count: ids.length,
+        sent_at: new Date().toISOString(),
       });
       await supabase.from("admin_actions").insert({
-        admin_id: user!.id, action_type: "broadcast",
+        admin_id: user!.id,
+        action_type: "broadcast",
         details: { title, target, value, count: ids.length } as never,
       });
       return ids.length;
@@ -97,10 +119,16 @@ function NotifyPage() {
     onSuccess: (count) => {
       if (count < 0) toast.success("নির্ধারিত সময়ে পাঠানো হবে");
       else toast.success(`${toBn(count)} জনকে পাঠানো হয়েছে`);
-      setTitle(""); setBody(""); setConfirming(false); setScheduledAt("");
+      setTitle("");
+      setBody("");
+      setConfirming(false);
+      setScheduledAt("");
       qc.invalidateQueries({ queryKey: ["admin", "notify", "history"] });
     },
-    onError: (e: Error) => { toast.error(e.message || "পাঠাতে ব্যর্থ"); setConfirming(false); },
+    onError: (e: Error) => {
+      toast.error(e.message || "পাঠাতে ব্যর্থ");
+      setConfirming(false);
+    },
   });
 
   return (
@@ -109,28 +137,45 @@ function NotifyPage() {
         <p className="text-sm font-bold">টার্গেট</p>
         <div className="flex flex-wrap gap-2">
           {(["all", "district", "upazila", "crop"] as Target[]).map((t) => (
-            <button key={t} onClick={() => setTarget(t)}
-              className={`px-3 py-1.5 rounded-md text-sm font-semibold border ${target === t ? "bg-purple-600 text-white border-purple-600" : "bg-white border-input"}`}>
-              {t === "all" ? "সকল কৃষক" : t === "district" ? "জেলা" : t === "upazila" ? "উপজেলা" : "ফসল"}
+            <button
+              key={t}
+              onClick={() => setTarget(t)}
+              className={`px-3 py-1.5 rounded-md text-sm font-semibold border ${target === t ? "bg-purple-600 text-white border-purple-600" : "bg-white border-input"}`}
+            >
+              {t === "all"
+                ? "সকল কৃষক"
+                : t === "district"
+                  ? "জেলা"
+                  : t === "upazila"
+                    ? "উপজেলা"
+                    : "ফসল"}
             </button>
           ))}
         </div>
         {target !== "all" && (
-          <Input value={value} onChange={(e) => setValue(e.target.value)}
-            placeholder={target === "crop" ? "ফসলের নাম (ধান, আলু…)" : "নাম লিখুন"} />
+          <Input
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            placeholder={target === "crop" ? "ফসলের নাম (ধান, আলু…)" : "নাম লিখুন"}
+          />
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
-            <p className="text-sm font-bold mb-1">শিরোনাম <span className="text-gray-400 text-xs">({toBn(title.length)}/৫০)</span></p>
+            <p className="text-sm font-bold mb-1">
+              শিরোনাম <span className="text-gray-400 text-xs">({toBn(title.length)}/৫০)</span>
+            </p>
             <Input value={title} maxLength={50} onChange={(e) => setTitle(e.target.value)} />
           </div>
           <div>
             <p className="text-sm font-bold mb-1">আইকন</p>
             <div className="flex gap-1.5">
               {["🌿", "📢", "⚠️", "💰", "🐛", "☀️", "🌧️"].map((e) => (
-                <button key={e} onClick={() => setIcon(e)}
-                  className={`h-9 w-9 text-lg rounded-md border ${icon === e ? "bg-purple-100 border-purple-400" : "bg-white border-input"}`}>
+                <button
+                  key={e}
+                  onClick={() => setIcon(e)}
+                  className={`h-9 w-9 text-lg rounded-md border ${icon === e ? "bg-purple-100 border-purple-400" : "bg-white border-input"}`}
+                >
                   {e}
                 </button>
               ))}
@@ -138,13 +183,23 @@ function NotifyPage() {
           </div>
         </div>
         <div>
-          <p className="text-sm font-bold mb-1">বার্তা <span className="text-gray-400 text-xs">({toBn(body.length)}/১৫০)</span></p>
-          <Textarea value={body} maxLength={150} onChange={(e) => setBody(e.target.value)} rows={3} />
+          <p className="text-sm font-bold mb-1">
+            বার্তা <span className="text-gray-400 text-xs">({toBn(body.length)}/১৫০)</span>
+          </p>
+          <Textarea
+            value={body}
+            maxLength={150}
+            onChange={(e) => setBody(e.target.value)}
+            rows={3}
+          />
         </div>
         <div>
           <p className="text-sm font-bold mb-1">লিংক</p>
-          <select value={link} onChange={(e) => setLink(e.target.value)}
-            className="w-full h-9 rounded-md border border-input bg-background px-2 text-sm">
+          <select
+            value={link}
+            onChange={(e) => setLink(e.target.value)}
+            className="w-full h-9 rounded-md border border-input bg-background px-2 text-sm"
+          >
             <option value="/feed">/feed</option>
             <option value="/prices">/prices</option>
             <option value="/exchange">/exchange</option>
@@ -160,27 +215,37 @@ function NotifyPage() {
             <p className="text-sm font-bold">{title || "শিরোনাম এখানে"}</p>
             <p className="text-xs text-gray-700">{body || "বার্তা এখানে দেখাবে…"}</p>
           </div>
-          <p className="text-xs mt-2 text-gray-600">আনুমানিক প্রাপক: <b>~{toBn(reach)} জন</b></p>
+          <p className="text-xs mt-2 text-gray-600">
+            আনুমানিক প্রাপক: <b>~{toBn(reach)} জন</b>
+          </p>
         </div>
 
         <div className="flex flex-col gap-2 border-t border-gray-100 pt-3">
           <div className="flex gap-2">
             {(["now", "later"] as const).map((m) => (
-              <button key={m} onClick={() => setScheduleMode(m)}
-                className={`px-3 py-1.5 rounded-md text-sm font-semibold border ${scheduleMode === m ? "bg-purple-600 text-white border-purple-600" : "bg-white border-input"}`}>
+              <button
+                key={m}
+                onClick={() => setScheduleMode(m)}
+                className={`px-3 py-1.5 rounded-md text-sm font-semibold border ${scheduleMode === m ? "bg-purple-600 text-white border-purple-600" : "bg-white border-input"}`}
+              >
                 {m === "now" ? "এখনই পাঠান" : "পরে নির্ধারণ করুন"}
               </button>
             ))}
           </div>
           {scheduleMode === "later" && (
-            <Input type="datetime-local" value={scheduledAt}
+            <Input
+              type="datetime-local"
+              value={scheduledAt}
               onChange={(e) => setScheduledAt(e.target.value)}
-              min={new Date(Date.now() + 60000).toISOString().slice(0, 16)} />
+              min={new Date(Date.now() + 60000).toISOString().slice(0, 16)}
+            />
           )}
         </div>
 
-        <Button disabled={!title || !body || send.isPending || (scheduleMode === "later" && !scheduledAt)}
-          onClick={() => setConfirming(true)}>
+        <Button
+          disabled={!title || !body || send.isPending || (scheduleMode === "later" && !scheduledAt)}
+          onClick={() => setConfirming(true)}
+        >
           <Send className="h-4 w-4" /> {scheduleMode === "later" ? "নির্ধারণ করুন" : "পাঠান"}
         </Button>
 
@@ -188,10 +253,16 @@ function NotifyPage() {
           <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
             <div className="bg-white rounded-xl p-5 max-w-sm w-full">
               <p className="font-bold mb-2">নিশ্চিত করুন</p>
-              <p className="text-sm text-gray-700">~{toBn(reach)} জন কৃষককে notification পাঠাবেন?</p>
+              <p className="text-sm text-gray-700">
+                ~{toBn(reach)} জন কৃষককে notification পাঠাবেন?
+              </p>
               <div className="flex gap-2 mt-4 justify-end">
-                <Button variant="outline" onClick={() => setConfirming(false)}>বাতিল</Button>
-                <Button onClick={() => send.mutate()} disabled={send.isPending}>হ্যাঁ, পাঠান</Button>
+                <Button variant="outline" onClick={() => setConfirming(false)}>
+                  বাতিল
+                </Button>
+                <Button onClick={() => send.mutate()} disabled={send.isPending}>
+                  হ্যাঁ, পাঠান
+                </Button>
               </div>
             </div>
           </div>
@@ -212,17 +283,25 @@ function NotifyPage() {
           <tbody>
             {history.map((h) => (
               <tr key={h.id} className="border-t border-gray-100">
-                <td className="px-3 py-2 text-xs">{format(new Date(h.created_at), "d MMM HH:mm")}</td>
+                <td className="px-3 py-2 text-xs">
+                  {format(new Date(h.created_at), "d MMM HH:mm")}
+                </td>
                 <td className="px-3 py-2">{h.title}</td>
                 <td className="px-3 py-2 text-right">{toBn(h.sent_count)}</td>
                 <td className="px-3 py-2 text-right">{toBn(h.opened_count)}</td>
                 <td className="px-3 py-2 text-right">
-                  {h.sent_count > 0 ? toBn(Math.round((h.opened_count / h.sent_count) * 100)) + "%" : "—"}
+                  {h.sent_count > 0
+                    ? toBn(Math.round((h.opened_count / h.sent_count) * 100)) + "%"
+                    : "—"}
                 </td>
               </tr>
             ))}
             {history.length === 0 && (
-              <tr><td colSpan={5} className="text-center py-6 text-gray-400">এখনো কোনো broadcast নেই</td></tr>
+              <tr>
+                <td colSpan={5} className="text-center py-6 text-gray-400">
+                  এখনো কোনো broadcast নেই
+                </td>
+              </tr>
             )}
           </tbody>
         </table>
