@@ -1,11 +1,10 @@
 # Tasks
 
-- [x] Verify and fix the expanded crop ledger disappearing on scroll; check lower entries and Print/PDF remain reachable.
-
-- [x] Make community and status updates visible immediately without refresh.
-- [x] Reorder the home agriculture helper cards and rename organic fertilizer to জৈব কর্নার.
-- [x] Add admin-managed YouTube links for every organic guide video section.
-- [x] Verify permissions, tests, build, and key user flows.
-- [x] Retitle the home helper section as "আপনার নিজস্ব AI কৃষি সহকারী" with the new tagline.
-- [x] Add সবজি চাষ গাইড after the crop calendar, and দামের পূর্বাভাস, বাজার দর দেখুন, বিনিময় after the pesticide guide.
-- [x] Verify the updated home section on mobile.
+- [x] Crop stages: close gaps, single current-stage logic, invariant tests.
+- [x] PHI engine: first-harvest based, all chemicals, all plans; weather heat bug.
+- [x] Chemical data: safety info for all guide medicines, carbofuran gated, brand removed, boron off late blight.
+- [x] Tomato schedule: IPM-based, capped, no chemicals in harvest window.
+- [x] Spray log with safety checklist, first-aid card, harvest-ban badge.
+- [x] Plan creation: variety + land; Bangla calendar; land shared with spray section.
+- [x] Plan page "today" card first; farming in bottom menu; duplicate plan list merged; friendly errors.
+- [ ] Variety-based timeline scaling, stable task IDs, computable fertilizer reminders, weather-triggered IPM alerts (next round).

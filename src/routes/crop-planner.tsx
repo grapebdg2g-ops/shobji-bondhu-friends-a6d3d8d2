@@ -214,7 +214,7 @@ function CropPlannerPage() {
             </button>
 
             <Link
-              to="/crop-planner/my-plans"
+              to="/crop-guide"
               className="block text-center text-sm text-emerald-700 font-semibold py-3"
             >
               📋 আমার সংরক্ষিত পরিকল্পনা দেখুন →
