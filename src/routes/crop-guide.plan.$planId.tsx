@@ -220,6 +220,7 @@ function PlanAdvisory() {
       {plan.is_gap && (
         <GapProtocolSection
           cropType={plan.crop_type}
+          plantingDate={plan.planting_date}
           daysUntilHarvest={guide.totalDays - days}
           completions={completions}
           onComplete={async (tid) => {
@@ -241,6 +242,7 @@ function PlanAdvisory() {
           plantingDate={plan.planting_date}
           days={days}
           completions={completions}
+          isGap={!!plan.is_gap}
           onComplete={async (tid) => {
             if (completions.has(tid)) return;
             try {

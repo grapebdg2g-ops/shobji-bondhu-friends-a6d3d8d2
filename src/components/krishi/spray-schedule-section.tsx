@@ -13,6 +13,7 @@ import { TOMATO_SPRAY_NOTES } from "@/lib/tomato-spray-schedule";
 import { addDays, formatBnDate } from "@/lib/bn-date";
 import { toBn } from "@/lib/bn";
 import { getAllChemicalInfo, getBioOptions } from "@/data/crop-knowledge";
+import { isSprayAllowedUnderGap } from "@/data/gap-protocol";
 
 type Props = {
   userId: string;
@@ -22,9 +23,10 @@ type Props = {
   days: number;
   completions: Set<string>;
   onComplete: (taskId: string) => Promise<void>;
+  isGap?: boolean;
 };
 
-export function SprayScheduleSection({ userId, planId, cropType, plantingDate, days, completions, onComplete }: Props) {
+export function SprayScheduleSection({ userId, planId, cropType, plantingDate, days, completions, onComplete, isGap }: Props) {
   const events = useMemo(() => buildSpraySchedule(cropType, plantingDate), [cropType, plantingDate]);
   const main = events.filter((e) => e.kind !== "nutrient");
   const nutrients = events.filter((e) => e.kind === "nutrient");
@@ -115,11 +117,19 @@ export function SprayScheduleSection({ userId, planId, cropType, plantingDate, d
               {overdue && <span className="text-destructive font-semibold"> · তারিখ পেরিয়েছে</span>}
             </p>
           </div>
+          {isGap && e.problem && !isSprayAllowedUnderGap(cropType, harvestDay - e.day) && (
+            <span className="shrink-0 rounded bg-destructive/10 text-destructive text-[10px] font-bold px-1.5 py-0.5">GAP ⛔</span>
+          )}
           {done ? <Check className="h-5 w-5 text-primary" /> : isOpen ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
         </button>
         {isOpen && (
           <div className="px-3 pb-3 space-y-2 text-sm">
             <p className="text-foreground/80">{e.desc}</p>
+            {isGap && e.problem && !isSprayAllowedUnderGap(cropType, harvestDay - e.day) && (
+              <p className="rounded-lg bg-destructive/10 p-2 text-xs text-destructive font-semibold">
+                🛡️ GAP নিয়ম: এই স্প্রের সময়ে ফসল তোলার আনুমানিক {toBn(Math.max(0, harvestDay - e.day))} দিন বাকি — GAP অনুযায়ী রাসায়নিক স্প্রে করা যাবে না। নিচের জৈব বিকল্প ব্যবহার করুন।
+              </p>
+            )}
             {e.problem && (
               <div className="rounded-lg bg-card p-2.5 ring-1 ring-border space-y-1">
                 {e.problem.chemicals.map((c) => {
