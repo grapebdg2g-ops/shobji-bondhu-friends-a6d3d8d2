@@ -72,6 +72,25 @@ export function SprayScheduleSection({ userId, planId, cropType, plantingDate, d
     );
   };
   const harvestDay = FARMING_STAGES[cropType]?.totalDays ?? 0;
+  // GAP mode: chemical sprays inside the PHI window are replaced by safe bio alternatives.
+  const displayMain = useMemo(() => {
+    if (!isGap) return main;
+    return main.map((e) => {
+      if (!e.problem) return e;
+      const daysLeft = harvestDay - e.day;
+      if (isSprayAllowedUnderGap(cropType, daysLeft)) return e;
+      const bio = getBioOptions(`${e.title} ${e.desc} ${e.problem.name}`);
+      const altText = bio.length > 0
+        ? bio.map((b) => `${b.name} — ${b.dose} (${b.method})`).join("; ")
+        : e.problem.organic[0] ?? "নিম তেল ৫ মিলি/লিটার পানি";
+      return {
+        ...e,
+        title: `জৈব বিকল্প: ${e.title}`,
+        desc: `🛡️ GAP নিয়ম: ফসল তোলার আনুমানিক ${toBn(Math.max(0, daysLeft))} দিন বাকি থাকায় এই সময়ে রাসায়নিক স্প্রে নিষেধ। নিরাপদ বিকল্প: ${altText}`,
+        problem: undefined,
+      } as SprayEvent;
+    });
+  }, [isGap, main, cropType, harvestDay]);
   if (events.length === 0) return null;
   const sw = weather.data?.forecast ? evaluateSprayWeather(weather.data.forecast) : null;
 
