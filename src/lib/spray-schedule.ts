@@ -68,7 +68,7 @@ export async function markSprayReminderDone(planId: string, cropType: string, pl
     .from("crop_reminders")
     .update({ is_done: true })
     .eq("plan_id", planId)
-    .eq("title", `${SPRAY_REMINDER_PREFIX}${e.title}`)
+    .in("title", [`${SPRAY_REMINDER_PREFIX}${e.title}`, `${SPRAY_REMINDER_PREFIX}জৈব বিকল্প: ${e.title}`])
     .eq("reminder_date", toIsoDate(addDays(plantingDate, e.day)));
   if (error) throw error;
 }
