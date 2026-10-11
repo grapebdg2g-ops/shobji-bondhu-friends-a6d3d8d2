@@ -107,7 +107,7 @@ export function SprayScheduleSection({
       </label>
     );
   };
-  const harvestDay = FARMING_STAGES[cropType]?.totalDays ?? 0;
+  const harvestDay = harvestStartFor(cropType);
   // GAP mode: chemical sprays inside the PHI window are replaced by safe bio alternatives.
   const displayMain = useMemo(
     () => (isGap ? applyGapSchedule(main, cropType) : main),
@@ -262,7 +262,7 @@ export function SprayScheduleSection({
               e.problem &&
               (() => {
                 const names = e.problem.chemicals.map((c) => c.name);
-                const phi = maxPhiDays(names.slice(0, 1));
+                const phi = maxPhiDays(names);
                 const pc = phiConflict(e.day, harvestDay, phi);
                 const rot = rotationWarning(e);
                 const dose = doseFor(e);

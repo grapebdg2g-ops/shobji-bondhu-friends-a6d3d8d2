@@ -6,7 +6,9 @@ import { PESTICIDE_GUIDE, type Problem } from "@/data/pesticide-guide";
 import { supabase } from "@/integrations/supabase/client";
 import { addDays, toIsoDate } from "@/lib/bn-date";
 import { buildTomatoSchedule } from "@/lib/tomato-spray-schedule";
-import { isSprayAllowedUnderGap } from "@/data/gap-protocol";
+import { getGapProfile } from "@/data/gap-protocol";
+import { firstHarvestDay } from "@/lib/crop-stage";
+import { maxPhiDays } from "@/lib/spray-tools";
 import { getBioOptions } from "@/data/crop-knowledge";
 import { toBn } from "@/lib/bn";
 
@@ -37,7 +39,11 @@ export function buildSpraySchedule(cropType: string, plantingDate?: string): Spr
   const guide = FARMING_STAGES[cropType];
   if (!guide) return [];
   if (cropType === "টমেটো" && plantingDate)
-    return buildTomatoSchedule(plantingDate, guide.totalDays);
+    return buildTomatoSchedule(
+      plantingDate,
+      guide.totalDays,
+      firstHarvestDay(guide.stages, guide.totalDays),
+    );
   const events: SprayEvent[] = [];
   for (const stage of guide.stages) {
     const sprays = stage.tasks
@@ -82,13 +88,30 @@ export async function markSprayReminderDone(
   if (error) throw error;
 }
 
-/** GAP mode: chemical sprays inside the PHI window become safe bio alternatives. */
-export function applyGapSchedule(events: SprayEvent[], cropType: string): SprayEvent[] {
-  const harvestDay = FARMING_STAGES[cropType]?.totalDays ?? 0;
+/** Harvest (first picking) day for a crop — PHI is counted from here. */
+export function harvestStartFor(cropType: string): number {
+  const g = FARMING_STAGES[cropType];
+  return g ? firstHarvestDay(g.stages, g.totalDays) : 0;
+}
+
+/** Longest PHI among every chemical offered for this event (not just the first). */
+export function eventPhiDays(e: SprayEvent): number {
+  return e.problem ? maxPhiDays(e.problem.chemicals.map((c) => c.name)) : 0;
+}
+
+/**
+ * Harvest-safety for every plan: a chemical spray whose PHI runs past the first
+ * harvest day becomes a safe bio alternative. GAP plans additionally honour the
+ * crop's stricter GAP PHI.
+ */
+export function applyPhiSafety(events: SprayEvent[], cropType: string, isGap = false): SprayEvent[] {
+  const harvestDay = harvestStartFor(cropType);
+  const gapPhi = isGap ? (getGapProfile(cropType)?.phiDays ?? 0) : 0;
   return events.map((e) => {
     if (!e.problem) return e;
     const daysLeft = harvestDay - e.day;
-    if (isSprayAllowedUnderGap(cropType, daysLeft)) return e;
+    const phi = Math.max(eventPhiDays(e), gapPhi);
+    if (phi === 0 || daysLeft > phi) return e;
     const bio = getBioOptions(`${e.title} ${e.desc} ${e.problem.name}`);
     const altText =
       bio.length > 0
@@ -97,10 +120,15 @@ export function applyGapSchedule(events: SprayEvent[], cropType: string): SprayE
     return {
       ...e,
       title: `জৈব বিকল্প: ${e.title}`,
-      desc: `🛡️ GAP নিয়ম: ফসল তোলার আনুমানিক ${toBn(Math.max(0, daysLeft))} দিন বাকি থাকায় এই সময়ে রাসায়নিক স্প্রে নিষেধ। নিরাপদ বিকল্প: ${altText}`,
+      desc: `${isGap ? "🛡️ GAP নিয়ম: " : "⛔ "}ফসল তোলা শুরুর আনুমানিক ${toBn(Math.max(0, daysLeft))} দিন বাকি, কিন্তু রাসায়নিকের বিষ কাটতে ${toBn(phi)} দিন লাগে — তাই এখন রাসায়নিক নয়। নিরাপদ বিকল্প: ${altText}`,
       problem: undefined,
     };
   });
+}
+
+/** GAP mode wrapper (kept for existing callers). */
+export function applyGapSchedule(events: SprayEvent[], cropType: string): SprayEvent[] {
+  return applyPhiSafety(events, cropType, true);
 }
 
 /** Creates reminders for all upcoming spray dates of a plan (skips existing ones). */
@@ -113,7 +141,7 @@ export async function syncSprayReminders(
 ) {
   const today = toIsoDate(new Date());
   const base = buildSpraySchedule(cropType, plantingDate);
-  const events = isGap ? applyGapSchedule(base, cropType) : base;
+  const events = applyPhiSafety(base, cropType, isGap);
   const { data: existing } = await supabase
     .from("crop_reminders")
     .select("title, reminder_date")

@@ -51,7 +51,7 @@ export function evaluateSprayWeather(f: Forecast): SprayWeather {
     reasons.push(
       `তাপমাত্রা বেশি (${Math.round(f.current.temperature)}°C) — দুপুরে স্প্রে করবেন না`,
     );
-  const ok = !storm && rain <= 50 && f.current.wind_speed <= 20;
+  const ok = !storm && rain <= 50 && f.current.wind_speed <= 20 && f.current.temperature <= 35;
   return { ok, reasons, bestTime: "সকাল ৭টা–৯টা অথবা বিকেল ৪টা–৬টা" };
 }
 
