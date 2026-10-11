@@ -13,6 +13,7 @@ import { TOMATO_SPRAY_NOTES } from "@/lib/tomato-spray-schedule";
 import { addDays, formatBnDate } from "@/lib/bn-date";
 import { toBn } from "@/lib/bn";
 import { getAllChemicalInfo, getBioOptions } from "@/data/crop-knowledge";
+import { isSprayAllowedUnderGap } from "@/data/gap-protocol";
 
 type Props = {
   userId: string;
@@ -22,9 +23,10 @@ type Props = {
   days: number;
   completions: Set<string>;
   onComplete: (taskId: string) => Promise<void>;
+  isGap?: boolean;
 };
 
-export function SprayScheduleSection({ userId, planId, cropType, plantingDate, days, completions, onComplete }: Props) {
+export function SprayScheduleSection({ userId, planId, cropType, plantingDate, days, completions, onComplete, isGap }: Props) {
   const events = useMemo(() => buildSpraySchedule(cropType, plantingDate), [cropType, plantingDate]);
   const main = events.filter((e) => e.kind !== "nutrient");
   const nutrients = events.filter((e) => e.kind === "nutrient");
