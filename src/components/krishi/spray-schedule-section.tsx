@@ -30,6 +30,8 @@ import { TOMATO_SPRAY_NOTES } from "@/lib/tomato-spray-schedule";
 import { addDays, formatBnDate } from "@/lib/bn-date";
 import { toBn } from "@/lib/bn";
 import { getAllChemicalInfo, getBioOptions } from "@/data/crop-knowledge";
+import { SprayLogDialog, FirstAidCard } from "@/components/krishi/spray-log-dialog";
+import { supabase } from "@/integrations/supabase/client";
 
 type Props = {
   userId: string;
@@ -40,6 +42,7 @@ type Props = {
   completions: Set<string>;
   onComplete: (taskId: string) => Promise<void>;
   isGap?: boolean;
+  landShotok?: number | null;
 };
 
 export function SprayScheduleSection({
@@ -51,6 +54,7 @@ export function SprayScheduleSection({
   completions,
   onComplete,
   isGap,
+  landShotok,
 }: Props) {
   const events = useMemo(
     () => buildSpraySchedule(cropType, plantingDate),
@@ -72,13 +76,17 @@ export function SprayScheduleSection({
     queryFn: () =>
       fetchWeather({ data: { district: user!.district!, upazila: user?.upazila ?? null } }),
   });
+  const [logFor, setLogFor] = useState<SprayEvent | null>(null);
   useEffect(() => {
-    const v = localStorage.getItem(`spray-land:${planId}`);
-    if (v) setShotok(v);
-  }, [planId]);
+    if (landShotok) setShotok(String(landShotok));
+  }, [landShotok]);
   function saveLand(v: string) {
     setShotok(v);
-    localStorage.setItem(`spray-land:${planId}`, v);
+  }
+  async function persistLand() {
+    const n = parseFloat(shotok.replace(/[০-৯]/g, (d) => String("০১২৩৪৫৬৭৮৯".indexOf(d))));
+    if (!n || n === landShotok) return;
+    await supabase.from("user_crop_plans").update({ land_shotok: n }).eq("id", planId);
   }
   const land = parseFloat(shotok.replace(/[০-৯]/g, (d) => String("০১২৩৪৫৬৭৮৯".indexOf(d)))) || 0;
   const [doseEdits, setDoseEdits] = useState<Record<string, string>>({});
@@ -334,9 +342,9 @@ export function SprayScheduleSection({
               ⚠️ লেবেলের নির্দেশনা মেনে, সকাল/বিকেলে বাতাসহীন সময়ে স্প্রে করুন।
             </p>
             <button
-              onClick={() => onComplete(e.id)}
+              onClick={() => setLogFor(e)}
               disabled={done}
-              className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground font-bold text-sm disabled:opacity-50 inline-flex items-center justify-center gap-1.5"
+              className="w-full min-h-12 py-2.5 rounded-xl bg-primary text-primary-foreground font-bold text-base disabled:opacity-50 inline-flex items-center justify-center gap-1.5"
             >
               <Check className="h-4 w-4" /> {done ? "স্প্রে সম্পন্ন" : "স্প্রে সম্পন্ন হয়েছে"}
             </button>
@@ -348,6 +356,16 @@ export function SprayScheduleSection({
 
   return (
     <section className="px-5 mt-5">
+      {logFor && (
+        <SprayLogDialog
+          event={logFor}
+          planId={planId}
+          userId={userId}
+          land={land}
+          onClose={() => setLogFor(null)}
+          onSaved={() => onComplete(logFor.id)}
+        />
+      )}
       <div className="bg-card rounded-2xl shadow-sm ring-1 ring-border overflow-hidden">
         <div className="p-4 flex items-start justify-between gap-3">
           <div>
@@ -379,6 +397,7 @@ export function SprayScheduleSection({
         )}
 
         <div className="mx-4 mb-3 grid gap-2">
+          <FirstAidCard />
           {sw ? (
             <div
               className={`rounded-xl p-3 text-xs ${sw.ok ? "bg-primary/10" : "bg-destructive/10"}`}
@@ -410,6 +429,7 @@ export function SprayScheduleSection({
               inputMode="decimal"
               value={shotok}
               onChange={(ev) => saveLand(ev.target.value)}
+              onBlur={persistLand}
               placeholder="যেমন ২০"
               className="w-20 rounded-lg bg-card ring-1 ring-border px-2 py-1.5 text-sm"
             />
