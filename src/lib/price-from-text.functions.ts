@@ -20,14 +20,24 @@ const extractedSchema = z.object({
 /** পোস্ট/কমেন্টে উল্লেখিত দাম বের করে লেখকের এলাকার কৃষক-রিপোর্ট হিসেবে বাজারদরে যোগ করে। */
 export const capturePricesFromContent = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) => z.object({ kind: z.enum(["post", "comment"]), id: z.string().uuid() }).parse(d))
+  .inputValidator((d) =>
+    z.object({ kind: z.enum(["post", "comment"]), id: z.string().uuid() }).parse(d),
+  )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const table = data.kind === "post" ? "posts" : "post_comments";
-    const { data: row } = await supabase.from(table).select("user_id, content").eq("id", data.id).maybeSingle();
+    const { data: row } = await supabase
+      .from(table)
+      .select("user_id, content")
+      .eq("id", data.id)
+      .maybeSingle();
     if (!row || row.user_id !== userId || !mentionsPrice(row.content)) return { added: 0 };
 
-    const { data: profile } = await supabase.from("profiles").select("name, district, upazila").eq("id", userId).maybeSingle();
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("name, district, upazila")
+      .eq("id", userId)
+      .maybeSingle();
     if (!profile?.district) return { added: 0 };
 
     const apiKey = process.env.LOVABLE_API_KEY;
@@ -66,7 +76,11 @@ export const capturePricesFromContent = createServerFn({ method: "POST" })
     };
     const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
       method: "POST",
-      headers: { "Lovable-API-Key": apiKey, "Content-Type": "application/json", "X-Lovable-AIG-SDK": "fetch" },
+      headers: {
+        "Lovable-API-Key": apiKey,
+        "Content-Type": "application/json",
+        "X-Lovable-AIG-SDK": "fetch",
+      },
       body: JSON.stringify({
         model: "openai/gpt-6-astra",
         input: prompt,
@@ -92,7 +106,9 @@ export const capturePricesFromContent = createServerFn({ method: "POST" })
         try {
           const ev = JSON.parse(line.slice(5).trim()) as { type?: string; delta?: string };
           if (ev.type === "response.output_text.delta" && ev.delta) raw += ev.delta;
-        } catch { /* ignore keep-alives */ }
+        } catch {
+          /* ignore keep-alives */
+        }
       }
     }
     let parsed: z.infer<typeof extractedSchema>;

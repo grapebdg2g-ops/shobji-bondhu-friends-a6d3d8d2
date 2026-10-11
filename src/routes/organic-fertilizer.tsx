@@ -62,9 +62,15 @@ function OrganicFertilizerPage() {
   const item = ORGANIC_FERTILIZER_GUIDE[active] as any;
   const { data: managedVideos = [] } = useOrganicGuideVideos();
   const activeVideos = managedVideos.filter((video) => video.guide_key === active);
-  const videos = activeVideos.length > 0
-    ? activeVideos.map((video) => ({ title: video.title, url: video.youtube_url, source: video.source, duration: video.duration }))
-    : (item.videoLinks ?? []);
+  const videos =
+    activeVideos.length > 0
+      ? activeVideos.map((video) => ({
+          title: video.title,
+          url: video.youtube_url,
+          source: video.source,
+          duration: video.duration,
+        }))
+      : (item.videoLinks ?? []);
 
   return (
     <main className="min-h-screen bg-[#F0FFF4] md:max-w-[560px] md:mx-auto pb-20">
@@ -125,11 +131,7 @@ function OrganicFertilizerPage() {
         {item.nitrogenProvided && (
           <Card title="🌱 নাইট্রোজেন সরবরাহ">
             <div className="grid gap-2">
-              <Stat
-                label="প্রতি বিঘায়"
-                value={item.nitrogenProvided.perBigha}
-                tone="emerald"
-              />
+              <Stat label="প্রতি বিঘায়" value={item.nitrogenProvided.perBigha} tone="emerald" />
               <Stat
                 label="ইউরিয়া সাশ্রয়"
                 value={item.nitrogenProvided.equivalentUrea}
@@ -152,9 +154,7 @@ function OrganicFertilizerPage() {
         )}
 
         {/* SECTION 4 — Calculator */}
-        {CALC_KEYS[active] && (
-          <Calculator activeKey={active} />
-        )}
+        {CALC_KEYS[active] && <Calculator activeKey={active} />}
 
         {/* Business potential — vermicompost only */}
         {item.businessPotential && (
@@ -183,9 +183,7 @@ function OrganicFertilizerPage() {
                   >
                     <span className="text-2xl">📹</span>
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm font-semibold text-gray-900 truncate">
-                        {v.title}
-                      </div>
+                      <div className="text-sm font-semibold text-gray-900 truncate">{v.title}</div>
                       <div className="text-[11px] text-gray-500">
                         {v.source}
                         {v.duration ? ` • ${v.duration}` : ""}
@@ -329,9 +327,7 @@ function StepsCard({ steps, color }: { steps: any[]; color: string }) {
               >
                 {s.step}
               </div>
-              {i < steps.length - 1 && (
-                <div className="w-px flex-1 bg-gray-200 my-1" />
-              )}
+              {i < steps.length - 1 && <div className="w-px flex-1 bg-gray-200 my-1" />}
             </div>
             <div className="flex-1 pb-1">
               <div className="flex items-start justify-between gap-2">
@@ -373,7 +369,9 @@ function Recipes({ recipes, color }: { recipes: any[]; color: string }) {
                 <div className="text-xs font-semibold text-gray-500 mb-1.5">উপকরণ</div>
                 <ul className="space-y-1">
                   {r.ingredients.map((i: string) => (
-                    <li key={i} className="text-sm text-gray-800">• {i}</li>
+                    <li key={i} className="text-sm text-gray-800">
+                      • {i}
+                    </li>
                   ))}
                 </ul>
               </div>
@@ -383,7 +381,9 @@ function Recipes({ recipes, color }: { recipes: any[]; color: string }) {
               onClick={() => setOpen(isOpen ? null : r.name)}
               className="w-full px-4 py-2.5 text-sm font-semibold text-emerald-700 bg-emerald-50 flex items-center justify-center gap-1 border-t border-emerald-100"
             >
-              <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+              <ChevronDown
+                className={`h-4 w-4 transition-transform ${isOpen ? "rotate-180" : ""}`}
+              />
               প্রস্তুত প্রণালী {isOpen ? "লুকান" : "দেখুন"}
             </button>
 
@@ -441,11 +441,14 @@ function Calculator({ activeKey }: { activeKey: OrganicFertilizerKey }) {
   const getRateKey = (name: string) => {
     if (availableCrops.has(name)) return name;
     if (name.includes("ধান") && availableCrops.has("ধান")) return "ধান";
-    if ((name === "লাউ" || name === "মিষ্টি কুমড়া") && availableCrops.has("লাউ/কুমড়া")) return "লাউ/কুমড়া";
+    if ((name === "লাউ" || name === "মিষ্টি কুমড়া") && availableCrops.has("লাউ/কুমড়া"))
+      return "লাউ/কুমড়া";
     return null;
   };
 
-  const [crop, setCrop] = useState<string>(() => crops.find((name) => getRateKey(name)) ?? crops[0]);
+  const [crop, setCrop] = useState<string>(
+    () => crops.find((name) => getRateKey(name)) ?? crops[0],
+  );
   const [areaInput, setAreaInput] = useState<string>("1");
   const [unit, setUnit] = useState<Unit>("bigha");
 
@@ -469,15 +472,12 @@ function Calculator({ activeKey }: { activeKey: OrganicFertilizerKey }) {
       }
     : null;
   const moneySaved = savings
-    ? Math.round(
-        savings.urea * PRICES.urea + savings.tsp * PRICES.tsp + savings.mop * PRICES.mop
-      )
+    ? Math.round(savings.urea * PRICES.urea + savings.tsp * PRICES.tsp + savings.mop * PRICES.mop)
     : 0;
 
   const bn1 = (n: number) => toBn(n.toFixed(1).replace(/\.0$/, ""));
-  const conv = shotok > 0
-    ? `= ${bn1(shotok)} শতক = ${bn1(shotok / 33)} বিঘা = ${bn1(shotok / 100)} একর`
-    : "";
+  const conv =
+    shotok > 0 ? `= ${bn1(shotok)} শতক = ${bn1(shotok / 33)} বিঘা = ${bn1(shotok / 100)} একর` : "";
 
   return (
     <Card title="কতটুকু দেবেন?">
@@ -490,7 +490,10 @@ function Calculator({ activeKey }: { activeKey: OrganicFertilizerKey }) {
             className="mt-1 w-full h-11 rounded-xl border border-gray-200 px-3 bg-white text-sm"
           >
             {crops.map((c) => (
-              <option key={c} value={c} disabled={!getRateKey(c)}>{c}{getRateKey(c) ? "" : " — শীঘ্রই"}</option>
+              <option key={c} value={c} disabled={!getRateKey(c)}>
+                {c}
+                {getRateKey(c) ? "" : " — শীঘ্রই"}
+              </option>
             ))}
           </select>
         </div>
@@ -513,13 +516,13 @@ function Calculator({ activeKey }: { activeKey: OrganicFertilizerKey }) {
               className="h-11 px-3 rounded-xl bg-gray-100 text-sm font-semibold"
             >
               {(Object.keys(UNIT_LABEL) as Unit[]).map((u) => (
-                <option key={u} value={u}>{UNIT_LABEL[u]}</option>
+                <option key={u} value={u}>
+                  {UNIT_LABEL[u]}
+                </option>
               ))}
             </select>
           </div>
-          {conv && (
-            <p className="mt-1.5 text-xs text-emerald-700 font-semibold">{conv}</p>
-          )}
+          {conv && <p className="mt-1.5 text-xs text-emerald-700 font-semibold">{conv}</p>}
         </div>
 
         {area > 0 && ratePerBigha > 0 && (
@@ -527,7 +530,6 @@ function Calculator({ activeKey }: { activeKey: OrganicFertilizerKey }) {
             <div className="font-bold text-emerald-900">
               {crop} — {toBn(area)} {UNIT_LABEL[unit]}-এর জন্য
             </div>
-
 
             <div className="flex items-center justify-between bg-white rounded-xl p-3">
               <span className="flex items-center gap-2 text-sm font-semibold text-gray-800">
@@ -556,7 +558,8 @@ function Calculator({ activeKey }: { activeKey: OrganicFertilizerKey }) {
         )}
         {area > 0 && ratePerBigha <= 0 && (
           <div className="mt-2 rounded-2xl border border-sky-200 bg-sky-50 p-3 text-xs leading-relaxed text-sky-900">
-            এই crop-এর জৈব সারের rate এখনও যোগ করা হয়নি। master crop catalog-এ cropটি আছে; rate যুক্ত হলে calculator-এ স্বয়ংক্রিয়ভাবে সক্রিয় হবে।
+            এই crop-এর জৈব সারের rate এখনও যোগ করা হয়নি। master crop catalog-এ cropটি আছে; rate
+            যুক্ত হলে calculator-এ স্বয়ংক্রিয়ভাবে সক্রিয় হবে।
           </div>
         )}
       </div>
@@ -567,7 +570,9 @@ function Calculator({ activeKey }: { activeKey: OrganicFertilizerKey }) {
 function SaveRow({ label, pct, kg }: { label: string; pct: number; kg: number }) {
   return (
     <li className="flex justify-between text-gray-800">
-      <span>{label}: {Math.round(pct * 100)}% কম</span>
+      <span>
+        {label}: {Math.round(pct * 100)}% কম
+      </span>
       <span className="font-semibold">= {kg} কেজি সাশ্রয়</span>
     </li>
   );

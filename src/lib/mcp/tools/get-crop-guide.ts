@@ -8,7 +8,11 @@ export default defineTool({
   description:
     "Get the full Bengali cultivation guide for one crop: stages, tasks, fertilizer schedule, varieties, costs, risks and tips.",
   inputSchema: {
-    crop: z.string().trim().min(1).describe("Crop id, Bengali name, or English name, e.g. 'tomato' / 'টমেটো'."),
+    crop: z
+      .string()
+      .trim()
+      .min(1)
+      .describe("Crop id, Bengali name, or English name, e.g. 'tomato' / 'টমেটো'."),
   },
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
   handler: ({ crop }) => {

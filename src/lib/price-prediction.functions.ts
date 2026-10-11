@@ -124,7 +124,6 @@ export const getPricePrediction = createServerFn({ method: "POST" })
       };
     }
 
-
     // ── Step 2: weather ──
     const [lat, lon] = getDistrictLatLng(district);
     let weather: { daily?: { precipitation_sum?: number[]; temperature_2m_max?: number[] } } = {};

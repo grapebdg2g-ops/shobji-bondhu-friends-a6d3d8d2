@@ -3,11 +3,26 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
 import {
-  ArrowLeft, TrendingUp, TrendingDown, ArrowRight, Bell, RotateCw, Share2,
-  Calendar, CloudRain, Info, Sparkles,
+  ArrowLeft,
+  TrendingUp,
+  TrendingDown,
+  ArrowRight,
+  Bell,
+  RotateCw,
+  Share2,
+  Calendar,
+  CloudRain,
+  Info,
+  Sparkles,
 } from "lucide-react";
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
   ReferenceArea,
 } from "recharts";
 import { z } from "zod";
@@ -29,7 +44,10 @@ export const Route = createFileRoute("/price-prediction")({
     meta: [
       { title: "দামের পূর্বাভাস — কৃষক বন্ধু" },
       { property: "og:title", content: "দামের পূর্বাভাস — কৃষক বন্ধু" },
-      { property: "og:description", content: "AI ও বাজার ডেটা বিশ্লেষণ দিয়ে কৃষিপণ্যের দাম পূর্বাভাস।" },
+      {
+        property: "og:description",
+        content: "AI ও বাজার ডেটা বিশ্লেষণ দিয়ে কৃষিপণ্যের দাম পূর্বাভাস।",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "description", content: "AI ও বাজার ডেটা বিশ্লেষণ দিয়ে কৃষিপণ্যের দাম পূর্বাভাস।" },
@@ -39,7 +57,7 @@ export const Route = createFileRoute("/price-prediction")({
 
 const POPULAR = POPULAR_CROP_OPTIONS.map((crop) => ({ name: crop.label, icon: crop.icon }));
 
-const BN_DIGITS = ["০","১","২","৩","৪","৫","৬","৭","৮","৯"];
+const BN_DIGITS = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
 const toBn = (n: number | string) => String(n).replace(/\d/g, (d) => BN_DIGITS[+d]);
 
 type Prediction = {
@@ -86,7 +104,10 @@ function PricePredictionPage() {
 
   useEffect(() => {
     if (userLoading) return;
-    if (!user) { navigate({ to: "/login" }); return; }
+    if (!user) {
+      navigate({ to: "/login" });
+      return;
+    }
     if (!district && user.district) setDistrict(user.district);
   }, [user, userLoading, district, navigate]);
 
@@ -101,8 +122,14 @@ function PricePredictionPage() {
   async function handleSubmit(p?: string, d?: string) {
     const prod = (p ?? product).trim();
     const dist = (d ?? district).trim();
-    if (!prod) { toast.error("পণ্য নির্বাচন করুন"); return; }
-    if (!dist) { toast.error("জেলা নির্বাচন করুন"); return; }
+    if (!prod) {
+      toast.error("পণ্য নির্বাচন করুন");
+      return;
+    }
+    if (!dist) {
+      toast.error("জেলা নির্বাচন করুন");
+      return;
+    }
     setLoading(true);
     setStep(0);
     setResult(null);
@@ -186,13 +213,14 @@ function PricePredictionPage() {
             </div>
           )}
           <SelectorScreen
-            product={product} setProduct={setProduct}
-            district={district} setDistrict={setDistrict}
+            product={product}
+            setProduct={setProduct}
+            district={district}
+            setDistrict={setDistrict}
             onSubmit={() => handleSubmit()}
           />
         </>
       )}
-
 
       {loading && <LoadingScreen step={step} />}
 
@@ -213,8 +241,10 @@ function PricePredictionPage() {
 /* ──────────────────── SELECTOR ──────────────────── */
 
 function SelectorScreen(props: {
-  product: string; setProduct: (s: string) => void;
-  district: string; setDistrict: (s: string) => void;
+  product: string;
+  setProduct: (s: string) => void;
+  district: string;
+  setDistrict: (s: string) => void;
   onSubmit: () => void;
 }) {
   const { product, setProduct, district, setDistrict, onSubmit } = props;
@@ -222,9 +252,7 @@ function SelectorScreen(props: {
   return (
     <div className="p-4 space-y-5 animate-fade-in">
       <div>
-        <label className="text-sm font-semibold text-gray-700 mb-2 block">
-          🔍 পণ্য খুঁজুন
-        </label>
+        <label className="text-sm font-semibold text-gray-700 mb-2 block">🔍 পণ্য খুঁজুন</label>
         <input
           type="text"
           value={product}
@@ -254,16 +282,18 @@ function SelectorScreen(props: {
       </div>
 
       <div>
-        <label className="text-sm font-semibold text-gray-700 mb-2 block">
-          📍 জেলা
-        </label>
+        <label className="text-sm font-semibold text-gray-700 mb-2 block">📍 জেলা</label>
         <select
           value={district}
           onChange={(e) => setDistrict(e.target.value)}
           className="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none text-base"
         >
           <option value="">জেলা নির্বাচন করুন</option>
-          {DISTRICTS.map((d) => <option key={d} value={d}>{d}</option>)}
+          {DISTRICTS.map((d) => (
+            <option key={d} value={d}>
+              {d}
+            </option>
+          ))}
         </select>
       </div>
 
@@ -302,15 +332,24 @@ function LoadingScreen({ step }: { step: number }) {
           const active = i === step;
           return (
             <div key={label} className="flex items-center gap-3 text-base">
-              <span className={`inline-flex w-6 h-6 rounded-full items-center justify-center text-sm ${
-                done ? "bg-emerald-500 text-white"
-                  : active ? "bg-amber-100 text-amber-700 animate-pulse"
-                  : "bg-gray-100 text-gray-400"
-              }`}>
+              <span
+                className={`inline-flex w-6 h-6 rounded-full items-center justify-center text-sm ${
+                  done
+                    ? "bg-emerald-500 text-white"
+                    : active
+                      ? "bg-amber-100 text-amber-700 animate-pulse"
+                      : "bg-gray-100 text-gray-400"
+                }`}
+              >
                 {done ? "✓" : active ? "⏳" : "○"}
               </span>
-              <span className={done ? "text-gray-700" : active ? "text-gray-800 font-medium" : "text-gray-400"}>
-                {label}{active && "..."}
+              <span
+                className={
+                  done ? "text-gray-700" : active ? "text-gray-800 font-medium" : "text-gray-400"
+                }
+              >
+                {label}
+                {active && "..."}
               </span>
             </div>
           );
@@ -334,28 +373,43 @@ function ResultScreen(props: {
   const p = result.prediction;
 
   const dirInfo = useMemo(() => {
-    if (p.direction.includes("বাড়")) return {
-      bg: "bg-gradient-to-br from-red-50 to-orange-50", icon: TrendingUp, color: "text-red-600", label: "দাম বাড়বে",
-    };
-    if (p.direction.includes("কম")) return {
-      bg: "bg-gradient-to-br from-green-50 to-emerald-50", icon: TrendingDown, color: "text-green-600", label: "দাম কমবে",
-    };
+    if (p.direction.includes("বাড়"))
+      return {
+        bg: "bg-gradient-to-br from-red-50 to-orange-50",
+        icon: TrendingUp,
+        color: "text-red-600",
+        label: "দাম বাড়বে",
+      };
+    if (p.direction.includes("কম"))
+      return {
+        bg: "bg-gradient-to-br from-green-50 to-emerald-50",
+        icon: TrendingDown,
+        color: "text-green-600",
+        label: "দাম কমবে",
+      };
     return {
-      bg: "bg-gradient-to-br from-blue-50 to-sky-50", icon: ArrowRight, color: "text-blue-600", label: "দাম স্থির",
+      bg: "bg-gradient-to-br from-blue-50 to-sky-50",
+      icon: ArrowRight,
+      color: "text-blue-600",
+      label: "দাম স্থির",
     };
   }, [p.direction]);
 
   const risk = p.risk_level || "মাঝারি";
-  const riskColor = risk.includes("কম") ? "bg-green-100 text-green-700"
-    : risk.includes("বেশি") ? "bg-red-100 text-red-700"
-    : "bg-amber-100 text-amber-700";
+  const riskColor = risk.includes("কম")
+    ? "bg-green-100 text-green-700"
+    : risk.includes("বেশি")
+      ? "bg-red-100 text-red-700"
+      : "bg-amber-100 text-amber-700";
   const riskEmoji = risk.includes("কম") ? "🟢" : risk.includes("বেশি") ? "🔴" : "🟡";
 
   return (
     <div className="p-4 space-y-4 animate-fade-in">
       {/* MAIN CARD */}
       <div className={`relative rounded-2xl p-6 shadow-sm ${dirInfo.bg}`}>
-        <div className={`absolute top-3 right-3 px-2.5 py-1 rounded-full text-xs font-semibold ${riskColor}`}>
+        <div
+          className={`absolute top-3 right-3 px-2.5 py-1 rounded-full text-xs font-semibold ${riskColor}`}
+        >
           {riskEmoji} {risk} ঝুঁকি
         </div>
 
@@ -369,7 +423,9 @@ function ResultScreen(props: {
           <div className="mt-4 grid grid-cols-2 gap-3 w-full text-sm">
             <div className="bg-white/70 rounded-lg p-3">
               <div className="text-gray-500 text-xs">বর্তমান</div>
-              <div className="font-bold text-gray-800 text-base">৳{toBn(p.current_avg_price)}/কেজি</div>
+              <div className="font-bold text-gray-800 text-base">
+                ৳{toBn(p.current_avg_price)}/কেজি
+              </div>
             </div>
             <div className="bg-white/70 rounded-lg p-3">
               <div className="text-gray-500 text-xs">পূর্বাভাস</div>
@@ -381,10 +437,14 @@ function ResultScreen(props: {
 
           <div className="mt-4 w-full">
             <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
-              <span>নির্ভরযোগ্যতা</span><span className="font-semibold">{toBn(p.confidence)}%</span>
+              <span>নির্ভরযোগ্যতা</span>
+              <span className="font-semibold">{toBn(p.confidence)}%</span>
             </div>
             <div className="h-2 bg-white/70 rounded-full overflow-hidden">
-              <div className={`h-full ${dirInfo.color.replace("text-", "bg-")}`} style={{ width: `${p.confidence}%` }} />
+              <div
+                className={`h-full ${dirInfo.color.replace("text-", "bg-")}`}
+                style={{ width: `${p.confidence}%` }}
+              />
             </div>
           </div>
         </div>
@@ -409,10 +469,15 @@ function ResultScreen(props: {
           <div className="text-sm font-semibold text-gray-700 mb-3">প্রভাবকারী কারণসমূহ</div>
           <div className="space-y-2.5">
             {p.factors.map((f, i) => {
-              const icon = /বৃষ্টি|আবহাওয়া|তাপ/.test(f) ? <CloudRain className="w-4 h-4" />
-                : /মৌসুম|মাস/.test(f) ? <Calendar className="w-4 h-4" />
-                : /দাম|বেড়|কম/.test(f) ? <TrendingUp className="w-4 h-4" />
-                : <Info className="w-4 h-4" />;
+              const icon = /বৃষ্টি|আবহাওয়া|তাপ/.test(f) ? (
+                <CloudRain className="w-4 h-4" />
+              ) : /মৌসুম|মাস/.test(f) ? (
+                <Calendar className="w-4 h-4" />
+              ) : /দাম|বেড়|কম/.test(f) ? (
+                <TrendingUp className="w-4 h-4" />
+              ) : (
+                <Info className="w-4 h-4" />
+              );
               return (
                 <div key={i} className="flex items-start gap-2.5 text-sm text-gray-700">
                   <span className="text-emerald-600 mt-0.5">{icon}</span>
@@ -436,22 +501,29 @@ function ResultScreen(props: {
       {/* SOURCE */}
       <div className="text-xs text-gray-500 text-center space-y-1">
         <div>📊 তথ্য উৎস: কৃষক বন্ধু বাজার ডেটা + সরকারি DAM ডেটা</div>
-        {result.cached && result.cached_at && (
-          <div>🕐 আপডেট: {relativeTime(result.cached_at)}</div>
-        )}
+        {result.cached && result.cached_at && <div>🕐 আপডেট: {relativeTime(result.cached_at)}</div>}
       </div>
 
       {/* ACTIONS */}
       <div className="grid grid-cols-3 gap-2 pt-2">
-        <button onClick={onAlert} className="flex flex-col items-center gap-1 py-3 rounded-xl bg-white border border-gray-200 text-sm active:scale-95">
+        <button
+          onClick={onAlert}
+          className="flex flex-col items-center gap-1 py-3 rounded-xl bg-white border border-gray-200 text-sm active:scale-95"
+        >
           <Bell className="w-5 h-5 text-amber-600" />
           <span className="text-xs">দাম জানান</span>
         </button>
-        <button onClick={onReset} className="flex flex-col items-center gap-1 py-3 rounded-xl bg-white border border-gray-200 text-sm active:scale-95">
+        <button
+          onClick={onReset}
+          className="flex flex-col items-center gap-1 py-3 rounded-xl bg-white border border-gray-200 text-sm active:scale-95"
+        >
           <RotateCw className="w-5 h-5 text-emerald-600" />
           <span className="text-xs">নতুন পূর্বাভাস</span>
         </button>
-        <button onClick={onShare} className="flex flex-col items-center gap-1 py-3 rounded-xl bg-white border border-gray-200 text-sm active:scale-95">
+        <button
+          onClick={onShare}
+          className="flex flex-col items-center gap-1 py-3 rounded-xl bg-white border border-gray-200 text-sm active:scale-95"
+        >
           <Share2 className="w-5 h-5 text-blue-600" />
           <span className="text-xs">শেয়ার</span>
         </button>
@@ -462,7 +534,13 @@ function ResultScreen(props: {
 
 /* ──────────────────── CHART ──────────────────── */
 
-function HistoryChart({ history, prediction }: { history: HistoryPoint[]; prediction: Prediction }) {
+function HistoryChart({
+  history,
+  prediction,
+}: {
+  history: HistoryPoint[];
+  prediction: Prediction;
+}) {
   // Bucket by date with separate fields per source
   const byDate = new Map<string, { date: string; app?: number; govt?: number }>();
   for (const h of history) {
@@ -475,7 +553,9 @@ function HistoryChart({ history, prediction }: { history: HistoryPoint[]; predic
 
   // Append 7-day prediction zone using midpoint
   const lastDate = past.at(-1)?.date ?? new Date().toISOString().slice(0, 10);
-  const midPred = ((prediction.predicted_price_range?.min ?? 0) + (prediction.predicted_price_range?.max ?? 0)) / 2;
+  const midPred =
+    ((prediction.predicted_price_range?.min ?? 0) + (prediction.predicted_price_range?.max ?? 0)) /
+    2;
   const future: Array<{ date: string; predicted: number }> = [];
   for (let i = 1; i <= 7; i++) {
     const d = new Date(lastDate);
@@ -484,7 +564,12 @@ function HistoryChart({ history, prediction }: { history: HistoryPoint[]; predic
   }
   const data = [
     ...past.map((p) => ({ ...p, predicted: undefined as number | undefined })),
-    ...future.map((f) => ({ date: f.date, app: undefined, govt: undefined, predicted: f.predicted })),
+    ...future.map((f) => ({
+      date: f.date,
+      app: undefined,
+      govt: undefined,
+      predicted: f.predicted,
+    })),
   ];
   const firstFuture = future[0]?.date;
   const lastFuture = future.at(-1)?.date;
@@ -513,16 +598,50 @@ function HistoryChart({ history, prediction }: { history: HistoryPoint[]; predic
             {firstFuture && lastFuture && (
               <ReferenceArea x1={firstFuture} x2={lastFuture} fill="#fef3c7" fillOpacity={0.5} />
             )}
-            <Line type="monotone" dataKey="app" name="অ্যাপ ডেটা" stroke="#2563eb" strokeWidth={2} dot={{ r: 2 }} connectNulls />
-            <Line type="monotone" dataKey="govt" name="সরকারি (DAM)" stroke="#f97316" strokeWidth={2} dot={{ r: 2 }} connectNulls />
-            <Line type="monotone" dataKey="predicted" name="পূর্বাভাস" stroke="#10b981" strokeWidth={2} strokeDasharray="5 4" dot={false} />
+            <Line
+              type="monotone"
+              dataKey="app"
+              name="অ্যাপ ডেটা"
+              stroke="#2563eb"
+              strokeWidth={2}
+              dot={{ r: 2 }}
+              connectNulls
+            />
+            <Line
+              type="monotone"
+              dataKey="govt"
+              name="সরকারি (DAM)"
+              stroke="#f97316"
+              strokeWidth={2}
+              dot={{ r: 2 }}
+              connectNulls
+            />
+            <Line
+              type="monotone"
+              dataKey="predicted"
+              name="পূর্বাভাস"
+              stroke="#10b981"
+              strokeWidth={2}
+              strokeDasharray="5 4"
+              dot={false}
+            />
           </LineChart>
         </ResponsiveContainer>
       </div>
       <div className="flex gap-3 text-xs text-gray-600 mt-2 flex-wrap">
-        <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-blue-600 inline-block" /> অ্যাপ ডেটা</span>
-        <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-orange-500 inline-block" /> সরকারি DAM</span>
-        <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-emerald-500 inline-block" style={{ borderTop: "2px dashed" }} /> পূর্বাভাস</span>
+        <span className="flex items-center gap-1">
+          <span className="w-3 h-0.5 bg-blue-600 inline-block" /> অ্যাপ ডেটা
+        </span>
+        <span className="flex items-center gap-1">
+          <span className="w-3 h-0.5 bg-orange-500 inline-block" /> সরকারি DAM
+        </span>
+        <span className="flex items-center gap-1">
+          <span
+            className="w-3 h-0.5 bg-emerald-500 inline-block"
+            style={{ borderTop: "2px dashed" }}
+          />{" "}
+          পূর্বাভাস
+        </span>
       </div>
     </div>
   );

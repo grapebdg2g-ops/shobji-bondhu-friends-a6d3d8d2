@@ -21,7 +21,11 @@ export const pushGroupMessage = createServerFn({ method: "POST" })
 
     const [{ data: group }, { data: members }, { data: sender }] = await Promise.all([
       supabaseAdmin.from("group_chats").select("name").eq("id", msg.group_id).maybeSingle(),
-      supabaseAdmin.from("group_chat_members").select("user_id").eq("group_id", msg.group_id).neq("user_id", userId),
+      supabaseAdmin
+        .from("group_chat_members")
+        .select("user_id")
+        .eq("group_id", msg.group_id)
+        .neq("user_id", userId),
       supabaseAdmin.from("profiles").select("name").eq("id", userId).maybeSingle(),
     ]);
     const ids = (members ?? []).map((m) => m.user_id);

@@ -1,12 +1,29 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import {
-  Users, UserPlus, FileText, Bug, Repeat2, TrendingUp, Star, DollarSign,
+  Users,
+  UserPlus,
+  FileText,
+  Bug,
+  Repeat2,
+  TrendingUp,
+  Star,
+  DollarSign,
   Activity,
 } from "lucide-react";
 import {
-  LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, ResponsiveContainer,
-  XAxis, YAxis, Tooltip, CartesianGrid,
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
 } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
 import { toBn, fmtBdt } from "@/lib/bn";
@@ -25,18 +42,29 @@ function OverviewPage() {
     refetchInterval: 30_000,
     queryFn: async () => {
       const startToday = startOfDay(new Date()).toISOString();
-      const [
-        farmers, todayUsers, posts, todayPosts, exchanges, prices, disease, todayDisease,
-      ] = await Promise.all([
-        supabase.from("profiles").select("id", { count: "exact", head: true }),
-        supabase.from("profiles").select("id", { count: "exact", head: true }).gte("created_at", startToday),
-        supabase.from("posts").select("*", { count: "exact", head: true }),
-        supabase.from("posts").select("*", { count: "exact", head: true }).gte("created_at", startToday),
-        supabase.from("exchanges").select("*", { count: "exact", head: true }).eq("is_active", true),
-        supabase.from("prices").select("*", { count: "exact", head: true }),
-        supabase.from("disease_history").select("*", { count: "exact", head: true }),
-        supabase.from("disease_history").select("*", { count: "exact", head: true }).gte("created_at", startToday),
-      ]);
+      const [farmers, todayUsers, posts, todayPosts, exchanges, prices, disease, todayDisease] =
+        await Promise.all([
+          supabase.from("profiles").select("id", { count: "exact", head: true }),
+          supabase
+            .from("profiles")
+            .select("id", { count: "exact", head: true })
+            .gte("created_at", startToday),
+          supabase.from("posts").select("*", { count: "exact", head: true }),
+          supabase
+            .from("posts")
+            .select("*", { count: "exact", head: true })
+            .gte("created_at", startToday),
+          supabase
+            .from("exchanges")
+            .select("*", { count: "exact", head: true })
+            .eq("is_active", true),
+          supabase.from("prices").select("*", { count: "exact", head: true }),
+          supabase.from("disease_history").select("*", { count: "exact", head: true }),
+          supabase
+            .from("disease_history")
+            .select("*", { count: "exact", head: true })
+            .gte("created_at", startToday),
+        ]);
       return {
         farmers: farmers.count ?? 0,
         todayUsers: todayUsers.count ?? 0,
@@ -132,33 +160,61 @@ function OverviewPage() {
     refetchInterval: 30_000,
     queryFn: async () => {
       const [profs, posts, reports, dx] = await Promise.all([
-        supabase.from("profiles").select("id, name, district, created_at").order("created_at", { ascending: false }).limit(8),
-        supabase.from("posts").select("id, user_name, content, created_at").order("created_at", { ascending: false }).limit(8),
-        supabase.from("user_reports").select("id, content_type, reason, created_at").order("created_at", { ascending: false }).limit(8),
-        supabase.from("disease_history").select("id, disease_name, crop_type, created_at").order("created_at", { ascending: false }).limit(8),
+        supabase
+          .from("profiles")
+          .select("id, name, district, created_at")
+          .order("created_at", { ascending: false })
+          .limit(8),
+        supabase
+          .from("posts")
+          .select("id, user_name, content, created_at")
+          .order("created_at", { ascending: false })
+          .limit(8),
+        supabase
+          .from("user_reports")
+          .select("id, content_type, reason, created_at")
+          .order("created_at", { ascending: false })
+          .limit(8),
+        supabase
+          .from("disease_history")
+          .select("id, disease_name, crop_type, created_at")
+          .order("created_at", { ascending: false })
+          .limit(8),
       ]);
       type Item = { kind: string; icon: string; text: string; at: string };
       const out: Item[] = [];
-      (profs.data ?? []).forEach((p) => out.push({
-        kind: "user", icon: "🧑",
-        text: `নতুন কৃষক: ${p.name || "—"}${p.district ? ", " + p.district : ""}`,
-        at: p.created_at,
-      }));
-      (posts.data ?? []).forEach((p) => out.push({
-        kind: "post", icon: "📝",
-        text: `${p.user_name || "একজন"}: ${(p.content || "").slice(0, 40)}…`,
-        at: p.created_at,
-      }));
-      (reports.data ?? []).forEach((r) => out.push({
-        kind: "report", icon: "⚠️",
-        text: `রিপোর্ট: ${r.content_type} — ${r.reason}`,
-        at: r.created_at,
-      }));
-      (dx.data ?? []).forEach((d) => out.push({
-        kind: "dx", icon: "🐛",
-        text: `${d.crop_type}: ${d.disease_name}`,
-        at: d.created_at,
-      }));
+      (profs.data ?? []).forEach((p) =>
+        out.push({
+          kind: "user",
+          icon: "🧑",
+          text: `নতুন কৃষক: ${p.name || "—"}${p.district ? ", " + p.district : ""}`,
+          at: p.created_at,
+        }),
+      );
+      (posts.data ?? []).forEach((p) =>
+        out.push({
+          kind: "post",
+          icon: "📝",
+          text: `${p.user_name || "একজন"}: ${(p.content || "").slice(0, 40)}…`,
+          at: p.created_at,
+        }),
+      );
+      (reports.data ?? []).forEach((r) =>
+        out.push({
+          kind: "report",
+          icon: "⚠️",
+          text: `রিপোর্ট: ${r.content_type} — ${r.reason}`,
+          at: r.created_at,
+        }),
+      );
+      (dx.data ?? []).forEach((d) =>
+        out.push({
+          kind: "dx",
+          icon: "🐛",
+          text: `${d.crop_type}: ${d.disease_name}`,
+          at: d.created_at,
+        }),
+      );
       return out.sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime()).slice(0, 20);
     },
   });
@@ -167,14 +223,58 @@ function OverviewPage() {
     <div className="space-y-6">
       {/* Stat cards */}
       <section className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <Stat icon={Users} label="মোট কৃষক" value={stats?.farmers ?? 0} accent="bg-emerald-50 text-emerald-700" />
-        <Stat icon={UserPlus} label="আজকের নতুন" value={stats?.todayUsers ?? 0} accent="bg-sky-50 text-sky-700" />
-        <Stat icon={FileText} label="মোট পোস্ট" value={stats?.posts ?? 0} sub={`আজ: ${toBn(stats?.todayPosts ?? 0)}`} accent="bg-amber-50 text-amber-700" />
-        <Stat icon={Bug} label="AI বিশ্লেষণ" value={stats?.disease ?? 0} sub={`আজ: ${toBn(stats?.todayDisease ?? 0)}`} accent="bg-purple-50 text-purple-700" />
-        <Stat icon={Repeat2} label="বিনিময়" value={stats?.exchanges ?? 0} accent="bg-rose-50 text-rose-700" />
-        <Stat icon={TrendingUp} label="দাম আপডেট" value={stats?.prices ?? 0} accent="bg-cyan-50 text-cyan-700" />
-        <Stat icon={Star} label="Pro User" value={0} sub="শীঘ্রই" accent="bg-yellow-50 text-yellow-700" />
-        <Stat icon={DollarSign} label="Revenue" valueRaw={fmtBdt(0)} sub="শীঘ্রই" accent="bg-green-50 text-green-700" />
+        <Stat
+          icon={Users}
+          label="মোট কৃষক"
+          value={stats?.farmers ?? 0}
+          accent="bg-emerald-50 text-emerald-700"
+        />
+        <Stat
+          icon={UserPlus}
+          label="আজকের নতুন"
+          value={stats?.todayUsers ?? 0}
+          accent="bg-sky-50 text-sky-700"
+        />
+        <Stat
+          icon={FileText}
+          label="মোট পোস্ট"
+          value={stats?.posts ?? 0}
+          sub={`আজ: ${toBn(stats?.todayPosts ?? 0)}`}
+          accent="bg-amber-50 text-amber-700"
+        />
+        <Stat
+          icon={Bug}
+          label="AI বিশ্লেষণ"
+          value={stats?.disease ?? 0}
+          sub={`আজ: ${toBn(stats?.todayDisease ?? 0)}`}
+          accent="bg-purple-50 text-purple-700"
+        />
+        <Stat
+          icon={Repeat2}
+          label="বিনিময়"
+          value={stats?.exchanges ?? 0}
+          accent="bg-rose-50 text-rose-700"
+        />
+        <Stat
+          icon={TrendingUp}
+          label="দাম আপডেট"
+          value={stats?.prices ?? 0}
+          accent="bg-cyan-50 text-cyan-700"
+        />
+        <Stat
+          icon={Star}
+          label="Pro User"
+          value={0}
+          sub="শীঘ্রই"
+          accent="bg-yellow-50 text-yellow-700"
+        />
+        <Stat
+          icon={DollarSign}
+          label="Revenue"
+          valueRaw={fmtBdt(0)}
+          sub="শীঘ্রই"
+          accent="bg-green-50 text-green-700"
+        />
       </section>
 
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -221,7 +321,10 @@ function OverviewPage() {
           <div className="overflow-x-auto -mx-1">
             <table className="w-full text-sm">
               <thead className="text-left text-xs text-gray-500">
-                <tr><th className="py-1.5 px-2">জেলা</th><th className="py-1.5 px-2 text-right">কৃষক</th></tr>
+                <tr>
+                  <th className="py-1.5 px-2">জেলা</th>
+                  <th className="py-1.5 px-2 text-right">কৃষক</th>
+                </tr>
               </thead>
               <tbody>
                 {districts.map((d) => (
@@ -231,7 +334,11 @@ function OverviewPage() {
                   </tr>
                 ))}
                 {districts.length === 0 && (
-                  <tr><td colSpan={2} className="text-center text-gray-400 py-6">কোনো তথ্য নেই</td></tr>
+                  <tr>
+                    <td colSpan={2} className="text-center text-gray-400 py-6">
+                      কোনো তথ্য নেই
+                    </td>
+                  </tr>
                 )}
               </tbody>
             </table>
@@ -264,7 +371,12 @@ function OverviewPage() {
 }
 
 function Stat({
-  icon: Icon, label, value, valueRaw, sub, accent,
+  icon: Icon,
+  label,
+  value,
+  valueRaw,
+  sub,
+  accent,
 }: {
   icon: typeof Users;
   label: string;
@@ -281,16 +393,17 @@ function Stat({
           <Icon className="h-4 w-4" />
         </span>
       </div>
-      <p className="mt-2 text-2xl font-bold text-gray-900">
-        {valueRaw ?? toBn(value ?? 0)}
-      </p>
+      <p className="mt-2 text-2xl font-bold text-gray-900">{valueRaw ?? toBn(value ?? 0)}</p>
       {sub && <p className="text-[11px] text-gray-500 mt-0.5">{sub}</p>}
     </div>
   );
 }
 
 function ChartCard({
-  title, children, className = "", icon,
+  title,
+  children,
+  className = "",
+  icon,
 }: {
   title: string;
   children: React.ReactNode;

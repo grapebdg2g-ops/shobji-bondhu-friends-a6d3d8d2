@@ -12,7 +12,10 @@ export const Route = createFileRoute("/vegetable-guide/")({
     meta: [
       { title: "ফসল চাষ গাইড — কৃষক বন্ধু" },
       { property: "og:title", content: "ফসল চাষ গাইড — কৃষক বন্ধু" },
-      { property: "og:description", content: "২৭+ ফসলের পূর্ণাঙ্গ চাষ পদ্ধতি, লাভ, ঝুঁকি ও জাত-পরিচিতি।" },
+      {
+        property: "og:description",
+        content: "২৭+ ফসলের পূর্ণাঙ্গ চাষ পদ্ধতি, লাভ, ঝুঁকি ও জাত-পরিচিতি।",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "description", content: "২৭+ ফসলের পূর্ণাঙ্গ চাষ পদ্ধতি, লাভ, ঝুঁকি ও জাত-পরিচিতি।" },
@@ -43,7 +46,20 @@ function fmtTk(n: number) {
 }
 
 function seasonText(seasons: string[], plantingMonths: number[]) {
-  const monthsBn = ["জানু", "ফেব্রু", "মার্চ", "এপ্রি", "মে", "জুন", "জুলা", "আগ", "সেপ্ট", "অক্টো", "নভে", "ডিসে"];
+  const monthsBn = [
+    "জানু",
+    "ফেব্রু",
+    "মার্চ",
+    "এপ্রি",
+    "মে",
+    "জুন",
+    "জুলা",
+    "আগ",
+    "সেপ্ট",
+    "অক্টো",
+    "নভে",
+    "ডিসে",
+  ];
   if (plantingMonths.length === 0) return seasons.join(", ");
   const first = monthsBn[plantingMonths[0] - 1];
   const last = monthsBn[plantingMonths[plantingMonths.length - 1] - 1];
@@ -66,12 +82,20 @@ function VegetableGuidePage() {
 
   return (
     <main className="min-h-screen bg-[#F0FFF4] md:max-w-[560px] md:mx-auto pb-8">
-      <header className="px-5 pt-8 pb-8 rounded-b-3xl text-white" style={{ background: "var(--gradient-brand)" }}>
-        <button onClick={() => navigate({ to: "/dashboard" })} className="h-9 w-9 rounded-full bg-white/15 flex items-center justify-center">
+      <header
+        className="px-5 pt-8 pb-8 rounded-b-3xl text-white"
+        style={{ background: "var(--gradient-brand)" }}
+      >
+        <button
+          onClick={() => navigate({ to: "/dashboard" })}
+          className="h-9 w-9 rounded-full bg-white/15 flex items-center justify-center"
+        >
           <ArrowLeft className="h-5 w-5" />
         </button>
         <h1 className="mt-4 text-2xl font-bold">ফসল চাষ গাইড</h1>
-        <p className="text-sm text-white/85 mt-1">{toBn(getAllCrops().length)}+ ফসলের পূর্ণাঙ্গ তথ্য</p>
+        <p className="text-sm text-white/85 mt-1">
+          {toBn(getAllCrops().length)}+ ফসলের পূর্ণাঙ্গ তথ্য
+        </p>
       </header>
 
       <CropAdvisoryWidget />
@@ -85,7 +109,9 @@ function VegetableGuidePage() {
             <span className="text-3xl">📋</span>
             <div className="flex-1">
               <p className="font-bold text-gray-900 text-sm">ফসল পরামর্শ</p>
-              <p className="text-[11px] text-gray-500 mt-0.5">রোপণ থেকে বিক্রি পর্যন্ত সম্পূর্ণ গাইড</p>
+              <p className="text-[11px] text-gray-500 mt-0.5">
+                রোপণ থেকে বিক্রি পর্যন্ত সম্পূর্ণ গাইড
+              </p>
             </div>
             <span className="text-emerald-600 text-sm font-semibold">দেখুন →</span>
           </div>
@@ -132,13 +158,17 @@ function VegetableGuidePage() {
               className="bg-white rounded-2xl p-4 border border-gray-100 active:scale-[0.98] transition block"
             >
               <div className="flex items-start gap-3">
-                <span className="text-4xl shrink-0"><CropIcon crop={c.id} /></span>
+                <span className="text-4xl shrink-0">
+                  <CropIcon crop={c.id} />
+                </span>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <h3 className="font-bold text-gray-900 text-base truncate">{c.name}</h3>
                     {isHot && <Flame className="h-4 w-4 text-orange-500 shrink-0" />}
                   </div>
-                  <p className="text-[11px] text-gray-500 mt-0.5">{seasonText(c.seasons, c.plantingMonths)}</p>
+                  <p className="text-[11px] text-gray-500 mt-0.5">
+                    {seasonText(c.seasons, c.plantingMonths)}
+                  </p>
                   <p className="text-[11px] text-emerald-700 mt-1 font-semibold">
                     ফলন: {toBn(c.yieldMin)}–{toBn(c.yieldMax)} মণ/বিঘা
                   </p>
@@ -148,12 +178,16 @@ function VegetableGuidePage() {
                       <TrendingUp className="h-3 w-3" />
                       লাভ: {fmtTk(c.profitMin)}–{fmtTk(c.profitMax)}
                     </div>
-                    <div className={`flex items-center gap-1 ${risk.bg} ${risk.text} px-2 py-1 rounded-full text-[11px] font-semibold`}>
+                    <div
+                      className={`flex items-center gap-1 ${risk.bg} ${risk.text} px-2 py-1 rounded-full text-[11px] font-semibold`}
+                    >
                       {risk.icon} ঝুঁকি: {c.riskLevel}
                     </div>
                   </div>
                 </div>
-                <span className="text-emerald-600 text-xs font-semibold whitespace-nowrap self-end">বিস্তারিত →</span>
+                <span className="text-emerald-600 text-xs font-semibold whitespace-nowrap self-end">
+                  বিস্তারিত →
+                </span>
               </div>
             </Link>
           );

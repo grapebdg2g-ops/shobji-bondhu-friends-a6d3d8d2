@@ -38,9 +38,11 @@ export function useRole(): RoleState {
           .maybeSingle(),
       ]);
       const roles = ((rolesRes.data as { role: AppRole }[] | null) ?? []).map((r) => r.role);
-      const prof = profRes.data as
-        | { is_suspended: boolean; suspension_until: string | null; suspension_reason: string | null }
-        | null;
+      const prof = profRes.data as {
+        is_suspended: boolean;
+        suspension_until: string | null;
+        suspension_reason: string | null;
+      } | null;
       const suspended =
         !!prof?.is_suspended &&
         (!prof.suspension_until || new Date(prof.suspension_until).getTime() > Date.now());

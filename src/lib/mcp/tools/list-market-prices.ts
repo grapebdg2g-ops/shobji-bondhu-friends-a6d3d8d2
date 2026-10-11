@@ -9,7 +9,12 @@ export default defineTool({
     "List recent community-reported vegetable and crop market prices, optionally filtered by product name and district (Bengali names).",
   inputSchema: {
     product: z.string().trim().min(1).optional().describe("Product name, e.g. 'টমেটো'."),
-    district: z.string().trim().min(1).optional().describe("District name in Bengali, e.g. 'ঢাকা'."),
+    district: z
+      .string()
+      .trim()
+      .min(1)
+      .optional()
+      .describe("District name in Bengali, e.g. 'ঢাকা'."),
     limit: z.number().int().min(1).max(50).optional().describe("Max rows (default 20)."),
   },
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
@@ -19,7 +24,9 @@ export default defineTool({
     const supabase = supabaseForUser(ctx);
     let query = supabase
       .from("prices")
-      .select("product_name, price, unit, market_name, district, upazila, category, previous_price, created_at")
+      .select(
+        "product_name, price, unit, market_name, district, upazila, category, previous_price, created_at",
+      )
       .order("created_at", { ascending: false })
       .limit(limit ?? 20);
     if (product) query = query.ilike("product_name", `%${product}%`);

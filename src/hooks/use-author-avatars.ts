@@ -10,7 +10,10 @@ export function useAuthorAvatars(ids: string[]) {
     enabled: authorIds.length > 0,
     staleTime: 60_000,
     queryFn: async (): Promise<Record<string, string | null>> => {
-      const { data, error } = await supabase.from("profiles").select("id, avatar_url").in("id", authorIds);
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, avatar_url")
+        .in("id", authorIds);
       if (error) throw error;
       return Object.fromEntries((data ?? []).map((profile) => [profile.id, profile.avatar_url]));
     },

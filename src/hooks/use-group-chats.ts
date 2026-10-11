@@ -28,8 +28,10 @@ export function useGroupThreads() {
     const id = Math.random().toString(36).slice(2, 10);
     const ch = supabase
       .channel(`group-threads-${userId}-${id}`)
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "group_chat_messages" }, () =>
-        qc.invalidateQueries({ queryKey: groupThreadsKey(userId) }),
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "group_chat_messages" },
+        () => qc.invalidateQueries({ queryKey: groupThreadsKey(userId) }),
       )
       .on("postgres_changes", { event: "*", schema: "public", table: "group_chat_members" }, () =>
         qc.invalidateQueries({ queryKey: groupThreadsKey(userId) }),
@@ -48,7 +50,12 @@ export function useGroupThreads() {
   };
 }
 
-export type FriendOption = { id: string; name: string; avatar_url: string | null; district: string | null };
+export type FriendOption = {
+  id: string;
+  name: string;
+  avatar_url: string | null;
+  district: string | null;
+};
 
 export function useMyFriends() {
   const { user } = useUser();
@@ -56,7 +63,9 @@ export function useMyFriends() {
     queryKey: ["my-friends", user?.id],
     enabled: Boolean(user),
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("get_public_connected_farmers", { target_user_id: user!.id });
+      const { data, error } = await supabase.rpc("get_public_connected_farmers", {
+        target_user_id: user!.id,
+      });
       if (error) throw error;
       return (data ?? []) as FriendOption[];
     },

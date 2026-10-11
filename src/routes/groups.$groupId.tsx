@@ -55,7 +55,11 @@ function GroupChatPage() {
   const groupQ = useQuery({
     queryKey: ["group", groupId],
     queryFn: async () => {
-      const { data, error } = await supabase.from("group_chats").select("*").eq("id", groupId).maybeSingle();
+      const { data, error } = await supabase
+        .from("group_chats")
+        .select("*")
+        .eq("id", groupId)
+        .maybeSingle();
       if (error) throw error;
       return data;
     },
@@ -64,10 +68,16 @@ function GroupChatPage() {
   const membersQ = useQuery({
     queryKey: ["group-members", groupId],
     queryFn: async (): Promise<Member[]> => {
-      const { data } = await supabase.from("group_chat_members").select("user_id, role").eq("group_id", groupId);
+      const { data } = await supabase
+        .from("group_chat_members")
+        .select("user_id, role")
+        .eq("group_id", groupId);
       const ids = (data ?? []).map((m) => m.user_id);
       if (!ids.length) return [];
-      const { data: profs } = await supabase.from("profiles").select("id, name, avatar_url").in("id", ids);
+      const { data: profs } = await supabase
+        .from("profiles")
+        .select("id, name, avatar_url")
+        .in("id", ids);
       const map = new Map((profs ?? []).map((p) => [p.id, p]));
       return (data ?? []).map((m) => ({
         ...m,
@@ -93,14 +103,19 @@ function GroupChatPage() {
       .then(({ data }) => {
         if (active) setMessages((data ?? []).reverse());
       });
-    void supabase.rpc("mark_group_read", { _group_id: groupId }).then(() =>
-      qc.invalidateQueries({ queryKey: groupThreadsKey(user?.id ?? null) }),
-    );
+    void supabase
+      .rpc("mark_group_read", { _group_id: groupId })
+      .then(() => qc.invalidateQueries({ queryKey: groupThreadsKey(user?.id ?? null) }));
     const ch = supabase
       .channel(`group-${groupId}-${Math.random().toString(36).slice(2, 8)}`)
       .on(
         "postgres_changes",
-        { event: "INSERT", schema: "public", table: "group_chat_messages", filter: `group_id=eq.${groupId}` },
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "group_chat_messages",
+          filter: `group_id=eq.${groupId}`,
+        },
         (payload) => {
           const m = payload.new as GroupMessage;
           setMessages((cur) => (cur.some((x) => x.id === m.id) ? cur : [...cur, m]));
@@ -109,7 +124,12 @@ function GroupChatPage() {
       )
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "group_chat_members", filter: `group_id=eq.${groupId}` },
+        {
+          event: "*",
+          schema: "public",
+          table: "group_chat_members",
+          filter: `group_id=eq.${groupId}`,
+        },
         () => qc.invalidateQueries({ queryKey: ["group-members", groupId] }),
       )
       .subscribe();
@@ -142,7 +162,10 @@ function GroupChatPage() {
   };
 
   const addMembers = async () => {
-    const { error } = await supabase.rpc("add_group_members", { _group_id: groupId, _member_ids: picked });
+    const { error } = await supabase.rpc("add_group_members", {
+      _group_id: groupId,
+      _member_ids: picked,
+    });
     if (error) return toast.error("সদস্য যোগ করা যায়নি");
     toast.success("সদস্য যোগ হয়েছে");
     setPicked([]);
@@ -151,7 +174,10 @@ function GroupChatPage() {
   };
 
   const removeMember = async (uid: string) => {
-    const { error } = await supabase.rpc("remove_group_member", { _group_id: groupId, _user_id: uid });
+    const { error } = await supabase.rpc("remove_group_member", {
+      _group_id: groupId,
+      _user_id: uid,
+    });
     if (error) return toast.error("সরানো যায়নি");
     if (uid === user?.id) {
       toast.success("গ্রুপ থেকে বের হয়েছেন");
@@ -174,7 +200,10 @@ function GroupChatPage() {
     return (
       <main className="flex min-h-dvh flex-col items-center justify-center gap-3 bg-background p-6 text-center">
         <p className="font-bold text-foreground">গ্রুপটি পাওয়া যায়নি বা আপনি এর সদস্য নন</p>
-        <Link to="/messages" className="rounded-full bg-primary px-4 py-2 text-sm font-bold text-primary-foreground">
+        <Link
+          to="/messages"
+          className="rounded-full bg-primary px-4 py-2 text-sm font-bold text-primary-foreground"
+        >
           মেসেজে ফিরে যান
         </Link>
       </main>
@@ -187,24 +216,39 @@ function GroupChatPage() {
   return (
     <main className="flex h-dvh flex-col bg-background">
       <header className="flex items-center gap-2 border-b border-border bg-card px-3 py-3">
-        <Link to="/messages" aria-label="ফিরে যান" className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-muted">
+        <Link
+          to="/messages"
+          aria-label="ফিরে যান"
+          className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-muted"
+        >
           <ArrowLeft className="h-5 w-5" />
         </Link>
-        <button type="button" onClick={() => setMembersOpen(true)} className="min-w-0 flex-1 text-left">
+        <button
+          type="button"
+          onClick={() => setMembersOpen(true)}
+          className="min-w-0 flex-1 text-left"
+        >
           <h1 className="truncate text-base font-black text-foreground">{g?.name ?? "..."}</h1>
           <p className="truncate text-xs text-muted-foreground">
             {g?.topic ? `${g.topic} · ` : ""}
             {members.length} জন সদস্য
           </p>
         </button>
-        <button type="button" onClick={() => setMembersOpen(true)} aria-label="সদস্য" className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary text-primary">
+        <button
+          type="button"
+          onClick={() => setMembersOpen(true)}
+          aria-label="সদস্য"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary text-primary"
+        >
           <Users className="h-5 w-5" />
         </button>
       </header>
 
       <div className="flex-1 space-y-2 overflow-y-auto px-3 py-4">
         {messages.length === 0 && (
-          <p className="pt-10 text-center text-sm text-muted-foreground">এখনো কোনো মেসেজ নেই — আলোচনা শুরু করুন</p>
+          <p className="pt-10 text-center text-sm text-muted-foreground">
+            এখনো কোনো মেসেজ নেই — আলোচনা শুরু করুন
+          </p>
         )}
         {messages.map((m, i) => {
           const mine = m.sender_id === user?.id;
@@ -213,12 +257,23 @@ function GroupChatPage() {
           return (
             <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
               <div className="max-w-[78%]">
-                {showName && <p className="mb-0.5 ml-2 text-[11px] font-bold text-muted-foreground">{sender?.name ?? "সাবেক সদস্য"}</p>}
-                <div className={`whitespace-pre-wrap break-words rounded-2xl px-3.5 py-2 text-sm ${mine ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"}`}>
+                {showName && (
+                  <p className="mb-0.5 ml-2 text-[11px] font-bold text-muted-foreground">
+                    {sender?.name ?? "সাবেক সদস্য"}
+                  </p>
+                )}
+                <div
+                  className={`whitespace-pre-wrap break-words rounded-2xl px-3.5 py-2 text-sm ${mine ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"}`}
+                >
                   {m.body}
                 </div>
-                <p className={`mt-0.5 text-[10px] text-muted-foreground ${mine ? "text-right mr-2" : "ml-2"}`}>
-                  {new Date(m.created_at).toLocaleTimeString("bn-BD", { hour: "numeric", minute: "2-digit" })}
+                <p
+                  className={`mt-0.5 text-[10px] text-muted-foreground ${mine ? "text-right mr-2" : "ml-2"}`}
+                >
+                  {new Date(m.created_at).toLocaleTimeString("bn-BD", {
+                    hour: "numeric",
+                    minute: "2-digit",
+                  })}
                 </p>
               </div>
             </div>
@@ -250,7 +305,12 @@ function GroupChatPage() {
             placeholder="মেসেজ লিখুন..."
             className="max-h-32 flex-1 resize-none rounded-2xl bg-muted px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/30"
           />
-          <button type="submit" disabled={!text.trim()} aria-label="পাঠান" className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground disabled:opacity-40">
+          <button
+            type="submit"
+            disabled={!text.trim()}
+            aria-label="পাঠান"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground disabled:opacity-40"
+          >
             <Send className="h-4 w-4" />
           </button>
         </form>
@@ -264,7 +324,14 @@ function GroupChatPage() {
         <div className="space-y-4 pb-4">
           {g?.topic && <p className="rounded-xl bg-muted p-3 text-sm text-foreground">{g.topic}</p>}
           {me && (
-            <button type="button" onClick={() => { setMembersOpen(false); setAddOpen(true); }} className="flex w-full items-center gap-3 rounded-xl bg-secondary p-3 text-sm font-bold text-primary">
+            <button
+              type="button"
+              onClick={() => {
+                setMembersOpen(false);
+                setAddOpen(true);
+              }}
+              className="flex w-full items-center gap-3 rounded-xl bg-secondary p-3 text-sm font-bold text-primary"
+            >
               <UserPlus className="h-5 w-5" /> বন্ধু যোগ করুন
             </button>
           )}
@@ -273,11 +340,21 @@ function GroupChatPage() {
               <div key={m.user_id} className="flex items-center gap-3 py-2.5">
                 <Avatar name={m.name} url={m.avatar_url} />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-bold text-foreground">{m.name}{m.user_id === user?.id ? " (আপনি)" : ""}</p>
-                  {m.role === "admin" && <p className="text-[11px] font-semibold text-primary">গ্রুপ অ্যাডমিন</p>}
+                  <p className="truncate text-sm font-bold text-foreground">
+                    {m.name}
+                    {m.user_id === user?.id ? " (আপনি)" : ""}
+                  </p>
+                  {m.role === "admin" && (
+                    <p className="text-[11px] font-semibold text-primary">গ্রুপ অ্যাডমিন</p>
+                  )}
                 </div>
                 {isGroupAdmin && m.role !== "admin" && (
-                  <button type="button" onClick={() => void removeMember(m.user_id)} aria-label="সরান" className="flex h-9 w-9 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+                  <button
+                    type="button"
+                    onClick={() => void removeMember(m.user_id)}
+                    aria-label="সরান"
+                    className="flex h-9 w-9 items-center justify-center rounded-full bg-destructive/10 text-destructive"
+                  >
                     <UserMinus className="h-4 w-4" />
                   </button>
                 )}
@@ -285,17 +362,32 @@ function GroupChatPage() {
             ))}
           </div>
           {me && (
-            <button type="button" onClick={() => { setMembersOpen(false); setReportOpen(true); }} className="flex w-full items-center gap-3 rounded-xl border border-border p-3 text-sm font-bold text-foreground">
+            <button
+              type="button"
+              onClick={() => {
+                setMembersOpen(false);
+                setReportOpen(true);
+              }}
+              className="flex w-full items-center gap-3 rounded-xl border border-border p-3 text-sm font-bold text-foreground"
+            >
               <Flag className="h-5 w-5 text-destructive" /> অ্যাপ অ্যাডমিনের কাছে রিপোর্ট করুন
             </button>
           )}
           {me && !isGroupAdmin && (
-            <button type="button" onClick={() => void removeMember(me.user_id)} className="flex w-full items-center gap-3 rounded-xl border border-border p-3 text-sm font-bold text-foreground">
+            <button
+              type="button"
+              onClick={() => void removeMember(me.user_id)}
+              className="flex w-full items-center gap-3 rounded-xl border border-border p-3 text-sm font-bold text-foreground"
+            >
               <LogOut className="h-5 w-5" /> গ্রুপ থেকে বের হোন
             </button>
           )}
           {(isGroupAdmin || isAppAdmin) && (
-            <button type="button" onClick={() => setConfirmDelete(true)} className="flex w-full items-center gap-3 rounded-xl bg-destructive/10 p-3 text-sm font-bold text-destructive">
+            <button
+              type="button"
+              onClick={() => setConfirmDelete(true)}
+              className="flex w-full items-center gap-3 rounded-xl bg-destructive/10 p-3 text-sm font-bold text-destructive"
+            >
               <Trash2 className="h-5 w-5" /> পুরো গ্রুপ চ্যাট মুছে ফেলুন
             </button>
           )}
@@ -304,12 +396,22 @@ function GroupChatPage() {
 
       <BottomSheet open={addOpen} onClose={() => setAddOpen(false)} title="বন্ধু যোগ করুন">
         <FriendPicker friends={addable} picked={picked} setPicked={setPicked} />
-        <button type="button" disabled={!picked.length} onClick={() => void addMembers()} className="mt-3 w-full rounded-xl bg-primary py-3 text-sm font-bold text-primary-foreground disabled:opacity-40">
+        <button
+          type="button"
+          disabled={!picked.length}
+          onClick={() => void addMembers()}
+          className="mt-3 w-full rounded-xl bg-primary py-3 text-sm font-bold text-primary-foreground disabled:opacity-40"
+        >
           যোগ করুন ({picked.length})
         </button>
       </BottomSheet>
 
-      <ReportModal open={reportOpen} onClose={() => setReportOpen(false)} contentType="group_chat" contentId={groupId} />
+      <ReportModal
+        open={reportOpen}
+        onClose={() => setReportOpen(false)}
+        contentType="group_chat"
+        contentId={groupId}
+      />
 
       <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
         <AlertDialogContent>
@@ -325,4 +427,3 @@ function GroupChatPage() {
     </main>
   );
 }
-

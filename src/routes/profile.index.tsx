@@ -3,8 +3,24 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { uploadOptimizedImage } from "@/lib/upload-image";
 import {
-  ArrowLeft, Camera, Edit3, Trash2, Power, Pencil, LogOut,
-  Bell, Globe, Info, Star, HelpCircle, ChevronRight, MapPin, Plus, BellOff, Settings, Users,
+  ArrowLeft,
+  Camera,
+  Edit3,
+  Trash2,
+  Power,
+  Pencil,
+  LogOut,
+  Bell,
+  Globe,
+  Info,
+  Star,
+  HelpCircle,
+  ChevronRight,
+  MapPin,
+  Plus,
+  BellOff,
+  Settings,
+  Users,
 } from "lucide-react";
 import { MutedUsersSheet } from "@/components/krishi/muted-users-sheet";
 import { DiseaseHistoryView } from "@/components/krishi/disease-history-view";
@@ -16,8 +32,14 @@ import { EmptyState } from "@/components/krishi/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LazyImage } from "@/components/krishi/lazy-image";
 import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Switch } from "@/components/ui/switch";
 import { DISTRICTS, getUpazilas } from "@/lib/bd-data";
@@ -91,8 +113,20 @@ function ProfilePage() {
 
         // Fetch profile fields safely
         // We fetch fields individually to handle cases where cover_url might not exist yet
-        const fields = ["id", "name", "district", "upazila", "crops", "role", "avatar_url", "bio", "posts_count", "exchanges_count", "prices_count"];
-        
+        const fields = [
+          "id",
+          "name",
+          "district",
+          "upazila",
+          "crops",
+          "role",
+          "avatar_url",
+          "bio",
+          "posts_count",
+          "exchanges_count",
+          "prices_count",
+        ];
+
         // Try fetching with cover_url first
         let { data: p, error } = await supabase
           .from("profiles")
@@ -108,13 +142,13 @@ function ProfilePage() {
             .select(fields.join(","))
             .eq("id", uid)
             .maybeSingle();
-          
+
           if (fallbackErr) throw fallbackErr;
           p = fallbackP;
         }
 
         const { data: phone } = await supabase.rpc("get_my_phone" as never);
-        
+
         if (p) {
           setFull({
             ...(p as any),
@@ -148,14 +182,27 @@ function ProfilePage() {
     if (!f || !full) return;
     setUploading(true);
     try {
-      const url = await uploadOptimizedImage({ file: f, userId: full.id, bucket: "avatars", prefix: "avatar", type: "profile" });
-      const { error: dbErr } = await supabase.from("profiles").update({ avatar_url: url }).eq("id", full.id);
+      const url = await uploadOptimizedImage({
+        file: f,
+        userId: full.id,
+        bucket: "avatars",
+        prefix: "avatar",
+        type: "profile",
+      });
+      const { error: dbErr } = await supabase
+        .from("profiles")
+        .update({ avatar_url: url })
+        .eq("id", full.id);
       if (dbErr) throw dbErr;
       setFull((p) => (p ? { ...p, avatar_url: url } : p));
       await refreshUser();
       toast.success("ছবি আপডেট হয়েছে");
     } catch (err) {
-      toast.error(err instanceof Error && /[\u0980-\u09FF]/.test(err.message) ? err.message : "ছবি আপলোড ব্যর্থ");
+      toast.error(
+        err instanceof Error && /[\u0980-\u09FF]/.test(err.message)
+          ? err.message
+          : "ছবি আপলোড ব্যর্থ",
+      );
     } finally {
       setUploading(false);
     }
@@ -167,14 +214,27 @@ function ProfilePage() {
     if (!f || !full) return;
     setUploadingCover(true);
     try {
-      const url = await uploadOptimizedImage({ file: f, userId: full.id, bucket: "avatars", prefix: "cover", type: "cover" });
-      const { error: dbErr } = await supabase.from("profiles").update({ cover_url: url }).eq("id", full.id);
+      const url = await uploadOptimizedImage({
+        file: f,
+        userId: full.id,
+        bucket: "avatars",
+        prefix: "cover",
+        type: "cover",
+      });
+      const { error: dbErr } = await supabase
+        .from("profiles")
+        .update({ cover_url: url })
+        .eq("id", full.id);
       if (dbErr) throw dbErr;
       setFull((p) => (p ? { ...p, cover_url: url } : p));
       await refreshUser();
       toast.success("কাভার ফটো আপডেট হয়েছে");
     } catch (err) {
-      toast.error(err instanceof Error && /[\u0980-\u09FF]/.test(err.message) ? err.message : "কাভার ফটো আপলোড ব্যর্থ");
+      toast.error(
+        err instanceof Error && /[\u0980-\u09FF]/.test(err.message)
+          ? err.message
+          : "কাভার ফটো আপলোড ব্যর্থ",
+      );
     } finally {
       setUploadingCover(false);
     }
@@ -183,7 +243,10 @@ function ProfilePage() {
   const handleSaveEdit = async (patch: Partial<ProfileFull>) => {
     if (!full) return;
     const { error } = await supabase.from("profiles").update(patch).eq("id", full.id);
-    if (error) { toast.error("সংরক্ষণ ব্যর্থ"); return; }
+    if (error) {
+      toast.error("সংরক্ষণ ব্যর্থ");
+      return;
+    }
     setFull({ ...full, ...patch });
     await refreshUser();
     toast.success("✅ প্রোফাইল আপডেট হয়েছে");
@@ -198,7 +261,9 @@ function ProfilePage() {
 
   const handlePostCreated = () => {
     setPostsRefreshKey((value) => value + 1);
-    setFull((current) => current ? { ...current, posts_count: current.posts_count + 1 } : current);
+    setFull((current) =>
+      current ? { ...current, posts_count: current.posts_count + 1 } : current,
+    );
   };
 
   if (loading) {
@@ -242,7 +307,7 @@ function ProfilePage() {
               <div className="pointer-events-none absolute -bottom-20 left-1/3 h-40 w-40 rounded-full bg-[#F4A261]/20 blur-2xl" />
             </div>
           )}
-          
+
           {uploadingCover && (
             <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/40 text-white text-xs font-bold">
               আপলোড হচ্ছে...
@@ -257,12 +322,27 @@ function ProfilePage() {
             <Camera className="h-4 w-4" />
             <span>কাভার পরিবর্তন</span>
           </button>
-          <input ref={coverFileRef} type="file" accept="image/*" className="hidden" onChange={onPickCover} />
+          <input
+            ref={coverFileRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={onPickCover}
+          />
 
-          <button onClick={() => navigate({ to: "/dashboard" })} aria-label="ফিরে যান" className="absolute left-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black/20 text-white backdrop-blur transition hover:bg-black/30">
+          <button
+            onClick={() => navigate({ to: "/dashboard" })}
+            aria-label="ফিরে যান"
+            className="absolute left-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black/20 text-white backdrop-blur transition hover:bg-black/30"
+          >
             <ArrowLeft className="h-5 w-5" />
           </button>
-          <button type="button" onClick={() => setSettingsOpen(true)} aria-label="সেটিংস খুলুন" className="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black/20 text-white backdrop-blur transition hover:bg-black/30">
+          <button
+            type="button"
+            onClick={() => setSettingsOpen(true)}
+            aria-label="সেটিংস খুলুন"
+            className="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black/20 text-white backdrop-blur transition hover:bg-black/30"
+          >
             <Settings className="h-5 w-5" />
           </button>
         </div>
@@ -271,30 +351,81 @@ function ProfilePage() {
           <div className="relative z-10 flex items-center justify-between gap-3 pt-4">
             <div className="relative h-24 w-24 shrink-0 rounded-full border-4 border-white bg-[#E7F3FF] text-4xl font-black text-[#1877F2] shadow-md sm:h-32 sm:w-32">
               <div className="h-full w-full overflow-hidden rounded-full">
-                {full.avatar_url ? <LazyImage src={full.avatar_url} alt={full.name} wrapperClassName="h-full w-full rounded-full" priority /> : <div className="flex h-full w-full items-center justify-center">{initials(full.name)}</div>}
+                {full.avatar_url ? (
+                  <LazyImage
+                    src={full.avatar_url}
+                    alt={full.name}
+                    wrapperClassName="h-full w-full rounded-full"
+                    priority
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center">
+                    {initials(full.name)}
+                  </div>
+                )}
               </div>
-              {uploading && <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/45 text-xs font-bold text-white">আপলোড...</div>}
-              <button type="button" onClick={() => fileRef.current?.click()} aria-label="ছবি পরিবর্তন" className="absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[#E4E6EB] text-[#1C1E21] shadow-sm transition hover:bg-[#D8DADF]"><Camera className="h-4 w-4" /></button>
-              <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onPickAvatar} />
+              {uploading && (
+                <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/45 text-xs font-bold text-white">
+                  আপলোড...
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={() => fileRef.current?.click()}
+                aria-label="ছবি পরিবর্তন"
+                className="absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[#E4E6EB] text-[#1C1E21] shadow-sm transition hover:bg-[#D8DADF]"
+              >
+                <Camera className="h-4 w-4" />
+              </button>
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={onPickAvatar}
+              />
             </div>
             <div className="flex gap-2 pb-1">
-              <Link to="/friends" className="flex h-10 items-center gap-1.5 rounded-lg bg-[#1877F2] px-3 text-xs font-extrabold text-white shadow-sm transition hover:bg-[#166FE5]"><Users className="h-4 w-4" /> বন্ধু</Link>
-              <button type="button" onClick={() => setEditOpen(true)} className="flex h-10 items-center gap-1.5 rounded-lg bg-[#E4E6EB] px-3 text-xs font-extrabold text-[#1C1E21] transition hover:bg-[#D8DADF]"><Edit3 className="h-4 w-4" /> সম্পাদনা</button>
+              <Link
+                to="/friends"
+                className="flex h-10 items-center gap-1.5 rounded-lg bg-[#1877F2] px-3 text-xs font-extrabold text-white shadow-sm transition hover:bg-[#166FE5]"
+              >
+                <Users className="h-4 w-4" /> বন্ধু
+              </Link>
+              <button
+                type="button"
+                onClick={() => setEditOpen(true)}
+                className="flex h-10 items-center gap-1.5 rounded-lg bg-[#E4E6EB] px-3 text-xs font-extrabold text-[#1C1E21] transition hover:bg-[#D8DADF]"
+              >
+                <Edit3 className="h-4 w-4" /> সম্পাদনা
+              </button>
             </div>
           </div>
 
-          <h1 className="mt-3 text-2xl font-black tracking-tight text-[#1C1E21]">{full.name || "কৃষক"}</h1>
+          <h1 className="mt-3 text-2xl font-black tracking-tight text-[#1C1E21]">
+            {full.name || "কৃষক"}
+          </h1>
           <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-[#65676B]">
-            <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5" />{full.district || "বাংলাদেশ"}{full.upazila ? `, ${full.upazila}` : ""}</span>
-            <span className="rounded-full bg-[#E7F3FF] px-2 py-0.5 text-xs font-bold text-[#1877F2]">{roleLabel}</span>
+            <span className="inline-flex items-center gap-1">
+              <MapPin className="h-3.5 w-3.5" />
+              {full.district || "বাংলাদেশ"}
+              {full.upazila ? `, ${full.upazila}` : ""}
+            </span>
+            <span className="rounded-full bg-[#E7F3FF] px-2 py-0.5 text-xs font-bold text-[#1877F2]">
+              {roleLabel}
+            </span>
           </div>
-          {full.bio && <p className="mt-3 max-w-xl text-sm leading-relaxed text-[#65676B]">{full.bio}</p>}
+          {full.bio && (
+            <p className="mt-3 max-w-xl text-sm leading-relaxed text-[#65676B]">{full.bio}</p>
+          )}
 
           <div className="mt-4 grid grid-cols-4 divide-x divide-[#DADDE1] rounded-xl border border-[#E4E6EB] bg-[#F7F8FA] py-2 text-center">
             <ProfileMetric value={counts.posts} label="পোস্ট" />
             <ProfileMetric value={counts.exchanges} label="বিনিময়" />
             <ProfileMetric value={counts.prices} label="দাম" />
-            <Link to="/friends" className="group"><ProfileMetric value="→" label="বন্ধু" accent /></Link>
+            <Link to="/friends" className="group">
+              <ProfileMetric value="→" label="বন্ধু" accent />
+            </Link>
           </div>
         </div>
       </header>
@@ -304,7 +435,11 @@ function ProfilePage() {
       <section className="mx-auto mt-3 max-w-3xl border-y border-[#DADDE1] bg-white px-4 py-3 shadow-sm sm:rounded-xl sm:border sm:px-6">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#E7F3FF] ring-1 ring-black/5">
-            {full.avatar_url ? <LazyImage src={full.avatar_url} alt="" wrapperClassName="h-full w-full" /> : <span className="text-lg font-black text-[#1877F2]">{initials(full.name)}</span>}
+            {full.avatar_url ? (
+              <LazyImage src={full.avatar_url} alt="" wrapperClassName="h-full w-full" />
+            ) : (
+              <span className="text-lg font-black text-[#1877F2]">{initials(full.name)}</span>
+            )}
           </div>
           <button
             type="button"
@@ -337,12 +472,14 @@ function ProfilePage() {
 
       <section className="mx-auto mt-3 max-w-3xl border-y border-[#DADDE1] bg-white px-4 pt-1 sm:rounded-xl sm:border sm:px-6">
         <div className="flex gap-1 overflow-x-auto">
-          {([
-            ["posts", "আমার পোস্ট"],
-            ["exchanges", "বিনিময়"],
-            ["prices", "দাম"],
-            ["diseases", "রোগ ইতিহাস"],
-          ] as const).map(([k, label]) => (
+          {(
+            [
+              ["posts", "আমার পোস্ট"],
+              ["exchanges", "বিনিময়"],
+              ["prices", "দাম"],
+              ["diseases", "রোগ ইতিহাস"],
+            ] as const
+          ).map(([k, label]) => (
             <button
               key={k}
               onClick={() => setTab(k)}
@@ -358,28 +495,46 @@ function ProfilePage() {
             <MyPostsTab
               key={postsRefreshKey}
               userId={full.id}
-              onChange={(delta) => setFull((p) => (p ? { ...p, posts_count: Math.max(0, p.posts_count + delta) } : p))}
+              onChange={(delta) =>
+                setFull((p) => (p ? { ...p, posts_count: Math.max(0, p.posts_count + delta) } : p))
+              }
             />
           )}
           {tab === "exchanges" && (
             <MyExchangesTab
               userId={full.id}
-              onChange={(delta) => setFull((p) => (p ? { ...p, exchanges_count: Math.max(0, p.exchanges_count + delta) } : p))}
+              onChange={(delta) =>
+                setFull((p) =>
+                  p ? { ...p, exchanges_count: Math.max(0, p.exchanges_count + delta) } : p,
+                )
+              }
             />
           )}
           {tab === "prices" && (
             <MyPricesTab
               userId={full.id}
-              onChange={(delta) => setFull((p) => (p ? { ...p, prices_count: Math.max(0, p.prices_count + delta) } : p))}
+              onChange={(delta) =>
+                setFull((p) =>
+                  p ? { ...p, prices_count: Math.max(0, p.prices_count + delta) } : p,
+                )
+              }
             />
           )}
           {tab === "diseases" && <DiseaseHistoryView userId={full.id} />}
         </div>
       </section>
 
-      <CreatePostSheet open={createPostOpen} onClose={() => setCreatePostOpen(false)} onCreated={handlePostCreated} />
+      <CreatePostSheet
+        open={createPostOpen}
+        onClose={() => setCreatePostOpen(false)}
+        onCreated={handlePostCreated}
+      />
 
-      <SettingsList open={settingsOpen} onClose={() => setSettingsOpen(false)} onLogout={() => setLogoutOpen(true)} />
+      <SettingsList
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        onLogout={() => setLogoutOpen(true)}
+      />
 
       <EditProfileSheet
         open={editOpen}
@@ -396,7 +551,10 @@ function ProfilePage() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>না</AlertDialogCancel>
-            <AlertDialogAction onClick={doLogout} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+            <AlertDialogAction
+              onClick={doLogout}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
               হ্যাঁ
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -406,10 +564,22 @@ function ProfilePage() {
   );
 }
 
-function ProfileMetric({ value, label, accent = false }: { value: number | string; label: string; accent?: boolean }) {
+function ProfileMetric({
+  value,
+  label,
+  accent = false,
+}: {
+  value: number | string;
+  label: string;
+  accent?: boolean;
+}) {
   return (
     <span className="flex min-w-0 flex-col items-center justify-center px-1">
-      <span className={`text-lg font-black leading-tight ${accent ? "text-[#1877F2]" : "text-[#1C1E21]"}`}>{value}</span>
+      <span
+        className={`text-lg font-black leading-tight ${accent ? "text-[#1877F2]" : "text-[#1C1E21]"}`}
+      >
+        {value}
+      </span>
       <span className="mt-0.5 truncate text-[10px] font-bold text-[#65676B]">{label}</span>
     </span>
   );
@@ -448,9 +618,18 @@ function EditProfileSheet({
 
   const submit = async () => {
     const cleanName = sanitize(name);
-    if (!cleanName) { toast.error("নাম দিন"); return; }
-    if (cleanName.length > 100) { toast.error("নাম ১০০ অক্ষরের মধ্যে"); return; }
-    if (bio.length > 150) { toast.error("পরিচিতি ১৫০ অক্ষরের মধ্যে"); return; }
+    if (!cleanName) {
+      toast.error("নাম দিন");
+      return;
+    }
+    if (cleanName.length > 100) {
+      toast.error("নাম ১০০ অক্ষরের মধ্যে");
+      return;
+    }
+    if (bio.length > 150) {
+      toast.error("পরিচিতি ১৫০ অক্ষরের মধ্যে");
+      return;
+    }
     setSaving(true);
     await onSave({
       name: cleanName,
@@ -476,12 +655,17 @@ function EditProfileSheet({
         <Field label="জেলা">
           <select
             value={district}
-            onChange={(e) => { setDistrict(e.target.value); setUpazila(""); }}
+            onChange={(e) => {
+              setDistrict(e.target.value);
+              setUpazila("");
+            }}
             className="w-full h-11 px-3 rounded-xl border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
           >
             <option value="">— নির্বাচন করুন —</option>
             {DISTRICTS.map((d) => (
-              <option key={d} value={d}>{d}</option>
+              <option key={d} value={d}>
+                {d}
+              </option>
             ))}
           </select>
         </Field>
@@ -493,11 +677,11 @@ function EditProfileSheet({
             onChange={(e) => setUpazila(e.target.value)}
             className="w-full h-11 px-3 rounded-xl border border-input bg-background text-sm disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-primary/30"
           >
-            <option value="">
-              {district ? "— উপজেলা বেছে নিন —" : "আগে জেলা বেছে নিন"}
-            </option>
+            <option value="">{district ? "— উপজেলা বেছে নিন —" : "আগে জেলা বেছে নিন"}</option>
             {getUpazilas(district).map((u) => (
-              <option key={u} value={u}>{u}</option>
+              <option key={u} value={u}>
+                {u}
+              </option>
             ))}
           </select>
         </Field>
@@ -562,8 +746,13 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 }
 
 type MyPost = {
-  id: string; type: string; content: string; image_url: string | null;
-  crop_tag: string | null; likes_count: number; comments_count: number;
+  id: string;
+  type: string;
+  content: string;
+  image_url: string | null;
+  crop_tag: string | null;
+  likes_count: number;
+  comments_count: number;
   created_at: string;
 };
 
@@ -575,8 +764,11 @@ function MyPostsTab({ userId, onChange }: { userId: string; onChange: (d: number
   useEffect(() => {
     (async () => {
       const { data } = await supabase
-        .from("posts").select("id, type, content, image_url, crop_tag, likes_count, comments_count, created_at")
-        .eq("user_id", userId).order("created_at", { ascending: false }).limit(50);
+        .from("posts")
+        .select("id, type, content, image_url, crop_tag, likes_count, comments_count, created_at")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(50);
       setRows((data as MyPost[]) ?? []);
     })();
   }, [userId]);
@@ -587,7 +779,12 @@ function MyPostsTab({ userId, onChange }: { userId: string; onChange: (d: number
     setRows(prev.filter((r) => r.id !== id));
     onChange(-1);
     const { error } = await supabase.from("posts").delete().eq("id", id);
-    if (error) { toast.error("মুছতে ব্যর্থ"); setRows(prev); onChange(1); return; }
+    if (error) {
+      toast.error("মুছতে ব্যর্থ");
+      setRows(prev);
+      onChange(1);
+      return;
+    }
     toast.success("পোস্ট মুছে ফেলা হয়েছে");
   };
 
@@ -598,7 +795,10 @@ function MyPostsTab({ userId, onChange }: { userId: string; onChange: (d: number
         title="এখনো কোনো পোস্ট নেই"
         description="আপনার প্রথম পোস্ট দিয়ে শুরু করুন"
         action={
-          <Link to="/feed" className="inline-flex h-10 px-4 rounded-xl bg-primary text-primary-foreground font-bold items-center gap-2">
+          <Link
+            to="/feed"
+            className="inline-flex h-10 px-4 rounded-xl bg-primary text-primary-foreground font-bold items-center gap-2"
+          >
             <Plus className="h-4 w-4" /> প্রথম পোস্ট করুন
           </Link>
         }
@@ -613,13 +813,22 @@ function MyPostsTab({ userId, onChange }: { userId: string; onChange: (d: number
           <LongPressCard key={p.id} onLongPress={() => setConfirmId(p.id)}>
             <article className="rounded-2xl border border-border bg-card p-3">
               <div className="flex items-start justify-between gap-3">
-                <p className="text-sm text-foreground line-clamp-3 whitespace-pre-wrap flex-1">{p.content}</p>
+                <p className="text-sm text-foreground line-clamp-3 whitespace-pre-wrap flex-1">
+                  {p.content}
+                </p>
                 {p.image_url && (
-                  <LazyImage src={p.image_url} alt="" wrapperClassName="h-16 w-16 rounded-lg shrink-0" />
+                  <LazyImage
+                    src={p.image_url}
+                    alt=""
+                    wrapperClassName="h-16 w-16 rounded-lg shrink-0"
+                  />
                 )}
               </div>
               <div className="flex items-center justify-between mt-2 text-[11px] text-muted-foreground">
-                <span>👍 {p.likes_count} · 💬 {p.comments_count}{p.crop_tag ? ` · 🌾 ${p.crop_tag}` : ""}</span>
+                <span>
+                  👍 {p.likes_count} · 💬 {p.comments_count}
+                  {p.crop_tag ? ` · 🌾 ${p.crop_tag}` : ""}
+                </span>
                 <button
                   type="button"
                   onClick={() => setConfirmId(p.id)}
@@ -651,18 +860,29 @@ function MyPostsTab({ userId, onChange }: { userId: string; onChange: (d: number
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      <span className="hidden" aria-hidden>{String(!!navigate)}</span>
+      <span className="hidden" aria-hidden>
+        {String(!!navigate)}
+      </span>
     </>
   );
 }
 
-function LongPressCard({ children, onLongPress }: { children: React.ReactNode; onLongPress: () => void }) {
+function LongPressCard({
+  children,
+  onLongPress,
+}: {
+  children: React.ReactNode;
+  onLongPress: () => void;
+}) {
   const timer = useRef<number | null>(null);
   const start = () => {
     timer.current = window.setTimeout(onLongPress, 550);
   };
   const cancel = () => {
-    if (timer.current) { window.clearTimeout(timer.current); timer.current = null; }
+    if (timer.current) {
+      window.clearTimeout(timer.current);
+      timer.current = null;
+    }
   };
   return (
     <div
@@ -679,8 +899,16 @@ function LongPressCard({ children, onLongPress }: { children: React.ReactNode; o
 }
 
 type MyExchange = {
-  id: string; title: string; type: string; price: number | null; unit: string | null;
-  is_free: boolean; is_active: boolean; district: string; created_at: string; image_url: string | null;
+  id: string;
+  title: string;
+  type: string;
+  price: number | null;
+  unit: string | null;
+  is_free: boolean;
+  is_active: boolean;
+  district: string;
+  created_at: string;
+  image_url: string | null;
 };
 
 function MyExchangesTab({ userId, onChange }: { userId: string; onChange: (d: number) => void }) {
@@ -689,8 +917,11 @@ function MyExchangesTab({ userId, onChange }: { userId: string; onChange: (d: nu
   useEffect(() => {
     (async () => {
       const { data } = await supabase
-        .from("exchanges").select("id, title, type, price, unit, is_free, is_active, district, created_at, image_url")
-        .eq("user_id", userId).order("created_at", { ascending: false }).limit(50);
+        .from("exchanges")
+        .select("id, title, type, price, unit, is_free, is_active, district, created_at, image_url")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(50);
       setRows((data as MyExchange[]) ?? []);
     })();
   }, [userId]);
@@ -712,7 +943,12 @@ function MyExchangesTab({ userId, onChange }: { userId: string; onChange: (d: nu
     setRows(prev.filter((r) => r.id !== id));
     onChange(-1);
     const { error } = await supabase.from("exchanges").delete().eq("id", id);
-    if (error) { setRows(prev); onChange(1); toast.error("মুছতে ব্যর্থ"); return; }
+    if (error) {
+      setRows(prev);
+      onChange(1);
+      toast.error("মুছতে ব্যর্থ");
+      return;
+    }
     toast.success("বিজ্ঞাপন মুছে ফেলা হয়েছে");
   };
 
@@ -723,7 +959,10 @@ function MyExchangesTab({ userId, onChange }: { userId: string; onChange: (d: nu
         title="কোনো বিজ্ঞাপন নেই"
         description="আপনার প্রথম বিজ্ঞাপন দিন"
         action={
-          <Link to="/exchange" className="inline-flex h-10 px-4 rounded-xl bg-primary text-primary-foreground font-bold items-center gap-2">
+          <Link
+            to="/exchange"
+            className="inline-flex h-10 px-4 rounded-xl bg-primary text-primary-foreground font-bold items-center gap-2"
+          >
             <Plus className="h-4 w-4" /> বিজ্ঞাপন দিন
           </Link>
         }
@@ -734,10 +973,17 @@ function MyExchangesTab({ userId, onChange }: { userId: string; onChange: (d: nu
   return (
     <div className="space-y-3">
       {rows.map((e) => (
-        <article key={e.id} className={`rounded-2xl border bg-card p-3 ${e.is_active ? "border-border" : "border-dashed border-muted-foreground/40 opacity-70"}`}>
+        <article
+          key={e.id}
+          className={`rounded-2xl border bg-card p-3 ${e.is_active ? "border-border" : "border-dashed border-muted-foreground/40 opacity-70"}`}
+        >
           <div className="flex items-start gap-3">
             {e.image_url ? (
-              <LazyImage src={e.image_url} alt="" wrapperClassName="h-14 w-14 rounded-lg shrink-0" />
+              <LazyImage
+                src={e.image_url}
+                alt=""
+                wrapperClassName="h-14 w-14 rounded-lg shrink-0"
+              />
             ) : (
               <div className="h-14 w-14 rounded-lg bg-muted shrink-0" />
             )}
@@ -747,7 +993,9 @@ function MyExchangesTab({ userId, onChange }: { userId: string; onChange: (d: nu
                 {e.is_free ? "বিনামূল্যে" : `${e.price ?? "—"} ${e.unit ?? ""}`} · {e.district}
               </p>
             </div>
-            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${e.is_active ? "bg-emerald-100 text-emerald-700" : "bg-muted text-muted-foreground"}`}>
+            <span
+              className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${e.is_active ? "bg-emerald-100 text-emerald-700" : "bg-muted text-muted-foreground"}`}
+            >
               {e.is_active ? "সক্রিয়" : "নিষ্ক্রিয়"}
             </span>
           </div>
@@ -781,8 +1029,13 @@ function MyExchangesTab({ userId, onChange }: { userId: string; onChange: (d: nu
 }
 
 type MyPrice = {
-  id: string; product_name: string; price: number; unit: string;
-  market_name: string; district: string; created_at: string;
+  id: string;
+  product_name: string;
+  price: number;
+  unit: string;
+  market_name: string;
+  district: string;
+  created_at: string;
 };
 
 function MyPricesTab({ userId, onChange }: { userId: string; onChange: (d: number) => void }) {
@@ -791,8 +1044,11 @@ function MyPricesTab({ userId, onChange }: { userId: string; onChange: (d: numbe
   useEffect(() => {
     (async () => {
       const { data } = await supabase
-        .from("prices").select("id, product_name, price, unit, market_name, district, created_at")
-        .eq("user_id", userId).order("created_at", { ascending: false }).limit(100);
+        .from("prices")
+        .select("id, product_name, price, unit, market_name, district, created_at")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(100);
       setRows((data as MyPrice[]) ?? []);
     })();
   }, [userId]);
@@ -802,7 +1058,12 @@ function MyPricesTab({ userId, onChange }: { userId: string; onChange: (d: numbe
     setRows(prev.filter((r) => r.id !== id));
     onChange(-1);
     const { error } = await supabase.from("prices").delete().eq("id", id);
-    if (error) { setRows(prev); onChange(1); toast.error("মুছতে ব্যর্থ"); return; }
+    if (error) {
+      setRows(prev);
+      onChange(1);
+      toast.error("মুছতে ব্যর্থ");
+      return;
+    }
     toast.success("মুছে ফেলা হয়েছে");
   };
 
@@ -839,7 +1100,15 @@ function MyPricesTab({ userId, onChange }: { userId: string; onChange: (d: numbe
   );
 }
 
-function SettingsList({ open, onClose, onLogout }: { open: boolean; onClose: () => void; onLogout: () => void }) {
+function SettingsList({
+  open,
+  onClose,
+  onLogout,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onLogout: () => void;
+}) {
   const [notifOpen, setNotifOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
@@ -847,14 +1116,29 @@ function SettingsList({ open, onClose, onLogout }: { open: boolean; onClose: () 
   const [mutedOpen, setMutedOpen] = useState(false);
 
   const [prefs, setPrefs] = useState(() => {
-    if (typeof window === "undefined") return { price: true, posts: true, comments: true, exchange: true };
-    try { return JSON.parse(localStorage.getItem("krishi:notif") || "") || { price: true, posts: true, comments: true, exchange: true }; }
-    catch { return { price: true, posts: true, comments: true, exchange: true }; }
+    if (typeof window === "undefined")
+      return { price: true, posts: true, comments: true, exchange: true };
+    try {
+      return (
+        JSON.parse(localStorage.getItem("krishi:notif") || "") || {
+          price: true,
+          posts: true,
+          comments: true,
+          exchange: true,
+        }
+      );
+    } catch {
+      return { price: true, posts: true, comments: true, exchange: true };
+    }
   });
   const updatePref = (k: keyof typeof prefs, v: boolean) => {
     const next = { ...prefs, [k]: v };
     setPrefs(next);
-    try { localStorage.setItem("krishi:notif", JSON.stringify(next)); } catch { /* ignore */ }
+    try {
+      localStorage.setItem("krishi:notif", JSON.stringify(next));
+    } catch {
+      /* ignore */
+    }
   };
 
   const rate = () => {
@@ -867,11 +1151,20 @@ function SettingsList({ open, onClose, onLogout }: { open: boolean; onClose: () 
         <div className="space-y-3">
           <div className="rounded-2xl bg-card border border-border overflow-hidden">
             <SettingRow icon={Bell} label="নোটিফিকেশন সেটিংস" onClick={() => setNotifOpen(true)} />
-            <SettingRow icon={BellOff} label="মিউট করা ব্যবহারকারীরা" onClick={() => setMutedOpen(true)} />
+            <SettingRow
+              icon={BellOff}
+              label="মিউট করা ব্যবহারকারীরা"
+              onClick={() => setMutedOpen(true)}
+            />
             <SettingRow icon={Globe} label="ভাষা" value="বাংলা" onClick={() => setLangOpen(true)} />
             <SettingRow icon={Info} label="অ্যাপ সম্পর্কে" onClick={() => setAboutOpen(true)} />
             <SettingRow icon={Star} label="অ্যাপ রেট করুন" onClick={rate} />
-            <SettingRow icon={HelpCircle} label="সাহায্য ও সাপোর্ট" onClick={() => setHelpOpen(true)} last />
+            <SettingRow
+              icon={HelpCircle}
+              label="সাহায্য ও সাপোর্ট"
+              onClick={() => setHelpOpen(true)}
+              last
+            />
           </div>
           <button
             type="button"
@@ -887,12 +1180,14 @@ function SettingsList({ open, onClose, onLogout }: { open: boolean; onClose: () 
 
       <BottomSheet open={notifOpen} onClose={() => setNotifOpen(false)} title="নোটিফিকেশন সেটিংস">
         <div className="space-y-3">
-          {([
-            ["price", "দাম আপডেট"],
-            ["posts", "নতুন পোস্ট"],
-            ["comments", "মন্তব্য"],
-            ["exchange", "বিনিময়"],
-          ] as const).map(([k, label]) => (
+          {(
+            [
+              ["price", "দাম আপডেট"],
+              ["posts", "নতুন পোস্ট"],
+              ["comments", "মন্তব্য"],
+              ["exchange", "বিনিময়"],
+            ] as const
+          ).map(([k, label]) => (
             <div key={k} className="flex items-center justify-between py-2">
               <span className="text-sm font-semibold text-foreground">{label}</span>
               <Switch checked={prefs[k]} onCheckedChange={(v) => updatePref(k, v)} />
@@ -906,7 +1201,10 @@ function SettingsList({ open, onClose, onLogout }: { open: boolean; onClose: () 
           <button className="w-full h-12 rounded-xl border-2 border-primary bg-primary/5 text-primary font-bold">
             বাংলা ✓
           </button>
-          <button disabled className="w-full h-12 rounded-xl border border-input text-muted-foreground font-semibold">
+          <button
+            disabled
+            className="w-full h-12 rounded-xl border border-input text-muted-foreground font-semibold"
+          >
             English (শীঘ্রই আসছে)
           </button>
         </div>
@@ -914,10 +1212,19 @@ function SettingsList({ open, onClose, onLogout }: { open: boolean; onClose: () 
 
       <BottomSheet open={aboutOpen} onClose={() => setAboutOpen(false)} title="অ্যাপ সম্পর্কে">
         <div className="space-y-3 text-sm text-foreground">
-          <p><span className="font-bold">কৃষক বন্ধু</span> — বাংলাদেশের কৃষকদের জন্য একটি কমিউনিটি অ্যাপ।</p>
-          <p>সংস্করণ: <span className="font-mono">1.0.0</span></p>
-          <a href="#" className="block text-primary font-semibold">শর্তাবলী</a>
-          <a href="#" className="block text-primary font-semibold">গোপনীয়তা নীতি</a>
+          <p>
+            <span className="font-bold">কৃষক বন্ধু</span> — বাংলাদেশের কৃষকদের জন্য একটি কমিউনিটি
+            অ্যাপ।
+          </p>
+          <p>
+            সংস্করণ: <span className="font-mono">1.0.0</span>
+          </p>
+          <a href="#" className="block text-primary font-semibold">
+            শর্তাবলী
+          </a>
+          <a href="#" className="block text-primary font-semibold">
+            গোপনীয়তা নীতি
+          </a>
         </div>
       </BottomSheet>
 
@@ -925,7 +1232,8 @@ function SettingsList({ open, onClose, onLogout }: { open: boolean; onClose: () 
         <div className="space-y-3">
           <a
             href={`https://wa.me/${SUPPORT_PHONE.replace(/^0/, "880")}`}
-            target="_blank" rel="noopener noreferrer"
+            target="_blank"
+            rel="noopener noreferrer"
             className="flex items-center justify-between p-3 rounded-xl bg-emerald-50 border border-emerald-200"
           >
             <span className="text-sm font-bold text-emerald-700">WhatsApp</span>
@@ -945,9 +1253,17 @@ function SettingsList({ open, onClose, onLogout }: { open: boolean; onClose: () 
 }
 
 function SettingRow({
-  icon: Icon, label, value, onClick, last,
+  icon: Icon,
+  label,
+  value,
+  onClick,
+  last,
 }: {
-  icon: typeof Bell; label: string; value?: string; onClick: () => void; last?: boolean;
+  icon: typeof Bell;
+  label: string;
+  value?: string;
+  onClick: () => void;
+  last?: boolean;
 }) {
   return (
     <button

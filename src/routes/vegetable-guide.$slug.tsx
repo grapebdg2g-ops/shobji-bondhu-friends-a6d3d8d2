@@ -2,9 +2,26 @@ import { CropIcon } from "@/components/krishi/crop-icon";
 import { createFileRoute, Link, useNavigate, notFound } from "@tanstack/react-router";
 import { useState } from "react";
 import {
-  ArrowLeft, Share2, Clock, Maximize2, Droplets, AlertTriangle,
-  TrendingUp, Calendar, Sprout, Leaf, FlaskConical, Lightbulb, Sparkles,
-  Landmark, ChevronDown, ChevronUp, Star, CheckCircle2, XCircle, BarChart3,
+  ArrowLeft,
+  Share2,
+  Clock,
+  Maximize2,
+  Droplets,
+  AlertTriangle,
+  TrendingUp,
+  Calendar,
+  Sprout,
+  Leaf,
+  FlaskConical,
+  Lightbulb,
+  Sparkles,
+  Landmark,
+  ChevronDown,
+  ChevronUp,
+  Star,
+  CheckCircle2,
+  XCircle,
+  BarChart3,
 } from "lucide-react";
 import { getCrop, type CropData, type Variety, type SoilType } from "@/data/master-crop-data";
 import { toBn, fmtBdt } from "@/lib/bn";
@@ -20,37 +37,71 @@ export const Route = createFileRoute("/vegetable-guide/$slug")({
     meta: [
       { title: `${loaderData?.crop.name ?? "ফসল"} চাষ গাইড — কৃষক বন্ধু` },
       { property: "og:title", content: `${loaderData?.crop.name ?? "ফসল"} চাষ গাইড — কৃষক বন্ধু` },
-      { property: "og:description", content: `${loaderData?.crop.name ?? ""} চাষের পদ্ধতি, খরচ, লাভ, জাত ও বাজার বিশ্লেষণ।` },
+      {
+        property: "og:description",
+        content: `${loaderData?.crop.name ?? ""} চাষের পদ্ধতি, খরচ, লাভ, জাত ও বাজার বিশ্লেষণ।`,
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "description", content: `${loaderData?.crop.name ?? ""} চাষের পদ্ধতি, খরচ, লাভ, জাত ও বাজার বিশ্লেষণ।` },
+      {
+        name: "description",
+        content: `${loaderData?.crop.name ?? ""} চাষের পদ্ধতি, খরচ, লাভ, জাত ও বাজার বিশ্লেষণ।`,
+      },
     ],
   }),
   notFoundComponent: () => (
     <div className="min-h-screen flex items-center justify-center p-6 text-center">
       <div>
         <p className="text-gray-700 mb-3">ফসল পাওয়া যায়নি</p>
-        <Link to="/vegetable-guide" className="text-emerald-600 font-semibold">← গাইডে ফিরুন</Link>
+        <Link to="/vegetable-guide" className="text-emerald-600 font-semibold">
+          ← গাইডে ফিরুন
+        </Link>
       </div>
     </div>
   ),
 });
 
-const MONTHS_BN = ["জানু", "ফেব্রু", "মার্চ", "এপ্রিল", "মে", "জুন", "জুলাই", "আগ", "সেপ্ট", "অক্টো", "নভে", "ডিসে"];
-const MONTHS_FULL = ["জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন", "জুলাই", "আগস্ট", "সেপ্টেম্বর", "অক্টোবর", "নভেম্বর", "ডিসেম্বর"];
+const MONTHS_BN = [
+  "জানু",
+  "ফেব্রু",
+  "মার্চ",
+  "এপ্রিল",
+  "মে",
+  "জুন",
+  "জুলাই",
+  "আগ",
+  "সেপ্ট",
+  "অক্টো",
+  "নভে",
+  "ডিসে",
+];
+const MONTHS_FULL = [
+  "জানুয়ারি",
+  "ফেব্রুয়ারি",
+  "মার্চ",
+  "এপ্রিল",
+  "মে",
+  "জুন",
+  "জুলাই",
+  "আগস্ট",
+  "সেপ্টেম্বর",
+  "অক্টোবর",
+  "নভেম্বর",
+  "ডিসেম্বর",
+];
 
 const SOIL_RANK: Record<SoilType, { label: string; ok: boolean }> = {
-  "দোআঁশ": { label: "দোআঁশ মাটি (সেরা)", ok: true },
-  "এঁটেল": { label: "এঁটেল দোআঁশ (ভালো)", ok: true },
+  দোআঁশ: { label: "দোআঁশ মাটি (সেরা)", ok: true },
+  এঁটেল: { label: "এঁটেল দোআঁশ (ভালো)", ok: true },
   "বেলে-দোআঁশ": { label: "বেলে দোআঁশ (চলবে)", ok: true },
-  "পলি": { label: "পলি মাটি (ভালো)", ok: true },
-  "বালি": { label: "বালি মাটি", ok: true },
+  পলি: { label: "পলি মাটি (ভালো)", ok: true },
+  বালি: { label: "বালি মাটি", ok: true },
 };
 
 const VARIETY_BADGE: Record<Variety["type"], string> = {
-  "উফশী": "bg-emerald-100 text-emerald-700",
-  "হাইব্রিড": "bg-blue-100 text-blue-700",
-  "স্থানীয়": "bg-orange-100 text-orange-700",
+  উফশী: "bg-emerald-100 text-emerald-700",
+  হাইব্রিড: "bg-blue-100 text-blue-700",
+  স্থানীয়: "bg-orange-100 text-orange-700",
 };
 
 function CropDetailPage() {
@@ -60,31 +111,52 @@ function CropDetailPage() {
   const handleShare = async () => {
     const url = window.location.href;
     if (navigator.share) {
-      try { await navigator.share({ title: crop.name, url }); } catch { /* ignore */ }
+      try {
+        await navigator.share({ title: crop.name, url });
+      } catch {
+        /* ignore */
+      }
     } else {
-      try { await navigator.clipboard.writeText(url); } catch { /* ignore */ }
+      try {
+        await navigator.clipboard.writeText(url);
+      } catch {
+        /* ignore */
+      }
     }
   };
 
   return (
     <main className="min-h-screen bg-[#F0FFF4] md:max-w-[560px] md:mx-auto pb-48 md:pb-32">
       {/* HEADER */}
-      <header className="px-5 pt-8 pb-6 rounded-b-3xl text-white" style={{ background: "var(--gradient-brand)" }}>
+      <header
+        className="px-5 pt-8 pb-6 rounded-b-3xl text-white"
+        style={{ background: "var(--gradient-brand)" }}
+      >
         <div className="flex items-center justify-between">
-          <button onClick={() => navigate({ to: "/vegetable-guide" })} className="h-9 w-9 rounded-full bg-white/15 flex items-center justify-center">
+          <button
+            onClick={() => navigate({ to: "/vegetable-guide" })}
+            className="h-9 w-9 rounded-full bg-white/15 flex items-center justify-center"
+          >
             <ArrowLeft className="h-5 w-5" />
           </button>
-          <button onClick={handleShare} className="h-9 w-9 rounded-full bg-white/15 flex items-center justify-center">
+          <button
+            onClick={handleShare}
+            className="h-9 w-9 rounded-full bg-white/15 flex items-center justify-center"
+          >
             <Share2 className="h-5 w-5" />
           </button>
         </div>
         <div className="mt-4 text-center">
-          <div className="text-[80px] leading-none"><CropIcon crop={crop.id} /></div>
+          <div className="text-[80px] leading-none">
+            <CropIcon crop={crop.id} />
+          </div>
           <h1 className="mt-2 text-[28px] font-bold">{crop.name}</h1>
           <div className="mt-2 inline-block bg-white/20 px-3 py-1 rounded-full text-xs font-semibold">
             {crop.seasons.join(" / ")} মৌসুম
           </div>
-          <p className="text-sm text-white/85 mt-2">{crop.nameEn} — {crop.category}</p>
+          <p className="text-sm text-white/85 mt-2">
+            {crop.nameEn} — {crop.category}
+          </p>
         </div>
 
         {/* Quick stats */}
@@ -144,7 +216,15 @@ function Stat({ icon, top, bottom }: { icon: string; top: string; bottom: string
   );
 }
 
-function SectionCard({ title, icon, children }: { title: string; icon: string; children: React.ReactNode }) {
+function SectionCard({
+  title,
+  icon,
+  children,
+}: {
+  title: string;
+  icon: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="bg-white rounded-2xl p-4 border border-gray-100">
       <h2 className="font-bold text-gray-900 flex items-center gap-2 mb-3">
@@ -168,7 +248,12 @@ function FinancialSection({ crop }: { crop: CropData }) {
   ];
 
   const demandPct = crop.demandLevel === "বেশি" ? 100 : crop.demandLevel === "মাঝারি" ? 60 : 30;
-  const demandColor = crop.demandLevel === "বেশি" ? "bg-emerald-500" : crop.demandLevel === "মাঝারি" ? "bg-amber-500" : "bg-gray-400";
+  const demandColor =
+    crop.demandLevel === "বেশি"
+      ? "bg-emerald-500"
+      : crop.demandLevel === "মাঝারি"
+        ? "bg-amber-500"
+        : "bg-gray-400";
 
   return (
     <SectionCard title="বাজার ও লাভের তথ্য" icon="💰">
@@ -191,22 +276,32 @@ function FinancialSection({ crop }: { crop: CropData }) {
         </div>
         <div className="mt-3 pt-3 border-t border-white/20 flex items-center justify-between">
           <span className="text-xs">ROI</span>
-          <span className="text-lg font-bold">{toBn(crop.roi)}% <span className="text-[10px] font-normal">(বিনিয়োগের {(crop.roi / 100).toFixed(1).replace(/\d/g, d => "০১২৩৪৫৬৭৮৯"[+d])} গুণ)</span></span>
+          <span className="text-lg font-bold">
+            {toBn(crop.roi)}%{" "}
+            <span className="text-[10px] font-normal">
+              (বিনিয়োগের {(crop.roi / 100).toFixed(1).replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[+d])} গুণ)
+            </span>
+          </span>
         </div>
       </div>
 
       {/* Cost breakdown */}
       <button
-        onClick={() => setOpen(o => !o)}
+        onClick={() => setOpen((o) => !o)}
         className="mt-3 w-full flex items-center justify-between bg-gray-50 rounded-xl p-3"
       >
-        <span className="text-sm font-semibold text-gray-800">বিঘা প্রতি আনুমানিক খরচ — {fmtBdt(crop.totalCost)}</span>
+        <span className="text-sm font-semibold text-gray-800">
+          বিঘা প্রতি আনুমানিক খরচ — {fmtBdt(crop.totalCost)}
+        </span>
         {open ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
       </button>
       {open && (
         <div className="mt-2 border border-gray-100 rounded-xl overflow-hidden text-sm">
           {costs.map((c) => (
-            <div key={c.label} className="flex justify-between px-3 py-2 border-b border-gray-50 last:border-0">
+            <div
+              key={c.label}
+              className="flex justify-between px-3 py-2 border-b border-gray-50 last:border-0"
+            >
               <span className="text-gray-700">{c.label}</span>
               <span className="font-semibold text-gray-900">{fmtBdt(c.v)}</span>
             </div>
@@ -220,7 +315,9 @@ function FinancialSection({ crop }: { crop: CropData }) {
 
       {/* Market intelligence */}
       <div className="mt-4 space-y-3">
-        <h3 className="text-sm font-bold text-gray-800 flex items-center gap-1"><BarChart3 className="h-4 w-4" /> বাজার বিশ্লেষণ</h3>
+        <h3 className="text-sm font-bold text-gray-800 flex items-center gap-1">
+          <BarChart3 className="h-4 w-4" /> বাজার বিশ্লেষণ
+        </h3>
         <div>
           <div className="flex justify-between text-xs mb-1">
             <span className="text-gray-600">চাহিদার মাত্রা</span>
@@ -254,17 +351,22 @@ function FinancialSection({ crop }: { crop: CropData }) {
             })}
           </div>
           <div className="flex gap-3 mt-2 text-[10px] text-gray-600">
-            <span>🟢 ভালো দাম</span><span>🟡 সংগ্রহ</span><span>🟣 রোপণ</span>
+            <span>🟢 ভালো দাম</span>
+            <span>🟡 সংগ্রহ</span>
+            <span>🟣 রোপণ</span>
           </div>
         </div>
 
         {crop.bestSellingMonths.length > 0 && (
           <div className="bg-amber-50 border border-amber-200 rounded-xl p-3">
-            <p className="text-xs font-bold text-amber-800 flex items-center gap-1"><Lightbulb className="h-3.5 w-3.5" /> দাম সম্পর্কে জানুন</p>
+            <p className="text-xs font-bold text-amber-800 flex items-center gap-1">
+              <Lightbulb className="h-3.5 w-3.5" /> দাম সম্পর্কে জানুন
+            </p>
             <p className="text-xs text-gray-800 mt-1.5 leading-relaxed">
               {crop.bestSellingMonths.length > 1
                 ? `${MONTHS_FULL[crop.bestSellingMonths[0] - 1]} থেকে ${MONTHS_FULL[crop.bestSellingMonths[crop.bestSellingMonths.length - 1] - 1]}`
-                : MONTHS_FULL[crop.bestSellingMonths[0] - 1]} মাসে {crop.name}-এর দাম সবচেয়ে বেশি থাকে। সেই অনুযায়ী রোপণের পরিকল্পনা করুন।
+                : MONTHS_FULL[crop.bestSellingMonths[0] - 1]}{" "}
+              মাসে {crop.name}-এর দাম সবচেয়ে বেশি থাকে। সেই অনুযায়ী রোপণের পরিকল্পনা করুন।
             </p>
           </div>
         )}
@@ -285,8 +387,14 @@ function SeasonSection({ crop }: { crop: CropData }) {
       <div className="bg-emerald-50 rounded-xl p-3 border border-emerald-100">
         <p className="text-xs font-bold text-emerald-700">মূল মৌসুম: {crop.seasons.join(", ")}</p>
         <div className="mt-2 space-y-1.5 text-sm">
-          <Row label="রোপণ" value={`${MONTHS_FULL[plantStart - 1]}${plantEnd !== plantStart ? ` - ${MONTHS_FULL[plantEnd - 1]}` : ""}`} />
-          <Row label="সংগ্রহ" value={`${MONTHS_FULL[harvestStart - 1]}${harvestEnd !== harvestStart ? ` - ${MONTHS_FULL[harvestEnd - 1]}` : ""}`} />
+          <Row
+            label="রোপণ"
+            value={`${MONTHS_FULL[plantStart - 1]}${plantEnd !== plantStart ? ` - ${MONTHS_FULL[plantEnd - 1]}` : ""}`}
+          />
+          <Row
+            label="সংগ্রহ"
+            value={`${MONTHS_FULL[harvestStart - 1]}${harvestEnd !== harvestStart ? ` - ${MONTHS_FULL[harvestEnd - 1]}` : ""}`}
+          />
           <Row label="মোট সময়" value={`${toBn(crop.totalDays)} দিন`} />
         </div>
       </div>
@@ -299,18 +407,33 @@ function SeasonSection({ crop }: { crop: CropData }) {
             const month = i + 1;
             const planting = crop.plantingMonths.includes(month);
             const harvest = crop.harvestMonths.includes(month);
-            const between = !planting && !harvest && crop.plantingMonths.some(p => crop.harvestMonths.some(h => {
-              if (p <= h) return month > p && month < h;
-              return month > p || month < h;
-            }));
-            const bg = planting ? "bg-emerald-500 text-white" : harvest ? "bg-amber-500 text-white" : between ? "bg-emerald-100 text-emerald-700" : "bg-gray-50 text-gray-400";
+            const between =
+              !planting &&
+              !harvest &&
+              crop.plantingMonths.some((p) =>
+                crop.harvestMonths.some((h) => {
+                  if (p <= h) return month > p && month < h;
+                  return month > p || month < h;
+                }),
+              );
+            const bg = planting
+              ? "bg-emerald-500 text-white"
+              : harvest
+                ? "bg-amber-500 text-white"
+                : between
+                  ? "bg-emerald-100 text-emerald-700"
+                  : "bg-gray-50 text-gray-400";
             return (
-              <div key={i} className={`rounded text-center py-1 text-[9px] font-semibold ${bg}`}>{m}</div>
+              <div key={i} className={`rounded text-center py-1 text-[9px] font-semibold ${bg}`}>
+                {m}
+              </div>
             );
           })}
         </div>
         <div className="flex gap-3 mt-2 text-[10px] text-gray-600">
-          <span>🟩 রোপণ</span><span>🟧 সংগ্রহ</span><span>🟢 বৃদ্ধি</span>
+          <span>🟩 রোপণ</span>
+          <span>🟧 সংগ্রহ</span>
+          <span>🟢 বৃদ্ধি</span>
         </div>
       </div>
     </SectionCard>
@@ -324,7 +447,7 @@ function VarietiesSection({ crop }: { crop: CropData }) {
   const [open, setOpen] = useState(false);
 
   if (crop.varieties.length === 0) return null;
-  const bestYield = Math.max(...crop.varieties.map(v => v.yieldPerBigha));
+  const bestYield = Math.max(...crop.varieties.map((v) => v.yieldPerBigha));
 
   const categorize = (v: Variety): string => {
     const s = (v.special ?? "").toLowerCase();
@@ -337,105 +460,123 @@ function VarietiesSection({ crop }: { crop: CropData }) {
 
   const CATS = ["সব", "আগাম", "মাঝারি", "নাবী", "রঙিন"] as const;
   const counts = CATS.reduce<Record<string, number>>((acc, c) => {
-    acc[c] = c === "সব" ? crop.varieties.length : crop.varieties.filter(v => categorize(v) === c).length;
+    acc[c] =
+      c === "সব" ? crop.varieties.length : crop.varieties.filter((v) => categorize(v) === c).length;
     return acc;
   }, {});
-  const availableCats = CATS.filter(c => counts[c] > 0);
+  const availableCats = CATS.filter((c) => counts[c] > 0);
 
-  const shown = filter === "সব" ? crop.varieties : crop.varieties.filter(v => categorize(v) === filter);
+  const shown =
+    filter === "সব" ? crop.varieties : crop.varieties.filter((v) => categorize(v) === filter);
 
   return (
     <SectionCard title="বাংলাদেশে প্রচলিত জাত" icon="🌱">
       <button
-        onClick={() => setOpen(o => !o)}
+        onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
         className="w-full flex items-center justify-between text-sm font-semibold text-gray-800 bg-gray-50 hover:bg-gray-100 rounded-xl px-3 py-2 transition"
       >
-        <span>{open ? "জাত তালিকা লুকান" : `জাত তালিকা দেখুন (${toBn(crop.varieties.length)}টি)`}</span>
+        <span>
+          {open ? "জাত তালিকা লুকান" : `জাত তালিকা দেখুন (${toBn(crop.varieties.length)}টি)`}
+        </span>
         {open ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
       </button>
-      {open && <div className="mt-3">
-      {availableCats.length > 2 && (
-
-        <div className="flex gap-1.5 overflow-x-auto pb-2 mb-2 -mx-1 px-1">
-          {availableCats.map(c => (
-            <button
-              key={c}
-              onClick={() => setFilter(c)}
-              className={`shrink-0 text-xs font-semibold px-3 py-1.5 rounded-full border transition ${
-                filter === c
-                  ? "bg-emerald-600 text-white border-emerald-600"
-                  : "bg-white text-gray-700 border-gray-200 hover:border-emerald-300"
-              }`}
-            >
-              {c} <span className="opacity-70">({toBn(counts[c])})</span>
-            </button>
-          ))}
-        </div>
-      )}
-      <div className="space-y-2.5">
-        {shown.map((v) => {
-          const isBest = v.yieldPerBigha === bestYield;
-          return (
-            <div key={v.name} className="border border-gray-100 rounded-xl p-3 relative">
-              {isBest && (
-                <span className="absolute -top-2 right-3 bg-amber-400 text-amber-900 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-0.5">
-                  <Star className="h-3 w-3 fill-current" /> সুপারিশকৃত
-                </span>
-              )}
-              <div className="flex justify-between items-start">
-                <p className="font-bold text-gray-900">{v.name}</p>
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${VARIETY_BADGE[v.type]}`}>{v.type}</span>
-              </div>
-              <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
-                <div className="text-gray-700"><span className="text-gray-500">ফলন:</span> <b>{toBn(v.yieldPerBigha)} মণ/বিঘা</b></div>
-                <div className="text-gray-700"><span className="text-gray-500">সময়:</span> <b>{toBn(v.daysToHarvest)} দিন</b></div>
-              </div>
-              {v.special && <p className="mt-1.5 text-xs text-emerald-700 font-semibold">{v.special}</p>}
-            </div>
-          );
-        })}
-        {shown.length === 0 && (
-          <p className="text-center text-sm text-gray-500 py-4">এই ক্যাটাগরিতে কোনো জাত নেই</p>
-        )}
-      </div>
-
-
-      <button onClick={() => setCompare(c => !c)} className="mt-3 w-full text-sm font-semibold text-emerald-700 bg-emerald-50 rounded-xl py-2">
-        {compare ? "তুলনা বন্ধ করুন" : "জাত তুলনা করুন →"}
-      </button>
-      {compare && (
-        <div className="mt-2 overflow-x-auto">
-          <table className="w-full text-xs">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="text-left p-2">জাত</th>
-                <th className="text-right p-2">ফলন</th>
-                <th className="text-right p-2">সময়</th>
-              </tr>
-            </thead>
-            <tbody>
-              {crop.varieties.map((v) => (
-                <tr key={v.name} className="border-t border-gray-100">
-                  <td className="p-2 font-semibold">{v.name}</td>
-                  <td className="p-2 text-right">{toBn(v.yieldPerBigha)} মণ</td>
-                  <td className="p-2 text-right">{toBn(v.daysToHarvest)} দিন</td>
-                </tr>
+      {open && (
+        <div className="mt-3">
+          {availableCats.length > 2 && (
+            <div className="flex gap-1.5 overflow-x-auto pb-2 mb-2 -mx-1 px-1">
+              {availableCats.map((c) => (
+                <button
+                  key={c}
+                  onClick={() => setFilter(c)}
+                  className={`shrink-0 text-xs font-semibold px-3 py-1.5 rounded-full border transition ${
+                    filter === c
+                      ? "bg-emerald-600 text-white border-emerald-600"
+                      : "bg-white text-gray-700 border-gray-200 hover:border-emerald-300"
+                  }`}
+                >
+                  {c} <span className="opacity-70">({toBn(counts[c])})</span>
+                </button>
               ))}
-            </tbody>
-          </table>
+            </div>
+          )}
+          <div className="space-y-2.5">
+            {shown.map((v) => {
+              const isBest = v.yieldPerBigha === bestYield;
+              return (
+                <div key={v.name} className="border border-gray-100 rounded-xl p-3 relative">
+                  {isBest && (
+                    <span className="absolute -top-2 right-3 bg-amber-400 text-amber-900 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-0.5">
+                      <Star className="h-3 w-3 fill-current" /> সুপারিশকৃত
+                    </span>
+                  )}
+                  <div className="flex justify-between items-start">
+                    <p className="font-bold text-gray-900">{v.name}</p>
+                    <span
+                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${VARIETY_BADGE[v.type]}`}
+                    >
+                      {v.type}
+                    </span>
+                  </div>
+                  <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
+                    <div className="text-gray-700">
+                      <span className="text-gray-500">ফলন:</span>{" "}
+                      <b>{toBn(v.yieldPerBigha)} মণ/বিঘা</b>
+                    </div>
+                    <div className="text-gray-700">
+                      <span className="text-gray-500">সময়:</span>{" "}
+                      <b>{toBn(v.daysToHarvest)} দিন</b>
+                    </div>
+                  </div>
+                  {v.special && (
+                    <p className="mt-1.5 text-xs text-emerald-700 font-semibold">{v.special}</p>
+                  )}
+                </div>
+              );
+            })}
+            {shown.length === 0 && (
+              <p className="text-center text-sm text-gray-500 py-4">এই ক্যাটাগরিতে কোনো জাত নেই</p>
+            )}
+          </div>
+
+          <button
+            onClick={() => setCompare((c) => !c)}
+            className="mt-3 w-full text-sm font-semibold text-emerald-700 bg-emerald-50 rounded-xl py-2"
+          >
+            {compare ? "তুলনা বন্ধ করুন" : "জাত তুলনা করুন →"}
+          </button>
+          {compare && (
+            <div className="mt-2 overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="text-left p-2">জাত</th>
+                    <th className="text-right p-2">ফলন</th>
+                    <th className="text-right p-2">সময়</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {crop.varieties.map((v) => (
+                    <tr key={v.name} className="border-t border-gray-100">
+                      <td className="p-2 font-semibold">{v.name}</td>
+                      <td className="p-2 text-right">{toBn(v.yieldPerBigha)} মণ</td>
+                      <td className="p-2 text-right">{toBn(v.daysToHarvest)} দিন</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       )}
-      </div>}
     </SectionCard>
-
   );
 }
 
 // ════════ SECTION 4: Soil ════════
 function SoilSection({ crop }: { crop: CropData }) {
   const allSoils: SoilType[] = ["দোআঁশ", "এঁটেল", "বেলে-দোআঁশ", "পলি", "বালি"];
-  const pct = ((crop.phRange.min + crop.phRange.max) / 2 - 4) / 6 * 100;
+  const pct = (((crop.phRange.min + crop.phRange.max) / 2 - 4) / 6) * 100;
 
   return (
     <SectionCard title="উপযুক্ত জমি ও মাটি" icon="🌍">
@@ -443,8 +584,15 @@ function SoilSection({ crop }: { crop: CropData }) {
         {allSoils.map((s) => {
           const ok = crop.soilTypes.includes(s);
           return (
-            <div key={s} className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${ok ? "bg-emerald-50 text-emerald-800" : "bg-gray-50 text-gray-400"}`}>
-              {ok ? <CheckCircle2 className="h-4 w-4 text-emerald-600" /> : <XCircle className="h-4 w-4 text-gray-300" />}
+            <div
+              key={s}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${ok ? "bg-emerald-50 text-emerald-800" : "bg-gray-50 text-gray-400"}`}
+            >
+              {ok ? (
+                <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+              ) : (
+                <XCircle className="h-4 w-4 text-gray-300" />
+              )}
               {SOIL_RANK[s]?.label || s}
             </div>
           );
@@ -454,24 +602,40 @@ function SoilSection({ crop }: { crop: CropData }) {
       <div className="mt-4">
         <div className="flex justify-between text-xs mb-1">
           <span className="text-gray-600">মাটির অম্লতা (pH)</span>
-          <span className="font-bold text-gray-900">{toBn(crop.phRange.min)} - {toBn(crop.phRange.max)}</span>
+          <span className="font-bold text-gray-900">
+            {toBn(crop.phRange.min)} - {toBn(crop.phRange.max)}
+          </span>
         </div>
         <div className="relative h-2 bg-gradient-to-r from-red-200 via-emerald-300 to-purple-200 rounded-full">
-          <div className="absolute h-4 w-1 bg-emerald-700 rounded -top-1" style={{ left: `${Math.min(95, Math.max(0, pct))}%` }} />
+          <div
+            className="absolute h-4 w-1 bg-emerald-700 rounded -top-1"
+            style={{ left: `${Math.min(95, Math.max(0, pct))}%` }}
+          />
         </div>
-        <div className="flex justify-between text-[10px] text-gray-500 mt-0.5"><span>৪</span><span>৭</span><span>১০</span></div>
+        <div className="flex justify-between text-[10px] text-gray-500 mt-0.5">
+          <span>৪</span>
+          <span>৭</span>
+          <span>১০</span>
+        </div>
       </div>
 
       <div className="mt-4 grid grid-cols-2 gap-2">
         <div className="bg-blue-50 rounded-xl p-3">
           <p className="text-[10px] font-semibold text-blue-700">পানির প্রয়োজন</p>
           <p className="text-sm font-bold text-blue-900 mt-1">
-            {crop.waterRequirement === "বেশি" ? "💧💧💧" : crop.waterRequirement === "মাঝারি" ? "💧💧" : "💧"} {crop.waterRequirement}
+            {crop.waterRequirement === "বেশি"
+              ? "💧💧💧"
+              : crop.waterRequirement === "মাঝারি"
+                ? "💧💧"
+                : "💧"}{" "}
+            {crop.waterRequirement}
           </p>
         </div>
         <div className="bg-emerald-50 rounded-xl p-3">
           <p className="text-[10px] font-semibold text-emerald-700">সেচ প্রয়োজন</p>
-          <p className="text-sm font-bold text-emerald-900 mt-1">{crop.irrigationNeeded ? "হ্যাঁ ✅" : "প্রয়োজন নেই"}</p>
+          <p className="text-sm font-bold text-emerald-900 mt-1">
+            {crop.irrigationNeeded ? "হ্যাঁ ✅" : "প্রয়োজন নেই"}
+          </p>
         </div>
       </div>
     </SectionCard>
@@ -496,7 +660,9 @@ function StagesSection({ crop }: { crop: CropData }) {
                 <span className="text-xl">{s.icon}</span>
                 <div className="flex-1">
                   <p className="text-sm font-bold text-gray-900">{s.name}</p>
-                  <p className="text-[10px] text-gray-500">দিন {toBn(s.startDay)}–{toBn(s.endDay)}</p>
+                  <p className="text-[10px] text-gray-500">
+                    দিন {toBn(s.startDay)}–{toBn(s.endDay)}
+                  </p>
                 </div>
                 {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
               </button>
@@ -568,17 +734,24 @@ function TipsSection({ crop }: { crop: CropData }) {
     <SectionCard title="অভিজ্ঞ কৃষকের পরামর্শ" icon="💡">
       <div className="space-y-2">
         {crop.tips.map((t, i) => (
-          <div key={i} className="bg-emerald-50 border-l-4 border-emerald-400 rounded-r-lg p-3 text-sm text-gray-800">
+          <div
+            key={i}
+            className="bg-emerald-50 border-l-4 border-emerald-400 rounded-r-lg p-3 text-sm text-gray-800"
+          >
             <Sparkles className="inline h-3.5 w-3.5 text-emerald-600 mr-1" /> {t}
           </div>
         ))}
       </div>
       {crop.riskFactors.length > 0 && (
         <div className="mt-4">
-          <h3 className="text-sm font-bold text-red-700 flex items-center gap-1"><AlertTriangle className="h-4 w-4" /> ঝুঁকি সম্পর্কে জানুন</h3>
+          <h3 className="text-sm font-bold text-red-700 flex items-center gap-1">
+            <AlertTriangle className="h-4 w-4" /> ঝুঁকি সম্পর্কে জানুন
+          </h3>
           <ul className="mt-2 space-y-1.5">
             {crop.riskFactors.map((r, i) => (
-              <li key={i} className="text-sm text-gray-800 bg-red-50 rounded-lg p-2.5">• {r}</li>
+              <li key={i} className="text-sm text-gray-800 bg-red-50 rounded-lg p-2.5">
+                • {r}
+              </li>
             ))}
           </ul>
         </div>
@@ -597,7 +770,12 @@ function CompanionsSection({ crop }: { crop: CropData }) {
           <p className="text-xs font-bold text-emerald-700 mb-2">✅ ভালো সঙ্গী</p>
           <div className="flex flex-wrap gap-2">
             {crop.goodCompanions.map((c, i) => (
-              <span key={i} className="bg-emerald-50 text-emerald-800 text-xs px-3 py-1.5 rounded-full font-semibold">{c}</span>
+              <span
+                key={i}
+                className="bg-emerald-50 text-emerald-800 text-xs px-3 py-1.5 rounded-full font-semibold"
+              >
+                {c}
+              </span>
             ))}
           </div>
         </div>
@@ -607,7 +785,12 @@ function CompanionsSection({ crop }: { crop: CropData }) {
           <p className="text-xs font-bold text-red-700 mb-2">❌ এড়িয়ে চলুন</p>
           <div className="flex flex-wrap gap-2">
             {crop.badCompanions.map((c, i) => (
-              <span key={i} className="bg-red-50 text-red-800 text-xs px-3 py-1.5 rounded-full font-semibold">{c}</span>
+              <span
+                key={i}
+                className="bg-red-50 text-red-800 text-xs px-3 py-1.5 rounded-full font-semibold"
+              >
+                {c}
+              </span>
             ))}
           </div>
         </div>

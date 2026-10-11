@@ -25,7 +25,8 @@ async function processLocation(district: string, upazila: string | null) {
     .from("weather_alerts_sent")
     .insert({ district, upazila, alert_type: alert.type });
   if (dedupeErr) {
-    if (dedupeErr.code === "23505") return { district, upazila, skipped: true, reason: "already_sent" };
+    if (dedupeErr.code === "23505")
+      return { district, upazila, skipped: true, reason: "already_sent" };
     console.error("[weather-alerts] dedupe insert error", dedupeErr);
     return { district, upazila, skipped: true, reason: "db_error" };
   }
@@ -55,7 +56,9 @@ async function processLocation(district: string, upazila: string | null) {
     countByUser.set(r.user_id, (countByUser.get(r.user_id) ?? 0) + 1);
   });
 
-  const allowedUserIds = userIds.filter((uid) => (countByUser.get(uid) ?? 0) < MAX_PER_USER_PER_DAY);
+  const allowedUserIds = userIds.filter(
+    (uid) => (countByUser.get(uid) ?? 0) < MAX_PER_USER_PER_DAY,
+  );
 
   // Insert in-app notifications (one per user)
   if (allowedUserIds.length > 0) {
@@ -93,10 +96,7 @@ export const Route = createFileRoute("/api/public/hooks/weather-alerts")({
       POST: async ({ request }) => {
         if (!isAuthorizedCronRequest(request)) return unauthorizedCronResponse();
         if (!configureVapid()) {
-          return Response.json(
-            { ok: false, error: "VAPID keys not configured" },
-            { status: 500 },
-          );
+          return Response.json({ ok: false, error: "VAPID keys not configured" }, { status: 500 });
         }
 
         // Get distinct (district, upazila) pairs with subscribers

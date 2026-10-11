@@ -267,91 +267,94 @@ function FacebookFriendRow({
   return (
     <>
       <div className="flex items-center gap-3 px-1 py-3 sm:px-2">
-      <Link
-        to="/u/$userId"
-        params={{ userId: profile.id }}
-        className="flex min-w-0 flex-1 items-center gap-3 rounded-lg p-1 transition hover:bg-[#F0F2F5]"
-      >
-        <div className="h-14 w-14 shrink-0 overflow-hidden rounded-full bg-[#E7F3FF] text-xl font-black text-[#1877F2]">
-          {profile.avatar_url ? (
-            <LazyImage
-              src={profile.avatar_url}
-              alt={profile.name}
-              wrapperClassName="h-full w-full"
-            />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center">
-              {profile.name?.charAt(0) || "ক"}
-            </div>
-          )}
+        <Link
+          to="/u/$userId"
+          params={{ userId: profile.id }}
+          className="flex min-w-0 flex-1 items-center gap-3 rounded-lg p-1 transition hover:bg-[#F0F2F5]"
+        >
+          <div className="h-14 w-14 shrink-0 overflow-hidden rounded-full bg-[#E7F3FF] text-xl font-black text-[#1877F2]">
+            {profile.avatar_url ? (
+              <LazyImage
+                src={profile.avatar_url}
+                alt={profile.name}
+                wrapperClassName="h-full w-full"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center">
+                {profile.name?.charAt(0) || "ক"}
+              </div>
+            )}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-extrabold text-[#1C1E21]">
+              {profile.name || "কৃষক"}
+            </p>
+            <p className="mt-0.5 truncate text-xs text-[#65676B]">
+              {profile.upazila
+                ? `${profile.upazila}, ${profile.district}`
+                : profile.district || "বাংলাদেশ"}
+            </p>
+            {profile.crops && profile.crops.length > 0 && (
+              <div className="mt-1 flex flex-wrap items-center gap-1" aria-label="চাষের ফসল">
+                <Sprout className="h-3 w-3 shrink-0 text-[#18A058]" aria-hidden="true" />
+                {profile.crops.slice(0, 4).map((crop) => (
+                  <span
+                    key={crop}
+                    className="rounded bg-[#E7F8EF] px-1.5 py-0.5 text-[10px] font-semibold leading-tight text-[#18A058]"
+                  >
+                    {crop}
+                  </span>
+                ))}
+                {profile.crops.length > 4 && (
+                  <span className="text-[10px] font-semibold text-[#65676B]">
+                    +{profile.crops.length - 4}
+                  </span>
+                )}
+              </div>
+            )}
+            <p className="mt-1 flex items-center gap-1 text-[10px] font-semibold text-[#65676B]">
+              <CalendarDays className="h-3 w-3" /> সংযুক্ত:{" "}
+              {formatDate(connection.updated_at || connection.created_at)}
+            </p>
+          </div>
+        </Link>
+        <div className="flex shrink-0 gap-1.5">
+          <button
+            type="button"
+            disabled={contactBusy}
+            onClick={() => void contact("message")}
+            aria-label={`${profile.name} কে মেসেজ করুন`}
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-[#E7F3FF] text-[#1877F2] transition hover:bg-[#D8ECFF] disabled:opacity-50"
+          >
+            <MessageCircle className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            disabled={contactBusy}
+            onClick={() => void contact("call")}
+            aria-label={`${profile.name} কে কল করুন`}
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-[#E7F8EF] text-[#18A058] transition hover:bg-[#D7F3E4] disabled:opacity-50"
+          >
+            <Phone className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            disabled={removeBusy}
+            onClick={() => setRemoveOpen(true)}
+            aria-label={`${profile.name} কে বন্ধু তালিকা থেকে সরান`}
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-[#FDECEC] text-[#D93025] transition hover:bg-[#FBDCDC] disabled:opacity-50"
+          >
+            <UserX className="h-4 w-4" />
+          </button>
         </div>
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-extrabold text-[#1C1E21]">{profile.name || "কৃষক"}</p>
-          <p className="mt-0.5 truncate text-xs text-[#65676B]">
-            {profile.upazila
-              ? `${profile.upazila}, ${profile.district}`
-              : profile.district || "বাংলাদেশ"}
-          </p>
-          {profile.crops && profile.crops.length > 0 && (
-            <div className="mt-1 flex flex-wrap items-center gap-1" aria-label="চাষের ফসল">
-              <Sprout className="h-3 w-3 shrink-0 text-[#18A058]" aria-hidden="true" />
-              {profile.crops.slice(0, 4).map((crop) => (
-                <span
-                  key={crop}
-                  className="rounded bg-[#E7F8EF] px-1.5 py-0.5 text-[10px] font-semibold leading-tight text-[#18A058]"
-                >
-                  {crop}
-                </span>
-              ))}
-              {profile.crops.length > 4 && (
-                <span className="text-[10px] font-semibold text-[#65676B]">
-                  +{profile.crops.length - 4}
-                </span>
-              )}
-            </div>
-          )}
-          <p className="mt-1 flex items-center gap-1 text-[10px] font-semibold text-[#65676B]">
-            <CalendarDays className="h-3 w-3" /> সংযুক্ত:{" "}
-            {formatDate(connection.updated_at || connection.created_at)}
-          </p>
-        </div>
-      </Link>
-      <div className="flex shrink-0 gap-1.5">
-        <button
-          type="button"
-          disabled={contactBusy}
-          onClick={() => void contact("message")}
-          aria-label={`${profile.name} কে মেসেজ করুন`}
-          className="flex h-9 w-9 items-center justify-center rounded-full bg-[#E7F3FF] text-[#1877F2] transition hover:bg-[#D8ECFF] disabled:opacity-50"
-        >
-          <MessageCircle className="h-4 w-4" />
-        </button>
-        <button
-          type="button"
-          disabled={contactBusy}
-          onClick={() => void contact("call")}
-          aria-label={`${profile.name} কে কল করুন`}
-          className="flex h-9 w-9 items-center justify-center rounded-full bg-[#E7F8EF] text-[#18A058] transition hover:bg-[#D7F3E4] disabled:opacity-50"
-        >
-          <Phone className="h-4 w-4" />
-        </button>
-        <button
-          type="button"
-          disabled={removeBusy}
-          onClick={() => setRemoveOpen(true)}
-          aria-label={`${profile.name} কে বন্ধু তালিকা থেকে সরান`}
-          className="flex h-9 w-9 items-center justify-center rounded-full bg-[#FDECEC] text-[#D93025] transition hover:bg-[#FBDCDC] disabled:opacity-50"
-        >
-          <UserX className="h-4 w-4" />
-        </button>
-      </div>
       </div>
       <AlertDialog open={removeOpen} onOpenChange={setRemoveOpen}>
         <AlertDialogContent className="max-w-sm rounded-2xl">
           <AlertDialogHeader>
             <AlertDialogTitle>আপনি কি নিশ্চিত মুছে ফেলতে চান?</AlertDialogTitle>
             <AlertDialogDescription>
-              {profile.name || "এই কৃষক"} আপনার বন্ধু তালিকা থেকে সরে যাবে। চাইলে পরে আবার সংযোগের অনুরোধ পাঠাতে পারবেন।
+              {profile.name || "এই কৃষক"} আপনার বন্ধু তালিকা থেকে সরে যাবে। চাইলে পরে আবার সংযোগের
+              অনুরোধ পাঠাতে পারবেন।
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

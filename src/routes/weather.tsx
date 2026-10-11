@@ -1,7 +1,16 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, Cloud, Droplets, Wind, Thermometer, Sun, CloudRain, CloudLightning } from "lucide-react";
+import {
+  ArrowLeft,
+  Cloud,
+  Droplets,
+  Wind,
+  Thermometer,
+  Sun,
+  CloudRain,
+  CloudLightning,
+} from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip as RTooltip } from "recharts";
 import { getWeatherForecast } from "@/lib/weather.functions";
 import { weatherCodeBn } from "@/lib/weather-rules";
@@ -16,7 +25,10 @@ export const Route = createFileRoute("/weather")({
   head: () => ({
     meta: [
       { title: "আবহাওয়া — কৃষক বন্ধু" },
-      { name: "description", content: "আপনার জেলার আজকের ও আগামী ৭ দিনের আবহাওয়া + কৃষি পরামর্শ।" },
+      {
+        name: "description",
+        content: "আপনার জেলার আজকের ও আগামী ৭ দিনের আবহাওয়া + কৃষি পরামর্শ।",
+      },
     ],
   }),
 });
@@ -33,7 +45,8 @@ const BN_DAYS = ["রবি", "সোম", "মঙ্গল", "বুধ", "ব�
 
 function farmingTip(d: DailyPoint): string {
   if (d.weather_code >= 95) return "⛈️ মাঠে যাবেন না";
-  if (d.precipitation_probability_max > 70 || d.weather_code >= 61) return "⚠️ কীটনাশক দেবেন না; সেচ লাগবে না";
+  if (d.precipitation_probability_max > 70 || d.weather_code >= 61)
+    return "⚠️ কীটনাশক দেবেন না; সেচ লাগবে না";
   if (d.weather_code === 3) return "✅ চারা রোপণের ভালো সময়";
   if (d.temp_max > 35) return "🌡️ বিকেলে অতিরিক্ত পানি দিন";
   if (d.weather_code <= 2) return "✅ জমি চাষ ও সার প্রয়োগের উপযুক্ত";
@@ -60,7 +73,10 @@ function WeatherPage() {
 
   return (
     <main className="min-h-screen bg-background pb-12">
-      <header className="px-5 pt-10 pb-12 rounded-b-3xl" style={{ background: "var(--gradient-brand)" }}>
+      <header
+        className="px-5 pt-10 pb-12 rounded-b-3xl"
+        style={{ background: "var(--gradient-brand)" }}
+      >
         <button
           onClick={() => navigate({ to: "/dashboard" })}
           className="flex items-center gap-1 text-white/90 mb-4"
@@ -72,7 +88,11 @@ function WeatherPage() {
         <h1 className="text-2xl font-bold text-white">আবহাওয়া</h1>
         <p className="text-sm text-white/80 mt-0.5">
           📍 {pos ? "আপনার লাইভ লোকেশন" : upazila ? `${upazila}, ${district}` : district}
-          {pos && <span className="ml-2 text-[10px] font-bold bg-white/20 px-1.5 py-0.5 rounded">GPS</span>}
+          {pos && (
+            <span className="ml-2 text-[10px] font-bold bg-white/20 px-1.5 py-0.5 rounded">
+              GPS
+            </span>
+          )}
         </p>
         {!pos && geoStatus !== "loading" && geoStatus !== "unavailable" && (
           <button
@@ -85,15 +105,23 @@ function WeatherPage() {
         )}
       </header>
 
-      <div className="px-5"><NotificationToggle /></div>
-
-
+      <div className="px-5">
+        <NotificationToggle />
+      </div>
 
       {isLoading && (
-        <div className="px-5 mt-6"><div className="rounded-2xl bg-card p-8 text-center text-muted-foreground">লোড হচ্ছে…</div></div>
+        <div className="px-5 mt-6">
+          <div className="rounded-2xl bg-card p-8 text-center text-muted-foreground">
+            লোড হচ্ছে…
+          </div>
+        </div>
       )}
       {(error || (data && !data.forecast)) && (
-        <div className="px-5 mt-6"><div className="rounded-2xl bg-destructive/10 border border-destructive p-4 text-sm text-destructive">আবহাওয়া তথ্য আনা যায়নি।</div></div>
+        <div className="px-5 mt-6">
+          <div className="rounded-2xl bg-destructive/10 border border-destructive p-4 text-sm text-destructive">
+            আবহাওয়া তথ্য আনা যায়নি।
+          </div>
+        </div>
       )}
 
       {data?.forecast && <WeatherContent forecast={data.forecast} />}
@@ -116,7 +144,9 @@ function WeatherContent({ forecast }: { forecast: Forecast }) {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-muted-foreground">এখন</p>
-              <p className="text-5xl font-bold text-foreground mt-1">{Math.round(c.temperature)}°C</p>
+              <p className="text-5xl font-bold text-foreground mt-1">
+                {Math.round(c.temperature)}°C
+              </p>
               <p className="text-sm text-foreground mt-1">{weatherCodeBn(c.weather_code)}</p>
             </div>
             <div className="text-primary">{weatherIcon(c.weather_code, "h-16 w-16")}</div>
@@ -147,13 +177,24 @@ function WeatherContent({ forecast }: { forecast: Forecast }) {
         <div className="flex gap-2 overflow-x-auto pb-2 -mx-5 px-5 snap-x">
           {forecast.hourly.map((h) => {
             const t = new Date(h.time);
-            const label = t.toLocaleTimeString("bn-BD", { hour: "2-digit", hour12: false, timeZone: "Asia/Dhaka" });
+            const label = t.toLocaleTimeString("bn-BD", {
+              hour: "2-digit",
+              hour12: false,
+              timeZone: "Asia/Dhaka",
+            });
             return (
-              <div key={h.time} className="snap-start shrink-0 w-20 rounded-xl bg-card border border-border p-3 text-center">
+              <div
+                key={h.time}
+                className="snap-start shrink-0 w-20 rounded-xl bg-card border border-border p-3 text-center"
+              >
                 <p className="text-xs text-muted-foreground">{label}</p>
-                <div className="my-1.5 flex justify-center text-primary">{weatherIcon(h.weather_code, "h-6 w-6")}</div>
+                <div className="my-1.5 flex justify-center text-primary">
+                  {weatherIcon(h.weather_code, "h-6 w-6")}
+                </div>
                 <p className="text-sm font-bold">{Math.round(h.temperature)}°</p>
-                <p className="text-[10px] text-muted-foreground mt-0.5">{h.precipitation_probability}%</p>
+                <p className="text-[10px] text-muted-foreground mt-0.5">
+                  {h.precipitation_probability}%
+                </p>
               </div>
             );
           })}
@@ -171,9 +212,15 @@ function WeatherContent({ forecast }: { forecast: Forecast }) {
               <div key={d.date} className="flex items-center gap-3 p-3">
                 <span className="w-12 text-sm font-semibold">{day}</span>
                 <div className="text-primary">{weatherIcon(d.weather_code)}</div>
-                <span className="flex-1 text-sm text-muted-foreground truncate">{weatherCodeBn(d.weather_code)}</span>
-                <span className="text-xs text-blue-600 w-10 text-right">{d.precipitation_probability_max}%</span>
-                <span className="text-sm font-bold w-20 text-right">{Math.round(d.temp_max)}°/{Math.round(d.temp_min)}°</span>
+                <span className="flex-1 text-sm text-muted-foreground truncate">
+                  {weatherCodeBn(d.weather_code)}
+                </span>
+                <span className="text-xs text-blue-600 w-10 text-right">
+                  {d.precipitation_probability_max}%
+                </span>
+                <span className="text-sm font-bold w-20 text-right">
+                  {Math.round(d.temp_max)}°/{Math.round(d.temp_min)}°
+                </span>
               </div>
             );
           })}

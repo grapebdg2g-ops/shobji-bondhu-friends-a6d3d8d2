@@ -36,7 +36,7 @@ const QUICK_ACTIONS = [
   { to: "/ai-bondhu/chat", label: "AI বন্ধুকে জিজ্ঞেস করুন", Icon: MessageSquareText },
   { to: "/feed", label: "কমিউনিটিতে যান", Icon: Newspaper },
   { to: "/farmers", label: "সকল কৃষক", Icon: Users },
-    { to: "/connections", label: "সংযোগ অনুরোধ", Icon: UserRoundPlus },
+  { to: "/connections", label: "সংযোগ অনুরোধ", Icon: UserRoundPlus },
 ] as const;
 
 // Center notch (circle cutout with curved edges flowing into the top & bottom
@@ -52,8 +52,7 @@ const notchMaskStyle: CSSProperties = {
   maskPosition: "center top, left top, right top, center bottom",
   WebkitMaskSize:
     "160px 64px, calc(50% - 80px) 100%, calc(50% - 80px) 100%, 160px calc(100% - 64px)",
-  maskSize:
-    "160px 64px, calc(50% - 80px) 100%, calc(50% - 80px) 100%, 160px calc(100% - 64px)",
+  maskSize: "160px 64px, calc(50% - 80px) 100%, calc(50% - 80px) 100%, 160px calc(100% - 64px)",
   WebkitMaskRepeat: "no-repeat",
   maskRepeat: "no-repeat",
 };
@@ -91,47 +90,52 @@ export function BottomNav() {
           />
         </svg>
         <div className="relative grid grid-cols-5 items-end h-16">
-        {LEFT.map((t) => (
-          <TabBtn key={t.to} tab={t} active={isActive(t.to)} />
-        ))}
+          {LEFT.map((t) => (
+            <TabBtn key={t.to} tab={t} active={isActive(t.to)} />
+          ))}
 
-        <div className="flex justify-center">
-          {open && (
-            <div className="absolute bottom-[4.5rem] left-1/2 -translate-x-1/2 w-[min(18rem,calc(100vw-2rem))] rounded-2xl border border-border/70 bg-card/95 p-2 shadow-2xl backdrop-blur-xl animate-fade-in">
-              <p className="px-3 pt-1 pb-2 text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
-                দ্রুত কাজ
-              </p>
-              {QUICK_ACTIONS.map((action) => (
-                <Link
-                  key={action.to}
-                  to={action.to}
-                  onClick={() => setOpen(false)}
-                  className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-foreground transition hover:bg-muted active:scale-[0.98]"
-                >
-                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-secondary text-primary">
-                    <action.Icon className="h-4.5 w-4.5" />
-                  </span>
-                  {action.label}
-                </Link>
-              ))}
-            </div>
-          )}
-          <button
-            type="button"
-            onClick={() => setOpen((value) => !value)}
-            aria-label="দ্রুত কাজের মেনু"
-            aria-expanded={open}
-            className={`absolute left-1/2 top-1 h-14 w-14 -translate-x-1/2 rounded-full flex flex-col items-center justify-center text-white shadow-lg transition duration-200 active:scale-95 ${open ? "rotate-45" : ""}`}
-            style={{ background: "var(--gradient-brand)" }}
-          >
-            <Plus className="h-5 w-5" strokeWidth={2.5} />
-            <span className="text-[9px] font-bold mt-0.5 leading-none">নতুন কাজ</span>
-          </button>
-        </div>
+          <div className="flex justify-center">
+            {open && (
+              <div className="absolute bottom-[4.5rem] left-1/2 -translate-x-1/2 w-[min(18rem,calc(100vw-2rem))] rounded-2xl border border-border/70 bg-card/95 p-2 shadow-2xl backdrop-blur-xl animate-fade-in">
+                <p className="px-3 pt-1 pb-2 text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
+                  দ্রুত কাজ
+                </p>
+                {QUICK_ACTIONS.map((action) => (
+                  <Link
+                    key={action.to}
+                    to={action.to}
+                    onClick={() => setOpen(false)}
+                    className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-foreground transition hover:bg-muted active:scale-[0.98]"
+                  >
+                    <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-secondary text-primary">
+                      <action.Icon className="h-4.5 w-4.5" />
+                    </span>
+                    {action.label}
+                  </Link>
+                ))}
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={() => setOpen((value) => !value)}
+              aria-label="দ্রুত কাজের মেনু"
+              aria-expanded={open}
+              className={`absolute left-1/2 top-1 h-14 w-14 -translate-x-1/2 rounded-full flex flex-col items-center justify-center text-white shadow-lg transition duration-200 active:scale-95 ${open ? "rotate-45" : ""}`}
+              style={{ background: "var(--gradient-brand)" }}
+            >
+              <Plus className="h-5 w-5" strokeWidth={2.5} />
+              <span className="text-[9px] font-bold mt-0.5 leading-none">নতুন কাজ</span>
+            </button>
+          </div>
 
-        {RIGHT.map((t) => (
-          <TabBtn key={t.to} tab={t} active={isActive(t.to) || (t.to === "/messages" && pathname.startsWith("/groups/"))} badge={t.to === "/messages" ? msgUnread : 0} />
-        ))}
+          {RIGHT.map((t) => (
+            <TabBtn
+              key={t.to}
+              tab={t}
+              active={isActive(t.to) || (t.to === "/messages" && pathname.startsWith("/groups/"))}
+              badge={t.to === "/messages" ? msgUnread : 0}
+            />
+          ))}
         </div>
       </div>
     </nav>

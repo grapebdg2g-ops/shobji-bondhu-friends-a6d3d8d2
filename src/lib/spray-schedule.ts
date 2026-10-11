@@ -36,7 +36,8 @@ function matchProblem(title: string, desc: string): Problem | undefined {
 export function buildSpraySchedule(cropType: string, plantingDate?: string): SprayEvent[] {
   const guide = FARMING_STAGES[cropType];
   if (!guide) return [];
-  if (cropType === "টমেটো" && plantingDate) return buildTomatoSchedule(plantingDate, guide.totalDays);
+  if (cropType === "টমেটো" && plantingDate)
+    return buildTomatoSchedule(plantingDate, guide.totalDays);
   const events: SprayEvent[] = [];
   for (const stage of guide.stages) {
     const sprays = stage.tasks
@@ -61,14 +62,22 @@ export function buildSpraySchedule(cropType: string, plantingDate?: string): Spr
 }
 
 /** Marks the reminder for a completed spray as done so it is no longer notified or listed. */
-export async function markSprayReminderDone(planId: string, cropType: string, plantingDate: string, eventId: string) {
+export async function markSprayReminderDone(
+  planId: string,
+  cropType: string,
+  plantingDate: string,
+  eventId: string,
+) {
   const e = buildSpraySchedule(cropType, plantingDate).find((x) => x.id === eventId);
   if (!e) return;
   const { error } = await supabase
     .from("crop_reminders")
     .update({ is_done: true })
     .eq("plan_id", planId)
-    .in("title", [`${SPRAY_REMINDER_PREFIX}${e.title}`, `${SPRAY_REMINDER_PREFIX}জৈব বিকল্প: ${e.title}`])
+    .in("title", [
+      `${SPRAY_REMINDER_PREFIX}${e.title}`,
+      `${SPRAY_REMINDER_PREFIX}জৈব বিকল্প: ${e.title}`,
+    ])
     .eq("reminder_date", toIsoDate(addDays(plantingDate, e.day)));
   if (error) throw error;
 }
@@ -81,9 +90,10 @@ export function applyGapSchedule(events: SprayEvent[], cropType: string): SprayE
     const daysLeft = harvestDay - e.day;
     if (isSprayAllowedUnderGap(cropType, daysLeft)) return e;
     const bio = getBioOptions(`${e.title} ${e.desc} ${e.problem.name}`);
-    const altText = bio.length > 0
-      ? bio.map((b) => `${b.name} — ${b.dose} (${b.method})`).join("; ")
-      : e.problem.organic[0] ?? "নিম তেল ৫ মিলি/লিটার পানি";
+    const altText =
+      bio.length > 0
+        ? bio.map((b) => `${b.name} — ${b.dose} (${b.method})`).join("; ")
+        : (e.problem.organic[0] ?? "নিম তেল ৫ মিলি/লিটার পানি");
     return {
       ...e,
       title: `জৈব বিকল্প: ${e.title}`,
@@ -94,7 +104,13 @@ export function applyGapSchedule(events: SprayEvent[], cropType: string): SprayE
 }
 
 /** Creates reminders for all upcoming spray dates of a plan (skips existing ones). */
-export async function syncSprayReminders(userId: string, planId: string, cropType: string, plantingDate: string, isGap = false) {
+export async function syncSprayReminders(
+  userId: string,
+  planId: string,
+  cropType: string,
+  plantingDate: string,
+  isGap = false,
+) {
   const today = toIsoDate(new Date());
   const base = buildSpraySchedule(cropType, plantingDate);
   const events = isGap ? applyGapSchedule(base, cropType) : base;
@@ -110,7 +126,9 @@ export async function syncSprayReminders(userId: string, planId: string, cropTyp
       plan_id: planId,
       crop_type: cropType,
       title: `${SPRAY_REMINDER_PREFIX}${e.title}`,
-      note: e.problem?.chemicals[0] ? `${e.problem.chemicals[0].name} · ${e.problem.chemicals[0].dose}` : e.desc.slice(0, 120),
+      note: e.problem?.chemicals[0]
+        ? `${e.problem.chemicals[0].name} · ${e.problem.chemicals[0].dose}`
+        : e.desc.slice(0, 120),
       reminder_date: toIsoDate(addDays(plantingDate, e.day)),
     }))
     .filter((r) => r.reminder_date >= today && !have.has(`${r.title}|${r.reminder_date}`));

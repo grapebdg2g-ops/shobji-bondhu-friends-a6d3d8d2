@@ -41,12 +41,14 @@ export function useUsersMeta(userIds: string[]) {
         string,
         { is_verified: boolean; expert_specialty: string | null; expert_institution: string | null }
       >();
-      for (const p of (profRes.data as {
-        id: string;
-        is_verified: boolean;
-        expert_specialty: string | null;
-        expert_institution: string | null;
-      }[] | null) ?? []) {
+      for (const p of (profRes.data as
+        | {
+            id: string;
+            is_verified: boolean;
+            expert_specialty: string | null;
+            expert_institution: string | null;
+          }[]
+        | null) ?? []) {
         profById.set(p.id, p);
       }
       const out: Record<string, UserMeta> = {};

@@ -8,8 +8,18 @@ export default defineTool({
   description:
     "List the crops covered by this app's Bengali farming guide, with season, category, duration and profitability summary.",
   inputSchema: {
-    season: z.string().trim().min(1).optional().describe("Season filter: রবি, খরিফ-১, খরিফ-২, সারা বছর."),
-    category: z.string().trim().min(1).optional().describe("Category filter: ধান্য, সবজি, মসলা, তেল, কন্দাল."),
+    season: z
+      .string()
+      .trim()
+      .min(1)
+      .optional()
+      .describe("Season filter: রবি, খরিফ-১, খরিফ-২, সারা বছর."),
+    category: z
+      .string()
+      .trim()
+      .min(1)
+      .optional()
+      .describe("Category filter: ধান্য, সবজি, মসলা, তেল, কন্দাল."),
   },
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
   handler: ({ season, category }) => {

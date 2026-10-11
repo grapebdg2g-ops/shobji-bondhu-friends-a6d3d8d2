@@ -1,7 +1,20 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, SlidersHorizontal, Plus, HelpCircle, Star, CloudRain, ChevronDown, ArrowUp, CheckCircle2, Trophy, ImagePlus, Sparkles } from "lucide-react";
+import {
+  ArrowLeft,
+  SlidersHorizontal,
+  Plus,
+  HelpCircle,
+  Star,
+  CloudRain,
+  ChevronDown,
+  ArrowUp,
+  CheckCircle2,
+  Trophy,
+  ImagePlus,
+  Sparkles,
+} from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
@@ -11,7 +24,9 @@ import { useFeed, type FeedFilters, type Post, type PostType } from "@/hooks/use
 import { useMutedIds } from "@/hooks/use-muted-users";
 import { ContentMenu } from "@/components/krishi/content-menu";
 import { BottomSheet } from "@/components/krishi/bottom-sheet";
-const CreatePostSheet = lazy(() => import("@/components/krishi/create-post-sheet").then((m) => ({ default: m.CreatePostSheet })));
+const CreatePostSheet = lazy(() =>
+  import("@/components/krishi/create-post-sheet").then((m) => ({ default: m.CreatePostSheet })),
+);
 import { CommentsSection } from "@/components/krishi/comments-section";
 import { DISTRICTS } from "@/lib/bd-data";
 import { MASTER_CROP_LABELS } from "@/lib/crop-options";
@@ -45,14 +60,50 @@ export const Route = createFileRoute("/feed")({
 });
 
 const CROPS = MASTER_CROP_LABELS;
-const TYPE_META: Record<PostType, { label: string; badge: string; border: string; icon: typeof HelpCircle | null; iconColor: string }> = {
-  general: { label: "সাধারণ", badge: "", border: "border-border bg-card", icon: null, iconColor: "" },
-  help: { label: "সাহায্য চাই", badge: "❓ সাহায্য চাই", border: "border-amber-300 bg-amber-50", icon: HelpCircle, iconColor: "text-amber-600" },
-  success: { label: "সাফল্য", badge: "🌟 সাফল্য", border: "border-emerald-300 bg-emerald-50", icon: Star, iconColor: "text-emerald-600" },
-  weather: { label: "সতর্কতা", badge: "🌧️ সতর্কতা", border: "border-sky-300 bg-sky-50", icon: CloudRain, iconColor: "text-sky-600" },
+const TYPE_META: Record<
+  PostType,
+  {
+    label: string;
+    badge: string;
+    border: string;
+    icon: typeof HelpCircle | null;
+    iconColor: string;
+  }
+> = {
+  general: {
+    label: "সাধারণ",
+    badge: "",
+    border: "border-border bg-card",
+    icon: null,
+    iconColor: "",
+  },
+  help: {
+    label: "সাহায্য চাই",
+    badge: "❓ সাহায্য চাই",
+    border: "border-amber-300 bg-amber-50",
+    icon: HelpCircle,
+    iconColor: "text-amber-600",
+  },
+  success: {
+    label: "সাফল্য",
+    badge: "🌟 সাফল্য",
+    border: "border-emerald-300 bg-emerald-50",
+    icon: Star,
+    iconColor: "text-emerald-600",
+  },
+  weather: {
+    label: "সতর্কতা",
+    badge: "🌧️ সতর্কতা",
+    border: "border-sky-300 bg-sky-50",
+    icon: CloudRain,
+    iconColor: "text-sky-600",
+  },
 };
 
-const FILTER_HEADER: Record<"all" | "help" | "success", { title: string; subtitle: string | null }> = {
+const FILTER_HEADER: Record<
+  "all" | "help" | "success",
+  { title: string; subtitle: string | null }
+> = {
   all: { title: "সংবাদ ফিড", subtitle: null },
   help: { title: "কৃষকদের প্রশ্নোত্তর", subtitle: "প্রশ্ন করুন, উত্তর পান" },
   success: { title: "সফল কৃষকের গল্প", subtitle: "অনুপ্রেরণার উৎস" },
@@ -84,12 +135,15 @@ function FeedPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [savedIds, setSavedIds] = useState<string[]>([]);
 
-  useEffect(() => { setSavedIds(readSavedPostIds()); }, []);
+  useEffect(() => {
+    setSavedIds(readSavedPostIds());
+  }, []);
 
   // Sync URL filter → types lock
   useEffect(() => {
     setFilters((f) => {
-      const want: PostType[] = filter === "help" ? ["help"] : filter === "success" ? ["success"] : [];
+      const want: PostType[] =
+        filter === "help" ? ["help"] : filter === "success" ? ["success"] : [];
       const same = f.types.length === want.length && want.every((t) => f.types.includes(t));
       if (same) return f;
       return { ...f, types: want };
@@ -97,7 +151,18 @@ function FeedPage() {
   }, [filter]);
 
   const { data: mutedIds = [] } = useMutedIds();
-  const { posts, loading, loadingMore, hasMore, error, loadMore, prepend, removeById, updateById, refresh } = useFeed(filters, user?.district ?? null, user?.upazila ?? null, mutedIds);
+  const {
+    posts,
+    loading,
+    loadingMore,
+    hasMore,
+    error,
+    loadMore,
+    prepend,
+    removeById,
+    updateById,
+    refresh,
+  } = useFeed(filters, user?.district ?? null, user?.upazila ?? null, mutedIds);
 
   // Sort posts based on active filter mode
   const displayPosts = useMemo(() => {
@@ -131,17 +196,27 @@ function FeedPage() {
         .eq("type", "success")
         .gte("created_at", startOfMonth.toISOString())
         .limit(200);
-      const map = new Map<string, { user_id: string; name: string; posts: number; likes: number }>();
-      for (const r of (data as { user_id: string; user_name: string; likes_count: number }[]) ?? []) {
-        const ex = map.get(r.user_id) ?? { user_id: r.user_id, name: r.user_name, posts: 0, likes: 0 };
+      const map = new Map<
+        string,
+        { user_id: string; name: string; posts: number; likes: number }
+      >();
+      for (const r of (data as { user_id: string; user_name: string; likes_count: number }[]) ??
+        []) {
+        const ex = map.get(r.user_id) ?? {
+          user_id: r.user_id,
+          name: r.user_name,
+          posts: 0,
+          likes: 0,
+        };
         ex.posts += 1;
         ex.likes += r.likes_count ?? 0;
         map.set(r.user_id, ex);
       }
-      return Array.from(map.values()).sort((a, b) => b.likes - a.likes || b.posts - a.posts).slice(0, 3);
+      return Array.from(map.values())
+        .sort((a, b) => b.likes - a.likes || b.posts - a.posts)
+        .slice(0, 3);
     },
   });
-
 
   // Active users (stories) — distinct recent posters. Cached, refetched at most every 2 min.
   const { data: activeUsers = [] } = useQuery({
@@ -154,7 +229,11 @@ function FeedPage() {
         .limit(40);
       const seen = new Set<string>();
       const unique: { id: string; name: string; district: string | null }[] = [];
-      for (const r of (data as { user_id: string; user_name: string; user_district: string | null }[]) ?? []) {
+      for (const r of (data as {
+        user_id: string;
+        user_name: string;
+        user_district: string | null;
+      }[]) ?? []) {
         if (!seen.has(r.user_id)) {
           seen.add(r.user_id);
           unique.push({ id: r.user_id, name: r.user_name, district: r.user_district });
@@ -166,12 +245,12 @@ function FeedPage() {
     staleTime: 2 * 60_000,
   });
 
-
   // Realtime new-post banner
   const [newCount, setNewCount] = useState(0);
   const dismissTimer = useRef<number | null>(null);
   const districtForSub = useMemo(() => {
-    if (filters.districtMode === "myUpazila" || filters.districtMode === "myDistrict") return user?.district ?? null;
+    if (filters.districtMode === "myUpazila" || filters.districtMode === "myDistrict")
+      return user?.district ?? null;
     if (filters.districtMode === "specific") return filters.district;
     return null; // 'all'
   }, [filters, user]);
@@ -183,7 +262,12 @@ function FeedPage() {
       .channel(`feed-${districtForSub ?? "all"}`)
       .on(
         "postgres_changes",
-        { event: "INSERT", schema: "public", table: "posts", ...(filterStr ? { filter: filterStr } : {}) },
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "posts",
+          ...(filterStr ? { filter: filterStr } : {}),
+        },
         (payload) => {
           const np = payload.new as Post;
           if (user && np.user_id === user.id) return; // skip own
@@ -193,9 +277,11 @@ function FeedPage() {
         },
       )
       .subscribe();
-    return () => { supabase.removeChannel(ch); if (dismissTimer.current) window.clearTimeout(dismissTimer.current); };
+    return () => {
+      supabase.removeChannel(ch);
+      if (dismissTimer.current) window.clearTimeout(dismissTimer.current);
+    };
   }, [districtForSub, user]);
-
 
   // Infinite scroll
   const sentinelRef = useRef<HTMLDivElement | null>(null);
@@ -212,7 +298,6 @@ function FeedPage() {
     return () => io.disconnect();
   }, [loadMore]);
 
-
   const toggleSave = useCallback((post: Post) => {
     setSavedIds((current) => {
       const saved = current.includes(post.id);
@@ -228,14 +313,22 @@ function FeedPage() {
     const text = `${p.user_name} (${p.district ?? ""}): ${p.content}`;
     try {
       if (navigator.share) await navigator.share({ title: "কৃষক বন্ধু পোস্ট", text, url });
-      else { await navigator.clipboard.writeText(`${text}\n${url}`); toast.success("কপি হয়েছে"); }
-    } catch { /* user cancel */ }
+      else {
+        await navigator.clipboard.writeText(`${text}\n${url}`);
+        toast.success("কপি হয়েছে");
+      }
+    } catch {
+      /* user cancel */
+    }
   };
 
   return (
     <main className="min-h-screen min-w-0 max-w-full overflow-x-hidden bg-background pb-20">
       {/* Header */}
-      <header className="relative overflow-hidden rounded-b-[28px] px-4 pb-6 pt-8 sm:px-6" style={{ background: "var(--gradient-brand)" }}>
+      <header
+        className="relative overflow-hidden rounded-b-[28px] px-4 pb-6 pt-8 sm:px-6"
+        style={{ background: "var(--gradient-brand)" }}
+      >
         <div className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-[#74C69D]/20 blur-3xl" />
         <div className="relative z-10 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
@@ -265,18 +358,21 @@ function FeedPage() {
 
       <nav className="relative z-10 mx-auto -mt-4 max-w-3xl px-4" aria-label="ফিডের ধরন">
         <div className="grid grid-cols-3 gap-1 rounded-2xl border border-border bg-card p-1 shadow-[var(--shadow-card)]">
-          {([
-            { value: "all", label: "সবার পোস্ট", icon: "🌾" },
-            { value: "help", label: "প্রশ্নোত্তর", icon: "❓" },
-            { value: "success", label: "সাফল্যের গল্প", icon: "🌟" },
-          ] as const).map((tab) => (
+          {(
+            [
+              { value: "all", label: "সবার পোস্ট", icon: "🌾" },
+              { value: "help", label: "প্রশ্নোত্তর", icon: "❓" },
+              { value: "success", label: "সাফল্যের গল্প", icon: "🌟" },
+            ] as const
+          ).map((tab) => (
             <button
               key={tab.value}
               type="button"
               onClick={() => navigate({ to: "/feed", search: { filter: tab.value } })}
               className={`home-pressable min-h-11 rounded-xl px-1 text-xs font-bold transition ${filter === tab.value ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:bg-muted"}`}
             >
-              <span className="mr-1">{tab.icon}</span>{tab.label}
+              <span className="mr-1">{tab.icon}</span>
+              {tab.label}
             </button>
           ))}
         </div>
@@ -285,15 +381,45 @@ function FeedPage() {
       <section className="mx-auto mt-3 max-w-3xl px-4">
         <div className="rounded-2xl border border-border bg-card p-3 shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/15 font-bold text-primary">{user?.name?.charAt(0) || "ক"}</div>
-            <button type="button" onClick={() => setCreateOpen(true)} className="flex h-10 flex-1 items-center rounded-full bg-muted px-4 text-left text-sm text-muted-foreground transition hover:bg-muted/80">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/15 font-bold text-primary">
+              {user?.name?.charAt(0) || "ক"}
+            </div>
+            <button
+              type="button"
+              onClick={() => setCreateOpen(true)}
+              className="flex h-10 flex-1 items-center rounded-full bg-muted px-4 text-left text-sm text-muted-foreground transition hover:bg-muted/80"
+            >
               আজ কী শেয়ার করবেন, {user?.name?.split(" ")[0] || "কৃষক"}?
             </button>
           </div>
           <div className="mt-3 grid grid-cols-3 gap-1 border-t border-border/60 pt-3">
-            <button type="button" onClick={() => setCreateOpen(true)} className="home-pressable flex min-h-10 items-center justify-center gap-1.5 rounded-lg text-xs font-semibold text-muted-foreground hover:bg-muted"><ImagePlus className="h-4 w-4 text-emerald-600" /> ছবি</button>
-            <button type="button" onClick={() => { setCreateOpen(true); toast.info("পোস্টের ধরনে ‘সাহায্য চাই’ বেছে নিন"); }} className="home-pressable flex min-h-10 items-center justify-center gap-1.5 rounded-lg text-xs font-semibold text-muted-foreground hover:bg-muted"><HelpCircle className="h-4 w-4 text-amber-600" /> প্রশ্ন</button>
-            <button type="button" onClick={() => { setCreateOpen(true); toast.info("পোস্টের ধরনে ‘সাফল্য’ বেছে নিন"); }} className="home-pressable flex min-h-10 items-center justify-center gap-1.5 rounded-lg text-xs font-semibold text-muted-foreground hover:bg-muted"><Sparkles className="h-4 w-4 text-sky-600" /> সাফল্য</button>
+            <button
+              type="button"
+              onClick={() => setCreateOpen(true)}
+              className="home-pressable flex min-h-10 items-center justify-center gap-1.5 rounded-lg text-xs font-semibold text-muted-foreground hover:bg-muted"
+            >
+              <ImagePlus className="h-4 w-4 text-emerald-600" /> ছবি
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setCreateOpen(true);
+                toast.info("পোস্টের ধরনে ‘সাহায্য চাই’ বেছে নিন");
+              }}
+              className="home-pressable flex min-h-10 items-center justify-center gap-1.5 rounded-lg text-xs font-semibold text-muted-foreground hover:bg-muted"
+            >
+              <HelpCircle className="h-4 w-4 text-amber-600" /> প্রশ্ন
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setCreateOpen(true);
+                toast.info("পোস্টের ধরনে ‘সাফল্য’ বেছে নিন");
+              }}
+              className="home-pressable flex min-h-10 items-center justify-center gap-1.5 rounded-lg text-xs font-semibold text-muted-foreground hover:bg-muted"
+            >
+              <Sparkles className="h-4 w-4 text-sky-600" /> সাফল্য
+            </button>
           </div>
         </div>
       </section>
@@ -302,7 +428,9 @@ function FeedPage() {
       <section className="mx-auto mt-4 mb-4 min-w-0 max-w-3xl px-4">
         <div className="mb-2 flex items-center justify-between px-1">
           <p className="text-xs font-extrabold tracking-tight text-foreground">এখন সক্রিয় কৃষক</p>
-          <span className="text-[10px] font-semibold text-muted-foreground">আপনার এলাকার আপডেট</span>
+          <span className="text-[10px] font-semibold text-muted-foreground">
+            আপনার এলাকার আপডেট
+          </span>
         </div>
         <div className="home-gradient-border min-w-0 max-w-full overflow-x-auto overscroll-x-contain rounded-2xl border border-border bg-card px-3 py-3 shadow-[var(--shadow-card)]">
           <div className="flex items-start gap-3 w-max">
@@ -313,17 +441,27 @@ function FeedPage() {
               <div className="h-14 w-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center ring-2 ring-primary/30">
                 <Plus className="h-6 w-6" />
               </div>
-              <span className="mt-1 text-[10px] font-semibold text-foreground text-center leading-tight">পোস্ট করুন</span>
+              <span className="mt-1 text-[10px] font-semibold text-foreground text-center leading-tight">
+                পোস্ট করুন
+              </span>
             </button>
             {activeUsers.map((u) => (
-              <Link key={u.id} to="/u/$userId" params={{ userId: u.id }} className="home-pressable flex w-16 min-w-[4rem] shrink-0 flex-col items-center rounded-xl px-1 py-1">
+              <Link
+                key={u.id}
+                to="/u/$userId"
+                params={{ userId: u.id }}
+                className="home-pressable flex w-16 min-w-[4rem] shrink-0 flex-col items-center rounded-xl px-1 py-1"
+              >
                 <div className="relative h-14 w-14 rounded-full bg-gradient-to-br from-emerald-200 to-emerald-400 p-[2px]">
                   <div className="h-full w-full rounded-full bg-card flex items-center justify-center text-base font-bold text-primary">
                     {u.name.charAt(0)}
                   </div>
                   <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-card bg-emerald-500" />
                 </div>
-                <span className="mt-1 w-full truncate text-center text-[10px] text-muted-foreground" title={u.district ?? ""}>
+                <span
+                  className="mt-1 w-full truncate text-center text-[10px] text-muted-foreground"
+                  title={u.district ?? ""}
+                >
                   {u.name}
                 </span>
               </Link>
@@ -371,7 +509,9 @@ function FeedPage() {
                     <div className="h-9 w-9 rounded-full bg-primary/15 text-primary flex items-center justify-center text-sm font-bold mt-1">
                       {u.name.charAt(0) || "ক"}
                     </div>
-                    <p className="mt-1 text-[11px] font-bold text-foreground truncate w-full">{u.name}</p>
+                    <p className="mt-1 text-[11px] font-bold text-foreground truncate w-full">
+                      {u.name}
+                    </p>
                     <p className="text-[10px] text-muted-foreground">{u.posts} পোস্ট</p>
                   </Link>
                 );
@@ -385,14 +525,26 @@ function FeedPage() {
       <section className="home-stagger mx-auto mt-4 min-w-0 max-w-3xl space-y-3 px-4">
         {loading ? (
           <div className="space-y-4">
-            {Array.from({ length: 3 }).map((_, i) => <PostSkeleton key={i} />)}
+            {Array.from({ length: 3 }).map((_, i) => (
+              <PostSkeleton key={i} />
+            ))}
           </div>
         ) : error ? (
           <p className="text-center text-sm text-destructive py-6">{error}</p>
         ) : displayPosts.length === 0 ? (
           <EmptyState
-            title={filter === "help" ? "কোনো প্রশ্ন নেই" : filter === "success" ? "কোনো সাফল্যের গল্প নেই" : "কোনো পোস্ট নেই"}
-            description={filter === "help" ? "প্রথম প্রশ্নটি আপনিই করুন" : "ফিল্টার বদলান বা প্রথম পোস্টটি আপনিই করুন"}
+            title={
+              filter === "help"
+                ? "কোনো প্রশ্ন নেই"
+                : filter === "success"
+                  ? "কোনো সাফল্যের গল্প নেই"
+                  : "কোনো পোস্ট নেই"
+            }
+            description={
+              filter === "help"
+                ? "প্রথম প্রশ্নটি আপনিই করুন"
+                : "ফিল্টার বদলান বা প্রথম পোস্টটি আপনিই করুন"
+            }
           />
         ) : (
           displayPosts.map((p) => (
@@ -414,7 +566,9 @@ function FeedPage() {
         <div ref={sentinelRef} className="h-2" />
         {loadingMore && (
           <div className="space-y-4">
-            {Array.from({ length: 3 }).map((_, i) => <PostSkeleton key={`m-${i}`} />)}
+            {Array.from({ length: 3 }).map((_, i) => (
+              <PostSkeleton key={`m-${i}`} />
+            ))}
           </div>
         )}
         {!hasMore && displayPosts.length > 0 && (
@@ -422,12 +576,27 @@ function FeedPage() {
         )}
       </section>
 
-      <FilterSheet open={filterOpen} onClose={() => setFilterOpen(false)} value={filters} onApply={(f) => { setFilters(f); setFilterOpen(false); }} />
-      {createOpen && <Suspense fallback={null}><CreatePostSheet open={createOpen} onClose={() => setCreateOpen(false)} onCreated={prepend} /></Suspense>}
+      <FilterSheet
+        open={filterOpen}
+        onClose={() => setFilterOpen(false)}
+        value={filters}
+        onApply={(f) => {
+          setFilters(f);
+          setFilterOpen(false);
+        }}
+      />
+      {createOpen && (
+        <Suspense fallback={null}>
+          <CreatePostSheet
+            open={createOpen}
+            onClose={() => setCreateOpen(false)}
+            onCreated={prepend}
+          />
+        </Suspense>
+      )}
     </main>
   );
 }
-
 
 function PostSkeleton() {
   return (
@@ -474,12 +643,20 @@ function PostCard({
   const text = expanded || !long ? post.content : post.content.slice(0, 180) + "...";
   const isAnswered = post.type === "help" && post.comments_count > 0;
   const isSuccessHighlight = mode === "success" && post.type === "success";
-  const { counts: reactionCounts, mine: myReaction, setReaction } = usePostReactions(post.id, visiblePostIds);
+  const {
+    counts: reactionCounts,
+    mine: myReaction,
+    setReaction,
+  } = usePostReactions(post.id, visiblePostIds);
 
   const handleReaction = async (reaction: Parameters<typeof setReaction>[0]) => {
     const result = await setReaction(reaction);
     if (!result.ok) {
-      toast.error(result.reason === "unauthenticated" ? "প্রতিক্রিয়া দিতে লগইন করুন" : "প্রতিক্রিয়া সংরক্ষণ করা যায়নি");
+      toast.error(
+        result.reason === "unauthenticated"
+          ? "প্রতিক্রিয়া দিতে লগইন করুন"
+          : "প্রতিক্রিয়া সংরক্ষণ করা যায়নি",
+      );
     }
   };
 
@@ -494,7 +671,9 @@ function PostCard({
   };
 
   return (
-    <article className={`home-pressable relative min-w-0 rounded-2xl border-2 ${isSuccessHighlight ? "border-amber-400 bg-gradient-to-br from-amber-50 to-white" : meta.border} shadow-sm`}>
+    <article
+      className={`home-pressable relative min-w-0 rounded-2xl border-2 ${isSuccessHighlight ? "border-amber-400 bg-gradient-to-br from-amber-50 to-white" : meta.border} shadow-sm`}
+    >
       {isSuccessHighlight && (
         <div className="absolute top-2 right-2 flex items-center gap-1 bg-amber-400 text-white px-2 py-0.5 rounded-full text-[10px] font-bold shadow z-10">
           <Star className="h-3 w-3 fill-current" /> সাফল্যের গল্প
@@ -502,10 +681,20 @@ function PostCard({
       )}
       <div className="p-4">
         <div className="flex items-start gap-3">
-          <Link to="/u/$userId" params={{ userId: post.user_id }} aria-label={`${post.user_name}-এর প্রোফাইল`}>
+          <Link
+            to="/u/$userId"
+            params={{ userId: post.user_id }}
+            aria-label={`${post.user_name}-এর প্রোফাইল`}
+          >
             <Avatar className="h-11 w-11 bg-primary/15">
-              <AvatarImage src={avatarUrl ?? undefined} alt={`${post.user_name}-এর প্রোফাইল ছবি`} className="object-cover" />
-              <AvatarFallback className="bg-primary/15 font-bold text-primary">{post.user_name.charAt(0) || "ক"}</AvatarFallback>
+              <AvatarImage
+                src={avatarUrl ?? undefined}
+                alt={`${post.user_name}-এর প্রোফাইল ছবি`}
+                className="object-cover"
+              />
+              <AvatarFallback className="bg-primary/15 font-bold text-primary">
+                {post.user_name.charAt(0) || "ক"}
+              </AvatarFallback>
             </Avatar>
           </Link>
           <div className="flex-1 min-w-0">
@@ -518,7 +707,9 @@ function PostCard({
                 {post.user_name}
               </Link>
               <div className="flex items-center gap-1 shrink-0">
-                <span className="text-[10px] text-muted-foreground">{timeAgo(post.created_at)}</span>
+                <span className="text-[10px] text-muted-foreground">
+                  {timeAgo(post.created_at)}
+                </span>
                 <ContentMenu
                   contentType="post"
                   contentId={post.id}
@@ -529,11 +720,13 @@ function PostCard({
               </div>
             </div>
             <p className="text-xs text-muted-foreground">
-              {post.upazila ? `${post.upazila}, ${post.district ?? "—"}` : post.district ?? "—"}
+              {post.upazila ? `${post.upazila}, ${post.district ?? "—"}` : (post.district ?? "—")}
             </p>
             <div className="flex items-center gap-2 mt-2 flex-wrap">
               {meta.badge && (
-                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${meta.iconColor} bg-white/80 border border-current/20`}>
+                <span
+                  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${meta.iconColor} bg-white/80 border border-current/20`}
+                >
                   {meta.badge}
                 </span>
               )}
@@ -551,20 +744,21 @@ function PostCard({
           </div>
         </div>
 
-        <p className="mt-3 text-sm text-foreground whitespace-pre-wrap break-words leading-relaxed">{text}</p>
+        <p className="mt-3 text-sm text-foreground whitespace-pre-wrap break-words leading-relaxed">
+          {text}
+        </p>
         {long && (
-          <button onClick={() => setExpanded((x) => !x)} className="mt-1 text-xs font-semibold text-primary">
+          <button
+            onClick={() => setExpanded((x) => !x)}
+            className="mt-1 text-xs font-semibold text-primary"
+          >
             {expanded ? "কম দেখুন" : "আরো পড়ুন"}
           </button>
         )}
       </div>
 
       {post.image_url && (
-        <LazyImage
-          src={post.image_url}
-          alt=""
-          wrapperClassName="w-full aspect-[4/3] bg-muted"
-        />
+        <LazyImage src={post.image_url} alt="" wrapperClassName="w-full aspect-[4/3] bg-muted" />
       )}
 
       <PostSocialActions
@@ -601,7 +795,9 @@ function FilterSheet({
   onApply: (f: FeedFilters) => void;
 }) {
   const [draft, setDraft] = useState<FeedFilters>(value);
-  useEffect(() => { if (open) setDraft(value); }, [open, value]);
+  useEffect(() => {
+    if (open) setDraft(value);
+  }, [open, value]);
 
   const TYPES: { value: PostType; label: string }[] = [
     { value: "general", label: "সাধারণ" },
@@ -611,7 +807,10 @@ function FilterSheet({
   ];
 
   const toggleType = (t: PostType) =>
-    setDraft((d) => ({ ...d, types: d.types.includes(t) ? d.types.filter((x) => x !== t) : [...d.types, t] }));
+    setDraft((d) => ({
+      ...d,
+      types: d.types.includes(t) ? d.types.filter((x) => x !== t) : [...d.types, t],
+    }));
 
   return (
     <BottomSheet open={open} onClose={onClose} title="ফিল্টার">
@@ -619,12 +818,14 @@ function FilterSheet({
         <div>
           <p className="text-sm font-bold text-foreground mb-2">কোন জেলার পোস্ট দেখবেন?</p>
           <div className="flex gap-2 flex-wrap">
-            {([
-              { v: "myUpazila", l: "আমার উপজেলা" },
-              { v: "myDistrict", l: "আমার জেলা" },
-              { v: "all", l: "সব বাংলাদেশ" },
-              { v: "specific", l: "নির্দিষ্ট জেলা" },
-            ] as const).map((o) => (
+            {(
+              [
+                { v: "myUpazila", l: "আমার উপজেলা" },
+                { v: "myDistrict", l: "আমার জেলা" },
+                { v: "all", l: "সব বাংলাদেশ" },
+                { v: "specific", l: "নির্দিষ্ট জেলা" },
+              ] as const
+            ).map((o) => (
               <button
                 key={o.v}
                 type="button"
@@ -643,7 +844,11 @@ function FilterSheet({
                 className="w-full h-10 px-3 pr-8 rounded-xl border border-input bg-background text-sm appearance-none"
               >
                 <option value="">— বাছুন —</option>
-                {DISTRICTS.map((d) => <option key={d} value={d}>{d}</option>)}
+                {DISTRICTS.map((d) => (
+                  <option key={d} value={d}>
+                    {d}
+                  </option>
+                ))}
               </select>
               <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
             </div>

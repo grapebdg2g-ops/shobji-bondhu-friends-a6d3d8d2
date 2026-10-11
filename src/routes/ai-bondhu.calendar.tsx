@@ -7,17 +7,31 @@ import { toBn } from "@/lib/bn";
 
 export const Route = createFileRoute("/ai-bondhu/calendar")({
   component: CalendarPage,
-  head: () => ({ meta: [{ title: "চাষের ক্যালেন্ডার — কৃষক বন্ধু" },
+  head: () => ({
+    meta: [
+      { title: "চাষের ক্যালেন্ডার — কৃষক বন্ধু" },
       { property: "og:title", content: "চাষের ক্যালেন্ডার — কৃষক বন্ধু" },
       { property: "og:description", content: "ফসলের পরিচর্যা ও কৃষি পরিকল্পনা — কৃষক বন্ধু।" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "description", content: "ফসলের পরিচর্যা ও কৃষি পরিকল্পনা — কৃষক বন্ধু।" },] }),
+      { name: "description", content: "ফসলের পরিচর্যা ও কৃষি পরিকল্পনা — কৃষক বন্ধু।" },
+    ],
+  }),
 });
 
 const MONTHS = [
-  "জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন",
-  "জুলাই", "আগস্ট", "সেপ্টেম্বর", "অক্টোবর", "নভেম্বর", "ডিসেম্বর",
+  "জানুয়ারি",
+  "ফেব্রুয়ারি",
+  "মার্চ",
+  "এপ্রিল",
+  "মে",
+  "জুন",
+  "জুলাই",
+  "আগস্ট",
+  "সেপ্টেম্বর",
+  "অক্টোবর",
+  "নভেম্বর",
+  "ডিসেম্বর",
 ];
 
 function CalendarPage() {
@@ -28,8 +42,14 @@ function CalendarPage() {
 
   return (
     <main className="min-h-screen bg-[#F0FFF4] md:max-w-[560px] md:mx-auto pb-8">
-      <header className="px-5 pt-8 pb-8 rounded-b-3xl text-white" style={{ background: "var(--gradient-brand)" }}>
-        <button onClick={() => navigate({ to: "/ai-bondhu" })} className="h-9 w-9 rounded-full bg-white/15 flex items-center justify-center">
+      <header
+        className="px-5 pt-8 pb-8 rounded-b-3xl text-white"
+        style={{ background: "var(--gradient-brand)" }}
+      >
+        <button
+          onClick={() => navigate({ to: "/ai-bondhu" })}
+          className="h-9 w-9 rounded-full bg-white/15 flex items-center justify-center"
+        >
           <ArrowLeft className="h-5 w-5" />
         </button>
         <h1 className="mt-4 text-2xl font-bold">চাষের ক্যালেন্ডার</h1>
@@ -54,25 +74,28 @@ function CalendarPage() {
         <h2 className="font-bold text-gray-900 px-1">{MONTHS[month]} মাসে যা লাগাবেন</h2>
         {crops.length === 0 ? (
           <p className="text-sm text-gray-500 px-1">এই মাসে কোনো সুপারিশ নেই।</p>
-        ) : crops.map((c) => (
-          <Link
-            key={c.id}
-            to="/crop-guide/new/$crop"
-            params={{ crop: c.name }}
-            className="bg-white rounded-2xl p-4 border border-gray-100 flex items-center gap-3 active:scale-[0.99] transition"
-          >
-            <div className="h-12 w-12 rounded-xl bg-emerald-100 flex items-center justify-center text-2xl">
-              <CropIcon crop={c.id} />
-            </div>
-            <div className="flex-1 min-w-0">
-              <h3 className="font-bold text-gray-900">{c.name}</h3>
-              <p className="text-xs text-gray-500 mt-0.5 truncate">
-                {c.seasons.join("/")} • {toBn(c.totalDays)} দিন • ফলন {toBn(c.yieldMin)}-{toBn(c.yieldMax)} মণ/বিঘা
-              </p>
-            </div>
-            <ChevronRight className="h-5 w-5 text-gray-400" />
-          </Link>
-        ))}
+        ) : (
+          crops.map((c) => (
+            <Link
+              key={c.id}
+              to="/crop-guide/new/$crop"
+              params={{ crop: c.name }}
+              className="bg-white rounded-2xl p-4 border border-gray-100 flex items-center gap-3 active:scale-[0.99] transition"
+            >
+              <div className="h-12 w-12 rounded-xl bg-emerald-100 flex items-center justify-center text-2xl">
+                <CropIcon crop={c.id} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-bold text-gray-900">{c.name}</h3>
+                <p className="text-xs text-gray-500 mt-0.5 truncate">
+                  {c.seasons.join("/")} • {toBn(c.totalDays)} দিন • ফলন {toBn(c.yieldMin)}-
+                  {toBn(c.yieldMax)} মণ/বিঘা
+                </p>
+              </div>
+              <ChevronRight className="h-5 w-5 text-gray-400" />
+            </Link>
+          ))
+        )}
       </section>
     </main>
   );

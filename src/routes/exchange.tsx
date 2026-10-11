@@ -31,12 +31,18 @@ function ExchangePage() {
   const [sort, setSort] = useState<"newest" | "cheapest">("newest");
   const [sheetOpen, setSheetOpen] = useState(false);
 
-  const filters = useMemo(() => ({ district, type, query, freeOnly, sort }), [district, type, query, freeOnly, sort]);
+  const filters = useMemo(
+    () => ({ district, type, query, freeOnly, sort }),
+    [district, type, query, freeOnly, sort],
+  );
   const { items, loading, addOptimistic } = useExchanges(filters);
 
   return (
     <main className="min-h-screen bg-background pb-28">
-      <header className="px-4 pt-10 pb-4 rounded-b-3xl" style={{ background: "var(--gradient-brand)" }}>
+      <header
+        className="px-4 pt-10 pb-4 rounded-b-3xl"
+        style={{ background: "var(--gradient-brand)" }}
+      >
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate({ to: "/dashboard" })}
@@ -62,7 +68,13 @@ function ExchangePage() {
         <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-1 px-1 pb-1">
           <TabPill active={type === "all"} onClick={() => setType("all")} label="সব" />
           {TABS.map(({ type: t, label, icon: Icon }) => (
-            <TabPill key={t} active={type === t} onClick={() => setType(t)} icon={<Icon className="h-4 w-4" />} label={label} />
+            <TabPill
+              key={t}
+              active={type === t}
+              onClick={() => setType(t)}
+              icon={<Icon className="h-4 w-4" />}
+              label={label}
+            />
           ))}
         </div>
       </div>
@@ -74,7 +86,11 @@ function ExchangePage() {
           className="h-9 px-3 rounded-lg bg-card border border-border text-sm font-medium"
         >
           <option value="">সব জেলা</option>
-          {DISTRICTS.map((d) => <option key={d} value={d}>{d}</option>)}
+          {DISTRICTS.map((d) => (
+            <option key={d} value={d}>
+              {d}
+            </option>
+          ))}
         </select>
         <button
           onClick={() => setFreeOnly((v) => !v)}
@@ -119,12 +135,21 @@ function ExchangePage() {
         userPhone={user?.phone ?? null}
         onCreated={addOptimistic}
       />
-
     </main>
   );
 }
 
-function TabPill({ active, onClick, label, icon }: { active: boolean; onClick: () => void; label: string; icon?: React.ReactNode }) {
+function TabPill({
+  active,
+  onClick,
+  label,
+  icon,
+}: {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+  icon?: React.ReactNode;
+}) {
   return (
     <button
       onClick={onClick}

@@ -21,30 +21,57 @@ function AnalyticsPage() {
   const { data: districts = [] } = useQuery({
     queryKey: ["admin", "analytics", "districts", range],
     queryFn: async () => {
-      const { data } = await supabase.from("posts").select("district").gte("created_at", since).limit(2000);
+      const { data } = await supabase
+        .from("posts")
+        .select("district")
+        .gte("created_at", since)
+        .limit(2000);
       const c: Record<string, number> = {};
-      (data ?? []).forEach((r) => { if (r.district) c[r.district] = (c[r.district] ?? 0) + 1; });
-      return Object.entries(c).map(([d, n]) => ({ district: d, count: n })).sort((a, b) => b.count - a.count).slice(0, 10);
+      (data ?? []).forEach((r) => {
+        if (r.district) c[r.district] = (c[r.district] ?? 0) + 1;
+      });
+      return Object.entries(c)
+        .map(([d, n]) => ({ district: d, count: n }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 10);
     },
   });
 
   const { data: products = [] } = useQuery({
     queryKey: ["admin", "analytics", "products", range],
     queryFn: async () => {
-      const { data } = await supabase.from("prices").select("product_name").gte("created_at", since).limit(2000);
+      const { data } = await supabase
+        .from("prices")
+        .select("product_name")
+        .gte("created_at", since)
+        .limit(2000);
       const c: Record<string, number> = {};
-      (data ?? []).forEach((r) => { if (r.product_name) c[r.product_name] = (c[r.product_name] ?? 0) + 1; });
-      return Object.entries(c).map(([p, n]) => ({ product: p, count: n })).sort((a, b) => b.count - a.count).slice(0, 10);
+      (data ?? []).forEach((r) => {
+        if (r.product_name) c[r.product_name] = (c[r.product_name] ?? 0) + 1;
+      });
+      return Object.entries(c)
+        .map(([p, n]) => ({ product: p, count: n }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 10);
     },
   });
 
   const { data: diseases = [] } = useQuery({
     queryKey: ["admin", "analytics", "diseases", range],
     queryFn: async () => {
-      const { data } = await supabase.from("disease_history").select("disease_name, crop_type").gte("created_at", since).limit(2000);
+      const { data } = await supabase
+        .from("disease_history")
+        .select("disease_name, crop_type")
+        .gte("created_at", since)
+        .limit(2000);
       const c: Record<string, number> = {};
-      (data ?? []).forEach((r) => { if (r.disease_name) c[r.disease_name] = (c[r.disease_name] ?? 0) + 1; });
-      return Object.entries(c).map(([d, n]) => ({ disease: d, count: n })).sort((a, b) => b.count - a.count).slice(0, 5);
+      (data ?? []).forEach((r) => {
+        if (r.disease_name) c[r.disease_name] = (c[r.disease_name] ?? 0) + 1;
+      });
+      return Object.entries(c)
+        .map(([d, n]) => ({ disease: d, count: n }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 5);
     },
   });
 
@@ -53,10 +80,18 @@ function AnalyticsPage() {
     queryFn: async () => {
       const w1 = subDays(new Date(), 14).toISOString();
       const w1end = subDays(new Date(), 7).toISOString();
-      const { data: cohort } = await supabase.from("profiles").select("id, created_at").gte("created_at", w1).lt("created_at", w1end);
+      const { data: cohort } = await supabase
+        .from("profiles")
+        .select("id, created_at")
+        .gte("created_at", w1)
+        .lt("created_at", w1end);
       const ids = (cohort ?? []).map((c) => c.id);
       if (!ids.length) return { week1: 0, total: 0 };
-      const { data: active } = await supabase.from("posts").select("user_id").gte("created_at", w1end).in("user_id", ids);
+      const { data: active } = await supabase
+        .from("posts")
+        .select("user_id")
+        .gte("created_at", w1end)
+        .in("user_id", ids);
       const returned = new Set((active ?? []).map((a) => a.user_id)).size;
       return { week1: Math.round((returned / ids.length) * 100), total: ids.length };
     },
@@ -93,8 +128,12 @@ function AnalyticsPage() {
       }));
       const requested = [...productStats].sort((a, b) => b.total - a.total).slice(0, 5);
       const checkedOnly = productStats.filter((p) => p.accuracy !== null && p.checked >= 2);
-      const best = [...checkedOnly].sort((a, b) => (b.accuracy ?? 0) - (a.accuracy ?? 0)).slice(0, 5);
-      const worst = [...checkedOnly].sort((a, b) => (a.accuracy ?? 0) - (b.accuracy ?? 0)).slice(0, 5);
+      const best = [...checkedOnly]
+        .sort((a, b) => (b.accuracy ?? 0) - (a.accuracy ?? 0))
+        .slice(0, 5);
+      const worst = [...checkedOnly]
+        .sort((a, b) => (a.accuracy ?? 0) - (b.accuracy ?? 0))
+        .slice(0, 5);
       return { total, checked: checked.length, accuracy, requested, best, worst };
     },
   });
@@ -105,16 +144,18 @@ function AnalyticsPage() {
     queryFn: () => cacheStatsFn(),
   });
 
-
-
-
   const exportCsv = (rows: Array<Record<string, unknown>>, name: string) => {
     if (!rows.length) return;
     const keys = Object.keys(rows[0]);
-    const csv = [keys.join(","), ...rows.map((r) => keys.map((k) => JSON.stringify(r[k] ?? "")).join(","))].join("\n");
+    const csv = [
+      keys.join(","),
+      ...rows.map((r) => keys.map((k) => JSON.stringify(r[k] ?? "")).join(",")),
+    ].join("\n");
     const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
     const a = document.createElement("a");
-    a.href = url; a.download = `${name}.csv`; a.click();
+    a.href = url;
+    a.download = `${name}.csv`;
+    a.click();
     URL.revokeObjectURL(url);
   };
 
@@ -124,8 +165,11 @@ function AnalyticsPage() {
         <p className="font-bold text-sm pl-2">Analytics</p>
         <div className="flex gap-1">
           {(["1", "7", "30"] as Range[]).map((r) => (
-            <button key={r} onClick={() => setRange(r)}
-              className={`px-3 py-1.5 rounded-md text-xs font-semibold ${range === r ? "bg-purple-600 text-white" : "text-gray-700"}`}>
+            <button
+              key={r}
+              onClick={() => setRange(r)}
+              className={`px-3 py-1.5 rounded-md text-xs font-semibold ${range === r ? "bg-purple-600 text-white" : "text-gray-700"}`}
+            >
               {r === "1" ? "আজ" : `${toBn(r)} দিন`}
             </button>
           ))}
@@ -133,7 +177,11 @@ function AnalyticsPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <Stat label="১ম সপ্তাহে ফিরে আসা" value={`${toBn(retention?.week1 ?? 0)}%`} sub={`কোহোর্ট: ${toBn(retention?.total ?? 0)} জন`} />
+        <Stat
+          label="১ম সপ্তাহে ফিরে আসা"
+          value={`${toBn(retention?.week1 ?? 0)}%`}
+          sub={`কোহোর্ট: ${toBn(retention?.total ?? 0)} জন`}
+        />
         <Stat label="সক্রিয় জেলা" value={toBn(districts.length)} />
         <Stat label="MRR (Revenue)" value={fmtBdt(0)} sub="Pro শীঘ্রই" />
       </div>
@@ -166,10 +214,13 @@ function AnalyticsPage() {
         <ul className="divide-y divide-gray-100">
           {diseases.map((d) => (
             <li key={d.disease} className="py-2 flex justify-between text-sm">
-              <span>{d.disease}</span><span className="font-bold">{toBn(d.count)}</span>
+              <span>{d.disease}</span>
+              <span className="font-bold">{toBn(d.count)}</span>
             </li>
           ))}
-          {diseases.length === 0 && <li className="py-4 text-center text-gray-400 text-sm">তথ্য নেই</li>}
+          {diseases.length === 0 && (
+            <li className="py-4 text-center text-gray-400 text-sm">তথ্য নেই</li>
+          )}
         </ul>
       </Card>
 
@@ -180,9 +231,23 @@ function AnalyticsPage() {
           <MiniStat label="নির্ভুলতা" value={`${toBn(predictionPerf?.accuracy ?? 0)}%`} />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <PredList title="সবচেয়ে অনুরোধকৃত" rows={predictionPerf?.requested ?? []} field="total" />
-          <PredList title="✅ সবচেয়ে সঠিক" rows={predictionPerf?.best ?? []} field="accuracy" suffix="%" />
-          <PredList title="❌ সবচেয়ে ভুল" rows={predictionPerf?.worst ?? []} field="accuracy" suffix="%" />
+          <PredList
+            title="সবচেয়ে অনুরোধকৃত"
+            rows={predictionPerf?.requested ?? []}
+            field="total"
+          />
+          <PredList
+            title="✅ সবচেয়ে সঠিক"
+            rows={predictionPerf?.best ?? []}
+            field="accuracy"
+            suffix="%"
+          />
+          <PredList
+            title="❌ সবচেয়ে ভুল"
+            rows={predictionPerf?.worst ?? []}
+            field="accuracy"
+            suffix="%"
+          />
         </div>
       </Card>
 
@@ -217,7 +282,9 @@ function AnalyticsPage() {
                       <div className="flex-1 h-2 bg-gray-100 rounded">
                         <div className="h-2 bg-purple-500 rounded" style={{ width: `${pct}%` }} />
                       </div>
-                      <span className="w-16 text-right font-bold">{toBn(pct)}% ({toBn(c.count)})</span>
+                      <span className="w-16 text-right font-bold">
+                        {toBn(pct)}% ({toBn(c.count)})
+                      </span>
                     </li>
                   );
                 })}
@@ -230,7 +297,9 @@ function AnalyticsPage() {
               <ul className="space-y-1">
                 {(cacheStats?.topQuestions ?? []).map((q, idx) => (
                   <li key={q.id} className="flex justify-between text-xs gap-2">
-                    <span className="truncate">{toBn(idx + 1)}. {q.question}</span>
+                    <span className="truncate">
+                      {toBn(idx + 1)}. {q.question}
+                    </span>
                     <span className="font-bold shrink-0">{toBn(q.hit_count)} বার</span>
                   </li>
                 ))}
@@ -242,7 +311,6 @@ function AnalyticsPage() {
           );
         })()}
       </Card>
-
     </div>
   );
 }
@@ -257,7 +325,15 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
   );
 }
 
-function Card({ title, children, onExport }: { title: string; children: React.ReactNode; onExport?: () => void }) {
+function Card({
+  title,
+  children,
+  onExport,
+}: {
+  title: string;
+  children: React.ReactNode;
+  onExport?: () => void;
+}) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-4">
       <div className="flex justify-between items-center mb-3">
@@ -283,7 +359,17 @@ function MiniStat({ label, value }: { label: string; value: string }) {
 }
 
 type PredRow = { product: string; total: number; accuracy: number | null; checked: number };
-function PredList({ title, rows, field, suffix }: { title: string; rows: PredRow[]; field: "total" | "accuracy"; suffix?: string }) {
+function PredList({
+  title,
+  rows,
+  field,
+  suffix,
+}: {
+  title: string;
+  rows: PredRow[];
+  field: "total" | "accuracy";
+  suffix?: string;
+}) {
   return (
     <div className="border border-gray-100 rounded-lg p-2">
       <p className="text-xs font-bold text-gray-600 mb-1">{title}</p>
@@ -296,7 +382,10 @@ function PredList({ title, rows, field, suffix }: { title: string; rows: PredRow
             return (
               <li key={r.product} className="flex justify-between text-xs">
                 <span className="truncate">{r.product}</span>
-                <span className="font-bold ml-2">{toBn(v ?? 0)}{suffix ?? ""}</span>
+                <span className="font-bold ml-2">
+                  {toBn(v ?? 0)}
+                  {suffix ?? ""}
+                </span>
               </li>
             );
           })}
@@ -305,4 +394,3 @@ function PredList({ title, rows, field, suffix }: { title: string; rows: PredRow
     </div>
   );
 }
-

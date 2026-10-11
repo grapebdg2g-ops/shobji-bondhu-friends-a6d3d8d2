@@ -8,18 +8,90 @@ import type { SprayEvent } from "@/lib/spray-schedule";
 const prob = (id: string) => PESTICIDE_GUIDE.find((p) => p.id === id);
 
 const NUTRIENTS: { day: number; range: string; title: string; dose: string; purpose: string }[] = [
-  { day: 5, range: "৫–৭", title: "সিউইড এক্সট্র্যাক্ট", dose: "১০–২০ মিলি", purpose: "চারা রোপণের ধকল (transplant shock) কমানো" },
-  { day: 12, range: "১২–১৪", title: "ক্যালসিয়াম নাইট্রেট", dose: "১০–১৫ গ্রাম", purpose: "গাছ শক্ত করা, ক্যালসিয়াম সরবরাহ" },
-  { day: 18, range: "১৮–২০", title: "ম্যাগনেসিয়াম সালফেট", dose: "৫–১০ গ্রাম", purpose: "Mg/S সরবরাহ, পাতার সবুজ কণা (ক্লোরোফিল)" },
-  { day: 25, range: "২৫–২৭", title: "অণুখাদ্য মিশ্রণ (Zn+B+Fe+Mn)", dose: "লেবেল ডোজ", purpose: "অণুখাদ্যের ঘাটতি প্রতিরোধ" },
-  { day: 32, range: "৩২–৩৫", title: "ক্যালসিয়াম নাইট্রেট", dose: "১০–১৫ গ্রাম", purpose: "ফুলের প্রস্তুতি ও ক্যালসিয়াম সরবরাহ" },
-  { day: 40, range: "৪০–৪২", title: "পটাশিয়াম সমৃদ্ধ সার", dose: "লেবেল ডোজ", purpose: "ফুল ও ফল ধরা" },
-  { day: 48, range: "৪৮–৫০", title: "ম্যাগনেসিয়াম সালফেট", dose: "৫–১০ গ্রাম", purpose: "পাতার কার্যক্ষমতা বাড়ানো" },
-  { day: 55, range: "৫৫–৫৮", title: "ক্যালসিয়াম নাইট্রেট", dose: "১০–১৫ গ্রাম", purpose: "ফলের প্রাথমিক বৃদ্ধি" },
-  { day: 63, range: "৬৩–৬৫", title: "পটাশিয়াম সার", dose: "লেবেল ডোজ", purpose: "ফলের আকার ও গুণমান" },
-  { day: 70, range: "৭০–৭২", title: "অণুখাদ্য + বোরন", dose: "লেবেল ডোজ", purpose: "ফুল ও ফল ঝরে পড়া রোধ" },
-  { day: 78, range: "৭৮–৮০", title: "ক্যালসিয়াম নাইট্রেট", dose: "১০ গ্রাম", purpose: "ফলে ক্যালসিয়াম সরবরাহ" },
-  { day: 87, range: "৮৭–৯০", title: "পটাশিয়াম সার", dose: "লেবেল ডোজ", purpose: "ফলের মান ও দৃঢ়তা" },
+  {
+    day: 5,
+    range: "৫–৭",
+    title: "সিউইড এক্সট্র্যাক্ট",
+    dose: "১০–২০ মিলি",
+    purpose: "চারা রোপণের ধকল (transplant shock) কমানো",
+  },
+  {
+    day: 12,
+    range: "১২–১৪",
+    title: "ক্যালসিয়াম নাইট্রেট",
+    dose: "১০–১৫ গ্রাম",
+    purpose: "গাছ শক্ত করা, ক্যালসিয়াম সরবরাহ",
+  },
+  {
+    day: 18,
+    range: "১৮–২০",
+    title: "ম্যাগনেসিয়াম সালফেট",
+    dose: "৫–১০ গ্রাম",
+    purpose: "Mg/S সরবরাহ, পাতার সবুজ কণা (ক্লোরোফিল)",
+  },
+  {
+    day: 25,
+    range: "২৫–২৭",
+    title: "অণুখাদ্য মিশ্রণ (Zn+B+Fe+Mn)",
+    dose: "লেবেল ডোজ",
+    purpose: "অণুখাদ্যের ঘাটতি প্রতিরোধ",
+  },
+  {
+    day: 32,
+    range: "৩২–৩৫",
+    title: "ক্যালসিয়াম নাইট্রেট",
+    dose: "১০–১৫ গ্রাম",
+    purpose: "ফুলের প্রস্তুতি ও ক্যালসিয়াম সরবরাহ",
+  },
+  {
+    day: 40,
+    range: "৪০–৪২",
+    title: "পটাশিয়াম সমৃদ্ধ সার",
+    dose: "লেবেল ডোজ",
+    purpose: "ফুল ও ফল ধরা",
+  },
+  {
+    day: 48,
+    range: "৪৮–৫০",
+    title: "ম্যাগনেসিয়াম সালফেট",
+    dose: "৫–১০ গ্রাম",
+    purpose: "পাতার কার্যক্ষমতা বাড়ানো",
+  },
+  {
+    day: 55,
+    range: "৫৫–৫৮",
+    title: "ক্যালসিয়াম নাইট্রেট",
+    dose: "১০–১৫ গ্রাম",
+    purpose: "ফলের প্রাথমিক বৃদ্ধি",
+  },
+  {
+    day: 63,
+    range: "৬৩–৬৫",
+    title: "পটাশিয়াম সার",
+    dose: "লেবেল ডোজ",
+    purpose: "ফলের আকার ও গুণমান",
+  },
+  {
+    day: 70,
+    range: "৭০–৭২",
+    title: "অণুখাদ্য + বোরন",
+    dose: "লেবেল ডোজ",
+    purpose: "ফুল ও ফল ঝরে পড়া রোধ",
+  },
+  {
+    day: 78,
+    range: "৭৮–৮০",
+    title: "ক্যালসিয়াম নাইট্রেট",
+    dose: "১০ গ্রাম",
+    purpose: "ফলে ক্যালসিয়াম সরবরাহ",
+  },
+  {
+    day: 87,
+    range: "৮৭–৯০",
+    title: "পটাশিয়াম সার",
+    dose: "লেবেল ডোজ",
+    purpose: "ফলের মান ও দৃঢ়তা",
+  },
 ];
 
 /** First occurrence of month/day on or after the planting date. */
@@ -42,43 +114,115 @@ export function buildTomatoSchedule(plantingDate: string, totalDays: number): Sp
     day: 0,
     title: "ড্যাম্পিং অফ (টমেটো) দমন — বীজ/বীজতলা শোধন",
     desc: "চারার গোড়া পচা রোধে বীজ শোধন ও বীজতলার মাটি ভিজিয়ে দিন।",
-    kind: "disease", stageName: "বীজতলা", stageIcon: "🌱", problem: prob("tomato-damping"),
+    kind: "disease",
+    stageName: "বীজতলা",
+    stageIcon: "🌱",
+    problem: prob("tomato-damping"),
   });
   events.push({
     id: "spray::tomato::trichoderma",
     day: 1,
     title: "ট্রাইকোডার্মা ড্রেঞ্চিং (গোড়ায়)",
     desc: "চারা লাগানোর সাথে সাথে গাছের গোড়ায় ট্রাইকোডার্মা গোলানো পানি ঢেলে দিন (লেবেল ডোজ) — গোড়া পচা ও মাটিবাহিত রোগ প্রতিরোধ।",
-    kind: "disease", stageName: "রোপণ", stageIcon: "🚜",
+    kind: "disease",
+    stageName: "রোপণ",
+    stageIcon: "🚜",
   });
 
   // Vegetative-stage disease sprays from the master crop guide (earlier schedule dates).
   const fixedDay = (key: string, day: number, title: string, desc: string, problemId: string) => {
     if (!inCrop(day)) return;
-    events.push({ id: `spray::tomato::${key}::${day}`, day, title, desc, kind: "disease", stageName: "গাছের বৃদ্ধি", stageIcon: "🌿", problem: prob(problemId) });
+    events.push({
+      id: `spray::tomato::${key}::${day}`,
+      day,
+      title,
+      desc,
+      kind: "disease",
+      stageName: "গাছের বৃদ্ধি",
+      stageIcon: "🌿",
+      problem: prob(problemId),
+    });
   };
-  fixedDay("fusarium", 50, "ফিউজেরিয়াম উইল্ট (টমেটো) দমন", "পাতা হলুদ হয়ে শুকায়, কান্ড কালো হয়। গোড়ায় মাটি ভিজিয়ে ও পাতায় স্প্রে — ১৫ দিন পর পর।", "tomato-fusarium");
-  fixedDay("earlyblight", 55, "আর্লি ব্লাইট (টমেটো) দমন", "পাতায় বাদামি গোল দাগ, কেন্দ্রে রিং। পুরো গাছে স্প্রে — ৭-১০ দিন পর পর, বৃষ্টির পর।", "tomato-earlyblight");
-  fixedDay("septoria", 60, "সেপ্টোরিয়া লিফ স্পট (টমেটো) দমন", "পাতায় সাদা কেন্দ্রসহ ছোট দাগ। নিচের পাতা থেকে উপরে স্প্রে — ১০ দিন পর পর।", "tomato-septoria");
+  fixedDay(
+    "fusarium",
+    50,
+    "ফিউজেরিয়াম উইল্ট (টমেটো) দমন",
+    "পাতা হলুদ হয়ে শুকায়, কান্ড কালো হয়। গোড়ায় মাটি ভিজিয়ে ও পাতায় স্প্রে — ১৫ দিন পর পর।",
+    "tomato-fusarium",
+  );
+  fixedDay(
+    "earlyblight",
+    55,
+    "আর্লি ব্লাইট (টমেটো) দমন",
+    "পাতায় বাদামি গোল দাগ, কেন্দ্রে রিং। পুরো গাছে স্প্রে — ৭-১০ দিন পর পর, বৃষ্টির পর।",
+    "tomato-earlyblight",
+  );
+  fixedDay(
+    "septoria",
+    60,
+    "সেপ্টোরিয়া লিফ স্পট (টমেটো) দমন",
+    "পাতায় সাদা কেন্দ্রসহ ছোট দাগ। নিচের পাতা থেকে উপরে স্প্রে — ১০ দিন পর পর।",
+    "tomato-septoria",
+  );
 
-  const fixed = (key: string, date: Date, title: string, desc: string, kind: "pest" | "disease", problemId?: string) => {
+  const fixed = (
+    key: string,
+    date: Date,
+    title: string,
+    desc: string,
+    kind: "pest" | "disease",
+    problemId?: string,
+  ) => {
     const day = dayDiff(date, planting);
     if (!inCrop(day)) return;
-    events.push({ id: `spray::tomato::${key}::${toIsoDate(date)}`, day, title, desc, kind, stageName: "নির্ধারিত তারিখ", stageIcon: "📅", problem: problemId ? prob(problemId) : undefined });
+    events.push({
+      id: `spray::tomato::${key}::${toIsoDate(date)}`,
+      day,
+      title,
+      desc,
+      kind,
+      stageName: "নির্ধারিত তারিখ",
+      stageIcon: "📅",
+      problem: problemId ? prob(problemId) : undefined,
+    });
   };
 
-  fixed("mz-cb", nextDate(planting, 11, 15), "ম্যানকোজেব + কার্বেন্ডাজিম স্প্রে", "ছত্রাকজনিত রোগ (ব্লাইট, উইল্ট) প্রতিরোধে পুরো গাছে স্প্রে করুন।", "disease");
+  fixed(
+    "mz-cb",
+    nextDate(planting, 11, 15),
+    "ম্যানকোজেব + কার্বেন্ডাজিম স্প্রে",
+    "ছত্রাকজনিত রোগ (ব্লাইট, উইল্ট) প্রতিরোধে পুরো গাছে স্প্রে করুন।",
+    "disease",
+  );
   const wfm = "সাদা মাছি + মাকড় দমন স্প্রে";
   const wfmDesc = "সাদা মাছি ও মাকড়ের ঔষধ একসাথে — পাতার নিচের দিকে ভালোভাবে স্প্রে করুন।";
-  for (const [m, d] of [[11, 25], [11, 30], [12, 7]] as const) {
+  for (const [m, d] of [
+    [11, 25],
+    [11, 30],
+    [12, 7],
+  ] as const) {
     fixed("wfm", nextDate(planting, m, d), wfm, wfmDesc, "pest", "tomato-whitefly");
   }
 
   // From 22 Dec: every 5 days whitefly + mite + fruit borer, late blight 3 days after each, until crop ends.
   const end = addDays(planting, totalDays);
   for (let d = nextDate(planting, 12, 22); d <= end; d = addDays(d, 5)) {
-    fixed("wfmfb", d, "সাদা মাছি + মাকড় + ফল ছিদ্রকারী পোকা স্প্রে", "তিনটি পোকার ঔষধ একসাথে — পুরো গাছে, বিশেষত ফুল, ফল ও পাতার নিচে।", "pest", "tomato-fruitborer");
-    fixed("lb", addDays(d, 3), "লেট ব্লাইট (টমেটো) প্রতিরোধ স্প্রে", "কীটনাশক স্প্রের ৩ দিন পর লেট ব্লাইটের ঔষধ পাতা ও কান্ডে স্প্রে করুন।", "disease", "tomato-lateblight");
+    fixed(
+      "wfmfb",
+      d,
+      "সাদা মাছি + মাকড় + ফল ছিদ্রকারী পোকা স্প্রে",
+      "তিনটি পোকার ঔষধ একসাথে — পুরো গাছে, বিশেষত ফুল, ফল ও পাতার নিচে।",
+      "pest",
+      "tomato-fruitborer",
+    );
+    fixed(
+      "lb",
+      addDays(d, 3),
+      "লেট ব্লাইট (টমেটো) প্রতিরোধ স্প্রে",
+      "কীটনাশক স্প্রের ৩ দিন পর লেট ব্লাইটের ঔষধ পাতা ও কান্ডে স্প্রে করুন।",
+      "disease",
+      "tomato-lateblight",
+    );
   }
 
   for (const n of NUTRIENTS) {
@@ -88,7 +232,9 @@ export function buildTomatoSchedule(plantingDate: string, totalDays: number): Sp
       day: n.day,
       title: n.title,
       desc: `${n.range} দিনে · প্রতি ১০ লিটার পানিতে ${n.dose} · উদ্দেশ্য: ${n.purpose}`,
-      kind: "nutrient", stageName: `${n.range} দিন`, stageIcon: "🌿",
+      kind: "nutrient",
+      stageName: `${n.range} দিন`,
+      stageIcon: "🌿",
     });
   }
 

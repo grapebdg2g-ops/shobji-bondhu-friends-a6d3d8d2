@@ -155,15 +155,18 @@ function DiseaseDetectionPage() {
         const { data: sess } = await supabase.auth.getSession();
         const uid = sess.session?.user.id;
         if (uid) {
-          supabase.from("disease_history").insert({
-            user_id: uid,
-            crop_type: state.crop,
-            disease_name: result.diseaseName,
-            severity: result.severity,
-            result_json: result as never,
-          }).then(({ error }) => {
-            if (error) console.error("history save failed:", error);
-          });
+          supabase
+            .from("disease_history")
+            .insert({
+              user_id: uid,
+              crop_type: state.crop,
+              disease_name: result.diseaseName,
+              severity: result.severity,
+              result_json: result as never,
+            })
+            .then(({ error }) => {
+              if (error) console.error("history save failed:", error);
+            });
         }
       }
     } catch (e) {
@@ -173,9 +176,8 @@ function DiseaseDetectionPage() {
       }
       console.error(e);
       const raw = (e as Error).message ?? "";
-      const msg = raw && /[\u0980-\u09FF]/.test(raw)
-        ? raw
-        : "শনাক্ত করা সম্ভব হয়নি, আবার চেষ্টা করুন";
+      const msg =
+        raw && /[\u0980-\u09FF]/.test(raw) ? raw : "শনাক্ত করা সম্ভব হয়নি, আবার চেষ্টা করুন";
       dispatch({ type: "SET_ERROR", msg });
     }
   };
@@ -223,7 +225,9 @@ function DiseaseDetectionPage() {
       <header className="sticky top-0 z-10 bg-card/95 backdrop-blur border-b border-border">
         <div className="flex items-center gap-3 px-4 h-14">
           <button
-            onClick={() => (router.history.length > 1 ? router.history.back() : navigate({ to: "/dashboard" }))}
+            onClick={() =>
+              router.history.length > 1 ? router.history.back() : navigate({ to: "/dashboard" })
+            }
             className="h-10 w-10 -ml-2 rounded-full flex items-center justify-center active:bg-muted"
             aria-label="ফিরে যান"
           >
@@ -236,7 +240,14 @@ function DiseaseDetectionPage() {
         </div>
       </header>
 
-      <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" hidden onChange={onPick} />
+      <input
+        ref={cameraInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        hidden
+        onChange={onPick}
+      />
       <input ref={galleryInputRef} type="file" accept="image/*" hidden onChange={onPick} />
 
       {state.stage === "landing" && (
@@ -318,10 +329,18 @@ function LandingScreen({
       </p>
 
       <div className="grid grid-cols-2 gap-3">
-        <BengaliButton variant="primary" onClick={guard(onCamera)} leftIcon={<Camera className="h-5 w-5" />}>
+        <BengaliButton
+          variant="primary"
+          onClick={guard(onCamera)}
+          leftIcon={<Camera className="h-5 w-5" />}
+        >
           ক্যামেরা
         </BengaliButton>
-        <BengaliButton variant="outline" onClick={guard(onGallery)} leftIcon={<ImageIcon className="h-5 w-5" />}>
+        <BengaliButton
+          variant="outline"
+          onClick={guard(onGallery)}
+          leftIcon={<ImageIcon className="h-5 w-5" />}
+        >
           গ্যালারি
         </BengaliButton>
       </div>
@@ -382,10 +401,18 @@ function PreviewScreen({
         </span>
       </div>
       <div className="px-5 grid grid-cols-2 gap-3">
-        <BengaliButton variant="outline" onClick={onRetake} leftIcon={<RefreshCw className="h-5 w-5" />}>
+        <BengaliButton
+          variant="outline"
+          onClick={onRetake}
+          leftIcon={<RefreshCw className="h-5 w-5" />}
+        >
           পুনরায় তুলুন
         </BengaliButton>
-        <BengaliButton variant="primary" onClick={onAnalyze} leftIcon={<ScanSearch className="h-5 w-5" />}>
+        <BengaliButton
+          variant="primary"
+          onClick={onAnalyze}
+          leftIcon={<ScanSearch className="h-5 w-5" />}
+        >
           বিশ্লেষণ করুন
         </BengaliButton>
       </div>
@@ -414,7 +441,11 @@ function AnalyzingScreen({ imageUrl, onCancel }: { imageUrl: string; onCancel: (
       </button>
 
       <div className="relative mx-auto max-w-sm overflow-hidden rounded-2xl">
-        <img src={imageUrl} alt="" className="w-full max-h-[50vh] object-contain bg-black blur-[2px] brightness-75" />
+        <img
+          src={imageUrl}
+          alt=""
+          className="w-full max-h-[50vh] object-contain bg-black blur-[2px] brightness-75"
+        />
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent shadow-[0_0_20px_4px] shadow-primary animate-[scan_2s_ease-in-out_infinite]" />
         </div>
@@ -425,16 +456,30 @@ function AnalyzingScreen({ imageUrl, onCancel }: { imageUrl: string; onCancel: (
           <span className="font-bold text-primary">{progress}%</span>
         </div>
         <div className="mt-3 h-2 overflow-hidden rounded-full bg-muted">
-          <div className="h-full rounded-full bg-gradient-to-r from-[#2D6A4F] to-[#74C69D] transition-[width] duration-500" style={{ width: `${progress}%` }} />
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-[#2D6A4F] to-[#74C69D] transition-[width] duration-500"
+            style={{ width: `${progress}%` }}
+          />
         </div>
         <div className="mt-4 grid grid-cols-3 gap-2 text-[11px] font-semibold">
           <span className="rounded-full bg-primary/10 px-2 py-1 text-primary">ছবি পড়া</span>
-          <span className={`rounded-full px-2 py-1 ${progress > 35 ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>রোগ খোঁজা</span>
-          <span className={`rounded-full px-2 py-1 ${progress > 70 ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>পরামর্শ তৈরি</span>
+          <span
+            className={`rounded-full px-2 py-1 ${progress > 35 ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}
+          >
+            রোগ খোঁজা
+          </span>
+          <span
+            className={`rounded-full px-2 py-1 ${progress > 70 ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}
+          >
+            পরামর্শ তৈরি
+          </span>
         </div>
         <p className="text-sm text-muted-foreground mt-3">সাধারণত ১০-১৫ সেকেন্ড লাগে</p>
       </div>
-      <button onClick={onCancel} className="text-sm text-muted-foreground underline mx-auto inline-flex items-center gap-1">
+      <button
+        onClick={onCancel}
+        className="text-sm text-muted-foreground underline mx-auto inline-flex items-center gap-1"
+      >
         <X className="h-4 w-4" /> বাতিল করুন
       </button>
       <style>{`@keyframes scan { 0% { top: 0%; } 50% { top: 100%; } 100% { top: 0%; } }`}</style>
@@ -467,10 +512,19 @@ function ResultScreen({
   return (
     <div className="px-5 pt-4 space-y-4">
       <div className="rounded-2xl bg-card border border-border p-4 shadow-sm flex gap-3">
-        <img src={imageUrl} alt="" className="h-20 w-20 rounded-xl object-cover bg-muted shrink-0" />
+        <img
+          src={imageUrl}
+          alt=""
+          className="h-20 w-20 rounded-xl object-cover bg-muted shrink-0"
+        />
         <div className="flex-1 min-w-0">
           <h2 className="text-lg font-bold text-foreground leading-tight">{result.diseaseName}</h2>
-          <span className={cn("inline-flex items-center gap-1 mt-2 px-2.5 py-1 rounded-full border text-xs font-bold", sev.color)}>
+          <span
+            className={cn(
+              "inline-flex items-center gap-1 mt-2 px-2.5 py-1 rounded-full border text-xs font-bold",
+              sev.color,
+            )}
+          >
             {sev.dot} তীব্রতা: {sev.label}
           </span>
           {typeof result.confidence === "number" && (
@@ -479,8 +533,8 @@ function ResultScreen({
             </span>
           )}
           <p className="mt-2 text-[11px] text-gray-500">
-            AI সহায়ক বিশ্লেষণ — নিশ্চিত নির্ণয় নয়। রাসায়নিক ব্যবহারের আগে product label, PHI/PPE যাচাই
-            করুন{result.severity === "high" ? " এবং উপজেলা কৃষি কর্মকর্তার পরামর্শ নিন" : ""}।
+            AI সহায়ক বিশ্লেষণ — নিশ্চিত নির্ণয় নয়। রাসায়নিক ব্যবহারের আগে product label, PHI/PPE
+            যাচাই করুন{result.severity === "high" ? " এবং উপজেলা কৃষি কর্মকর্তার পরামর্শ নিন" : ""}।
           </p>
         </div>
       </div>
@@ -491,13 +545,20 @@ function ResultScreen({
 
       <Section icon="💊" title="চিকিৎসা পদ্ধতি" defaultOpen>
         <ol className="text-sm text-foreground space-y-2 list-decimal pl-5">
-          {result.treatments.map((t, i) => <li key={i}>{t}</li>)}
+          {result.treatments.map((t, i) => (
+            <li key={i}>{t}</li>
+          ))}
         </ol>
       </Section>
 
       <Section icon="🛡️" title="প্রতিরোধ ব্যবস্থা">
         <ul className="text-sm text-foreground space-y-2">
-          {result.prevention.map((p, i) => <li key={i} className="flex gap-2"><span>•</span>{p}</li>)}
+          {result.prevention.map((p, i) => (
+            <li key={i} className="flex gap-2">
+              <span>•</span>
+              {p}
+            </li>
+          ))}
         </ul>
       </Section>
 
@@ -508,7 +569,8 @@ function ResultScreen({
           <ul className="text-sm text-foreground divide-y divide-border">
             {result.cost.map((c, i) => (
               <li key={i} className="flex justify-between py-2">
-                <span>{c.name}</span><span className="font-bold">{c.price}</span>
+                <span>{c.name}</span>
+                <span className="font-bold">{c.price}</span>
               </li>
             ))}
           </ul>
@@ -516,14 +578,23 @@ function ResultScreen({
       </Section>
 
       <div className="grid grid-cols-2 gap-3 pt-2">
-        <BengaliButton variant="primary" onClick={onNew} leftIcon={<RefreshCw className="h-5 w-5" />}>
+        <BengaliButton
+          variant="primary"
+          onClick={onNew}
+          leftIcon={<RefreshCw className="h-5 w-5" />}
+        >
           নতুন ছবি
         </BengaliButton>
         <BengaliButton variant="outline" onClick={onSave} leftIcon={<Save className="h-5 w-5" />}>
           সংরক্ষণ
         </BengaliButton>
       </div>
-      <BengaliButton variant="ghost" fullWidth onClick={onShare} leftIcon={<Share2 className="h-5 w-5" />}>
+      <BengaliButton
+        variant="ghost"
+        fullWidth
+        onClick={onShare}
+        leftIcon={<Share2 className="h-5 w-5" />}
+      >
         শেয়ার করুন
       </BengaliButton>
     </div>
@@ -551,7 +622,9 @@ function Section({
         <span className="font-bold text-foreground text-base flex items-center gap-2">
           <span>{icon}</span> {title}
         </span>
-        <ChevronDown className={cn("h-5 w-5 text-muted-foreground transition-transform", open && "rotate-180")} />
+        <ChevronDown
+          className={cn("h-5 w-5 text-muted-foreground transition-transform", open && "rotate-180")}
+        />
       </button>
       {open && <div className="px-4 pb-4">{children}</div>}
     </div>
@@ -563,11 +636,18 @@ function Section({
 function ErrorScreen({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
     <div className="px-5 pt-10 text-center space-y-4">
-      <div className="mx-auto h-32 w-32 rounded-full bg-muted flex items-center justify-center text-6xl">🥀</div>
+      <div className="mx-auto h-32 w-32 rounded-full bg-muted flex items-center justify-center text-6xl">
+        🥀
+      </div>
       <h2 className="text-xl font-bold text-foreground">শনাক্ত করা সম্ভব হয়নি</h2>
       <p className="text-sm text-muted-foreground max-w-xs mx-auto">{message}</p>
       <div className="pt-2 space-y-2">
-        <BengaliButton variant="primary" fullWidth onClick={onRetry} leftIcon={<RefreshCw className="h-5 w-5" />}>
+        <BengaliButton
+          variant="primary"
+          fullWidth
+          onClick={onRetry}
+          leftIcon={<RefreshCw className="h-5 w-5" />}
+        >
           আবার চেষ্টা করুন
         </BengaliButton>
         <button className="text-sm text-primary font-semibold underline">

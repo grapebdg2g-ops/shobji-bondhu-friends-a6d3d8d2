@@ -15,14 +15,19 @@ import { ShieldCheck } from "lucide-react";
 
 export const Route = createFileRoute("/crop-guide/new/$crop")({
   component: NewCropPlan,
-  head: () => ({ meta: [
-    { title: "নতুন ফসল রোপণ পরিকল্পনা — কৃষক বন্ধু" },
+  head: () => ({
+    meta: [
+      { title: "নতুন ফসল রোপণ পরিকল্পনা — কৃষক বন্ধু" },
       { property: "og:title", content: "নতুন ফসল রোপণ পরিকল্পনা — কৃষক বন্ধু" },
-      { property: "og:description", content: "রোপণের তারিখ থেকে ফসলের পরিচর্যা পরিকল্পনা তৈরি করুন।" },
+      {
+        property: "og:description",
+        content: "রোপণের তারিখ থেকে ফসলের পরিচর্যা পরিকল্পনা তৈরি করুন।",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-    { name: "description", content: "রোপণের তারিখ থেকে ফসলের পরিচর্যা পরিকল্পনা তৈরি করুন।" },
-  ] }),
+      { name: "description", content: "রোপণের তারিখ থেকে ফসলের পরিচর্যা পরিকল্পনা তৈরি করুন।" },
+    ],
+  }),
   loader: ({ params }) => {
     const guide = FARMING_STAGES[params.crop];
     if (!guide) throw notFound();
@@ -32,7 +37,9 @@ export const Route = createFileRoute("/crop-guide/new/$crop")({
     <div className="min-h-screen flex items-center justify-center p-6 text-center">
       <div>
         <p className="text-gray-700 mb-3">ফসল পাওয়া যায়নি</p>
-        <Link to="/crop-guide" className="text-emerald-600 font-semibold">← ফিরুন</Link>
+        <Link to="/crop-guide" className="text-emerald-600 font-semibold">
+          ← ফিরুন
+        </Link>
       </div>
     </div>
   ),
@@ -40,7 +47,9 @@ export const Route = createFileRoute("/crop-guide/new/$crop")({
     <div className="min-h-screen flex items-center justify-center p-6 text-center">
       <div>
         <p className="text-gray-700 mb-3">ত্রুটি: {(error as Error).message}</p>
-        <button onClick={reset} className="text-emerald-600 font-semibold">পুনরায় চেষ্টা</button>
+        <button onClick={reset} className="text-emerald-600 font-semibold">
+          পুনরায় চেষ্টা
+        </button>
       </div>
     </div>
   ),
@@ -56,11 +65,19 @@ function NewCropPlan() {
   const [gap, setGap] = useState(false);
 
   async function handleSave() {
-    if (!user) { navigate({ to: "/login" }); return; }
+    if (!user) {
+      navigate({ to: "/login" });
+      return;
+    }
     setSaving(true);
     const { data, error } = await supabase
       .from("user_crop_plans" as never)
-      .insert({ user_id: user.id, crop_type: crop, planting_date: toIsoDate(date), is_gap: gapEligible && gap } as never)
+      .insert({
+        user_id: user.id,
+        crop_type: crop,
+        planting_date: toIsoDate(date),
+        is_gap: gapEligible && gap,
+      } as never)
       .select("id")
       .single();
     setSaving(false);
@@ -70,22 +87,39 @@ function NewCropPlan() {
     }
     toast.success("ফসল পরিকল্পনা যোগ হয়েছে");
     try {
-      const n = await syncSprayReminders(user.id, (data as { id: string }).id, crop, toIsoDate(date), gapEligible && gap);
+      const n = await syncSprayReminders(
+        user.id,
+        (data as { id: string }).id,
+        crop,
+        toIsoDate(date),
+        gapEligible && gap,
+      );
       if (n > 0) toast.success(`${n}টি স্প্রে রিমাইন্ডার সেট হয়েছে`);
-    } catch { /* plan still saved */ }
+    } catch {
+      /* plan still saved */
+    }
     navigate({ to: "/crop-guide/plan/$planId", params: { planId: (data as { id: string }).id } });
   }
 
   return (
     <main className="min-h-screen bg-[#F0FFF4] pb-24 md:max-w-[560px] md:mx-auto">
-      <header className="px-5 pt-8 pb-6 rounded-b-3xl text-white" style={{ background: "var(--gradient-brand)" }}>
+      <header
+        className="px-5 pt-8 pb-6 rounded-b-3xl text-white"
+        style={{ background: "var(--gradient-brand)" }}
+      >
         <div className="flex items-center gap-3 mb-3">
-          <Link to="/crop-guide" aria-label="ফিরে যান" className="h-9 w-9 rounded-full bg-white/15 flex items-center justify-center">
+          <Link
+            to="/crop-guide"
+            aria-label="ফিরে যান"
+            className="h-9 w-9 rounded-full bg-white/15 flex items-center justify-center"
+          >
             <ArrowLeft className="h-5 w-5" />
           </Link>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-4xl"><CropIcon crop={crop} /></span>
+          <span className="text-4xl">
+            <CropIcon crop={crop} />
+          </span>
           <div>
             <h1 className="text-2xl font-bold">{crop}</h1>
             <p className="text-sm text-white/85">{guide.season}</p>
@@ -120,17 +154,39 @@ function NewCropPlan() {
           </Popover>
 
           <div className="mt-4 text-xs text-gray-600 space-y-1">
-            <p>• মোট চক্র: <strong>{guide.totalDays} দিন</strong></p>
-            <p>• আনুমানিক ফলন: <strong>{guide.yield}</strong></p>
+            <p>
+              • মোট চক্র: <strong>{guide.totalDays} দিন</strong>
+            </p>
+            <p>
+              • আনুমানিক ফলন: <strong>{guide.yield}</strong>
+            </p>
           </div>
 
           {gapEligible && (
             <div className="mt-5 rounded-2xl ring-1 ring-primary/30 bg-primary/5 p-4">
-              <p className="font-bold text-foreground flex items-center gap-2"><ShieldCheck className="h-5 w-5 text-primary" /> আপনি কি GAP সার্টিফাইড ফসল উৎপাদন করতে চান?</p>
-              <p className="text-xs text-muted-foreground mt-1">GAP (উত্তম কৃষি চর্চা) মেনে নিরাপদ ফসল ফলালে সুপারশপ ও রপ্তানিতে বেশি দাম পাওয়া যায়। জমি প্রস্তুতি, স্প্রে ও সংগ্রহ সব GAP নিয়মে সাজানো হবে।</p>
+              <p className="font-bold text-foreground flex items-center gap-2">
+                <ShieldCheck className="h-5 w-5 text-primary" /> আপনি কি GAP সার্টিফাইড ফসল উৎপাদন
+                করতে চান?
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                GAP (উত্তম কৃষি চর্চা) মেনে নিরাপদ ফসল ফলালে সুপারশপ ও রপ্তানিতে বেশি দাম পাওয়া
+                যায়। জমি প্রস্তুতি, স্প্রে ও সংগ্রহ সব GAP নিয়মে সাজানো হবে।
+              </p>
               <div className="mt-3 grid grid-cols-2 gap-2">
-                <button type="button" onClick={() => setGap(false)} className={`rounded-xl py-2 text-sm font-semibold ring-1 ${!gap ? "bg-primary text-primary-foreground ring-primary" : "bg-card ring-border text-foreground"}`}>না, সাধারণ চাষ</button>
-                <button type="button" onClick={() => setGap(true)} className={`rounded-xl py-2 text-sm font-semibold ring-1 ${gap ? "bg-primary text-primary-foreground ring-primary" : "bg-card ring-border text-foreground"}`}>হ্যাঁ, GAP চাষ</button>
+                <button
+                  type="button"
+                  onClick={() => setGap(false)}
+                  className={`rounded-xl py-2 text-sm font-semibold ring-1 ${!gap ? "bg-primary text-primary-foreground ring-primary" : "bg-card ring-border text-foreground"}`}
+                >
+                  না, সাধারণ চাষ
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setGap(true)}
+                  className={`rounded-xl py-2 text-sm font-semibold ring-1 ${gap ? "bg-primary text-primary-foreground ring-primary" : "bg-card ring-border text-foreground"}`}
+                >
+                  হ্যাঁ, GAP চাষ
+                </button>
               </div>
             </div>
           )}

@@ -23,7 +23,8 @@ export type ExtractedPrice = {
 
 /** মণের দাম কেজিতে রূপান্তর করে, যাতে বর্তমান বাজারদর ও পূর্বাভাসের সাথে তুলনা করা যায়। */
 export function normalizePrice(p: ExtractedPrice): { price: number; unit: string } {
-  if (p.unit === "মণ") return { price: Math.round((p.price / MON_IN_KG) * 100) / 100, unit: "কেজি" };
+  if (p.unit === "মণ")
+    return { price: Math.round((p.price / MON_IN_KG) * 100) / 100, unit: "কেজি" };
   if (p.unit === "হালি") return { price: Math.round((p.price / 4) * 100) / 100, unit: "পিস" };
   return { price: p.price, unit: p.unit };
 }

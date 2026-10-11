@@ -146,8 +146,8 @@ export function ContentMenu({
           <AlertDialogHeader>
             <AlertDialogTitle>মিউট করবেন?</AlertDialogTitle>
             <AlertDialogDescription>
-              {authorName ? `"${authorName}" এর` : "এই ব্যবহারকারীর"} পোস্ট আপনার ফিড থেকে লুকিয়ে যাবে।
-              তিনি জানবেন না যে আপনি মিউট করেছেন। যেকোনো সময় আনমিউট করতে পারবেন।
+              {authorName ? `"${authorName}" এর` : "এই ব্যবহারকারীর"} পোস্ট আপনার ফিড থেকে লুকিয়ে
+              যাবে। তিনি জানবেন না যে আপনি মিউট করেছেন। যেকোনো সময় আনমিউট করতে পারবেন।
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

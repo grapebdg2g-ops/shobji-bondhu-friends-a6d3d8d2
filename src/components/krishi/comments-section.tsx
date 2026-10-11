@@ -29,11 +29,20 @@ function timeAgo(iso: string) {
 
 function reportPrices(kind: "post" | "comment", id: string) {
   void capturePricesFromContent({ data: { kind, id } })
-    .then((r) => { if (r.added > 0) toast.success(`আপনার জানানো দাম বাজারদরে যোগ হয়েছে: ${(r.products ?? []).join(", ")}`); })
+    .then((r) => {
+      if (r.added > 0)
+        toast.success(`আপনার জানানো দাম বাজারদরে যোগ হয়েছে: ${(r.products ?? []).join(", ")}`);
+    })
     .catch(() => {});
 }
 
-export function CommentsSection({ postId, onCommentAdded }: { postId: string; onCommentAdded: () => void }) {
+export function CommentsSection({
+  postId,
+  onCommentAdded,
+}: {
+  postId: string;
+  onCommentAdded: () => void;
+}) {
   const { user } = useUser();
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -57,29 +66,43 @@ export function CommentsSection({ postId, onCommentAdded }: { postId: string; on
         setLoading(false);
       }
     })();
-    return () => { active = false; };
+    return () => {
+      active = false;
+    };
   }, [postId]);
 
   useEffect(() => {
     const channel = supabase
       .channel(`post-comments-${postId}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "post_comments", filter: `post_id=eq.${postId}` }, (payload) => {
-        if (payload.eventType === "DELETE") {
-          setComments((current) => current.filter((comment) => comment.id !== (payload.old as { id: string }).id));
-          return;
-        }
-        const incoming = payload.new as Comment;
-        setComments((current) => {
-          if (current.some((comment) => comment.id === incoming.id)) return current.map((comment) => comment.id === incoming.id ? incoming : comment);
-          return [...current, incoming];
-        });
-      })
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "post_comments", filter: `post_id=eq.${postId}` },
+        (payload) => {
+          if (payload.eventType === "DELETE") {
+            setComments((current) =>
+              current.filter((comment) => comment.id !== (payload.old as { id: string }).id),
+            );
+            return;
+          }
+          const incoming = payload.new as Comment;
+          setComments((current) => {
+            if (current.some((comment) => comment.id === incoming.id))
+              return current.map((comment) => (comment.id === incoming.id ? incoming : comment));
+            return [...current, incoming];
+          });
+        },
+      )
       .subscribe();
-    return () => { void supabase.removeChannel(channel); };
+    return () => {
+      void supabase.removeChannel(channel);
+    };
   }, [postId]);
 
   const authorIds = useMemo(
-    () => [...new Set([...comments.map((comment) => comment.user_id), ...(user ? [user.id] : [])])].sort(),
+    () =>
+      [
+        ...new Set([...comments.map((comment) => comment.user_id), ...(user ? [user.id] : [])]),
+      ].sort(),
     [comments, user?.id],
   );
   const { data: avatars = {} } = useQuery({
@@ -87,7 +110,10 @@ export function CommentsSection({ postId, onCommentAdded }: { postId: string; on
     enabled: authorIds.length > 0,
     staleTime: 60_000,
     queryFn: async (): Promise<Record<string, string | null>> => {
-      const { data, error } = await supabase.from("profiles").select("id, avatar_url").in("id", authorIds);
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, avatar_url")
+        .in("id", authorIds);
       if (error) throw error;
       return Object.fromEntries((data ?? []).map((profile) => [profile.id, profile.avatar_url]));
     },
@@ -95,8 +121,14 @@ export function CommentsSection({ postId, onCommentAdded }: { postId: string; on
 
   const authorAvatar = (id: string | undefined, name: string, size: string) => (
     <Avatar className={`${size} bg-primary/15`}>
-      <AvatarImage src={id ? avatars[id] ?? undefined : undefined} alt={`${name}-এর প্রোফাইল ছবি`} className="object-cover" />
-      <AvatarFallback className="bg-primary/15 text-xs font-bold text-primary">{name.charAt(0) || "ক"}</AvatarFallback>
+      <AvatarImage
+        src={id ? (avatars[id] ?? undefined) : undefined}
+        alt={`${name}-এর প্রোফাইল ছবি`}
+        className="object-cover"
+      />
+      <AvatarFallback className="bg-primary/15 text-xs font-bold text-primary">
+        {name.charAt(0) || "ক"}
+      </AvatarFallback>
     </Avatar>
   );
 
@@ -116,8 +148,14 @@ export function CommentsSection({ postId, onCommentAdded }: { postId: string; on
   const submit = async (rawText: string, parentId: string | null) => {
     const trimmed = sanitize(rawText);
     if (!trimmed || sending) return;
-    if (!user) { toast.error("মন্তব্য করতে লগইন করুন"); return; }
-    if (trimmed.length > 200) { toast.error("মন্তব্য ২০০ অক্ষরের মধ্যে রাখুন"); return; }
+    if (!user) {
+      toast.error("মন্তব্য করতে লগইন করুন");
+      return;
+    }
+    if (trimmed.length > 200) {
+      toast.error("মন্তব্য ২০০ অক্ষরের মধ্যে রাখুন");
+      return;
+    }
     setSending(true);
     const optimistic: Comment = {
       id: `tmp-${Date.now()}`,
@@ -128,11 +166,20 @@ export function CommentsSection({ postId, onCommentAdded }: { postId: string; on
       parent_id: parentId,
     };
     setComments((current) => [...current, optimistic]);
-    if (parentId) { setReplyText(""); setReplyTo(null); } else setText("");
+    if (parentId) {
+      setReplyText("");
+      setReplyTo(null);
+    } else setText("");
 
     const { data, error } = await supabase
       .from("post_comments")
-      .insert({ post_id: postId, user_id: user.id, user_name: user.name || "আমি", content: trimmed, parent_id: parentId })
+      .insert({
+        post_id: postId,
+        user_id: user.id,
+        user_name: user.name || "আমি",
+        content: trimmed,
+        parent_id: parentId,
+      })
       .select("id, user_id, user_name, content, created_at, parent_id")
       .single();
     if (error || !data) {
@@ -163,13 +210,23 @@ export function CommentsSection({ postId, onCommentAdded }: { postId: string; on
             <div className="rounded-2xl bg-muted/70 px-3 py-2">
               <div className="flex items-center justify-between gap-2">
                 <p className="truncate text-xs font-bold text-foreground">{comment.user_name}</p>
-                <span className="shrink-0 text-[10px] text-muted-foreground">{timeAgo(comment.created_at)}</span>
+                <span className="shrink-0 text-[10px] text-muted-foreground">
+                  {timeAgo(comment.created_at)}
+                </span>
               </div>
-              <p className="mt-0.5 whitespace-pre-wrap break-words text-sm text-foreground">{comment.content}</p>
+              <p className="mt-0.5 whitespace-pre-wrap break-words text-sm text-foreground">
+                {comment.content}
+              </p>
             </div>
             <div className="mt-1 flex items-center gap-3 pl-2">
               {depth < 2 && (
-                <button type="button" onClick={() => setReplyTo((current) => current === comment.id ? null : comment.id)} className="inline-flex min-h-7 items-center gap-1 text-[11px] font-bold text-muted-foreground hover:text-primary">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setReplyTo((current) => (current === comment.id ? null : comment.id))
+                  }
+                  className="inline-flex min-h-7 items-center gap-1 text-[11px] font-bold text-muted-foreground hover:text-primary"
+                >
                   <Reply className="h-3.5 w-3.5" /> উত্তর দিন
                 </button>
               )}
@@ -181,11 +238,22 @@ export function CommentsSection({ postId, onCommentAdded }: { postId: string; on
                   autoFocus
                   value={replyText}
                   onChange={(event) => setReplyText(event.target.value.slice(0, 200))}
-                  onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) void submit(replyText, comment.id); }}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" && !event.shiftKey)
+                      void submit(replyText, comment.id);
+                  }}
                   placeholder={`${comment.user_name}-কে উত্তর দিন...`}
                   className="h-9 min-w-0 flex-1 rounded-full bg-muted px-3 text-xs focus:outline-none focus:ring-2 focus:ring-primary/30"
                 />
-                <button type="button" onClick={() => void submit(replyText, comment.id)} disabled={!replyText.trim() || sending} aria-label="উত্তর পাঠান" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground disabled:opacity-40"><Send className="h-4 w-4" /></button>
+                <button
+                  type="button"
+                  onClick={() => void submit(replyText, comment.id)}
+                  disabled={!replyText.trim() || sending}
+                  aria-label="উত্তর পাঠান"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground disabled:opacity-40"
+                >
+                  <Send className="h-4 w-4" />
+                </button>
               </div>
             )}
           </div>
@@ -197,10 +265,22 @@ export function CommentsSection({ postId, onCommentAdded }: { postId: string; on
 
   return (
     <div className="mt-3 space-y-3 border-t border-border pt-3">
-      {loading ? <p className="text-xs text-muted-foreground">লোড হচ্ছে...</p> : comments.length === 0 ? <p className="text-xs text-muted-foreground">কোনো মন্তব্য নেই — প্রথম মন্তব্য করুন</p> : (
+      {loading ? (
+        <p className="text-xs text-muted-foreground">লোড হচ্ছে...</p>
+      ) : comments.length === 0 ? (
+        <p className="text-xs text-muted-foreground">কোনো মন্তব্য নেই — প্রথম মন্তব্য করুন</p>
+      ) : (
         <>
           {visibleTopLevel.map((comment) => renderComment(comment))}
-          {!showAll && topLevel.length > 3 && <button type="button" onClick={() => setShowAll(true)} className="inline-flex min-h-8 items-center gap-1 pl-2 text-xs font-bold text-primary">আরো মন্তব্য দেখুন <ChevronDown className="h-3 w-3" /></button>}
+          {!showAll && topLevel.length > 3 && (
+            <button
+              type="button"
+              onClick={() => setShowAll(true)}
+              className="inline-flex min-h-8 items-center gap-1 pl-2 text-xs font-bold text-primary"
+            >
+              আরো মন্তব্য দেখুন <ChevronDown className="h-3 w-3" />
+            </button>
+          )}
         </>
       )}
       <div className="flex min-w-0 items-center gap-2 pt-1">
@@ -208,11 +288,21 @@ export function CommentsSection({ postId, onCommentAdded }: { postId: string; on
         <input
           value={text}
           onChange={(event) => setText(event.target.value.slice(0, 200))}
-          onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) void submit(text, null); }}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" && !event.shiftKey) void submit(text, null);
+          }}
           placeholder="মন্তব্য লিখুন..."
           className="h-9 min-w-0 flex-1 rounded-full bg-muted px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
         />
-        <button type="button" onClick={() => void submit(text, null)} disabled={!text.trim() || sending} aria-label="মন্তব্য পাঠান" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground disabled:opacity-40"><Send className="h-4 w-4" /></button>
+        <button
+          type="button"
+          onClick={() => void submit(text, null)}
+          disabled={!text.trim() || sending}
+          aria-label="মন্তব্য পাঠান"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground disabled:opacity-40"
+        >
+          <Send className="h-4 w-4" />
+        </button>
       </div>
     </div>
   );

@@ -110,14 +110,20 @@ function PricesPage() {
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
-        {isLoading && <div className="p-3"><Skeleton className="h-20 w-full" /></div>}
+        {isLoading && (
+          <div className="p-3">
+            <Skeleton className="h-20 w-full" />
+          </div>
+        )}
         {!isLoading && filtered.length === 0 && (
           <p className="text-center text-gray-400 py-10 text-sm">কোনো এন্ট্রি নেই</p>
         )}
         {filtered.map((p) => {
           const change =
             p.previous_price && p.previous_price > 0
-              ? Math.round(((Number(p.price) - Number(p.previous_price)) / Number(p.previous_price)) * 100)
+              ? Math.round(
+                  ((Number(p.price) - Number(p.previous_price)) / Number(p.previous_price)) * 100,
+                )
               : 0;
           return (
             <div key={p.id} className="p-3 flex items-start gap-3">

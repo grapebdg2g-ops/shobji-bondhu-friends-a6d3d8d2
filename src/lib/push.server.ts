@@ -37,6 +37,9 @@ export async function sendWebPush(subscription: StoredPushSubscription, payload:
     if (statusCode === 404 || statusCode === 410) {
       await supabaseAdmin.from("push_subscriptions").delete().eq("endpoint", subscription.endpoint);
     }
-    return { ok: false as const, error: String((error as { message?: string } | null)?.message ?? error) };
+    return {
+      ok: false as const,
+      error: String((error as { message?: string } | null)?.message ?? error),
+    };
   }
 }

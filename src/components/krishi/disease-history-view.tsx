@@ -26,7 +26,20 @@ const SEVERITY = {
 
 function bnDate(iso: string) {
   const d = new Date(iso);
-  const months = ["জানু", "ফেব", "মার্চ", "এপ্রিল", "মে", "জুন", "জুলাই", "আগ", "সেপ", "অক্টো", "নভে", "ডিসে"];
+  const months = [
+    "জানু",
+    "ফেব",
+    "মার্চ",
+    "এপ্রিল",
+    "মে",
+    "জুন",
+    "জুলাই",
+    "আগ",
+    "সেপ",
+    "অক্টো",
+    "নভে",
+    "ডিসে",
+  ];
   return `${toBn(d.getDate())} ${months[d.getMonth()]}, ${toBn(d.getFullYear())}`;
 }
 
@@ -91,7 +104,12 @@ export function DiseaseHistoryView({ userId }: { userId: string }) {
 
       <div className="space-y-3">
         {rows.map((r) => {
-          const sev = SEVERITY[(r.severity as keyof typeof SEVERITY) in SEVERITY ? (r.severity as keyof typeof SEVERITY) : "medium"];
+          const sev =
+            SEVERITY[
+              (r.severity as keyof typeof SEVERITY) in SEVERITY
+                ? (r.severity as keyof typeof SEVERITY)
+                : "medium"
+            ];
           return (
             <button
               key={r.id}
@@ -110,7 +128,12 @@ export function DiseaseHistoryView({ userId }: { userId: string }) {
                 <p className="text-sm font-bold text-foreground truncate">{r.disease_name}</p>
                 <p className="text-xs text-muted-foreground mt-0.5">ফসল: {r.crop_type}</p>
                 <div className="flex items-center justify-between mt-1.5">
-                  <span className={cn("inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10px] font-bold", sev.color)}>
+                  <span
+                    className={cn(
+                      "inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10px] font-bold",
+                      sev.color,
+                    )}
+                  >
                     {sev.dot} {sev.label}
                   </span>
                   <span className="text-[10px] text-muted-foreground">{bnDate(r.created_at)}</span>
@@ -138,16 +161,28 @@ function StatCard({ label, sub, value }: { label: string; sub: string; value: nu
 
 function ResultModal({ row, onClose }: { row: HistoryRow; onClose: () => void }) {
   const r = row.result_json;
-  const sev = SEVERITY[(row.severity as keyof typeof SEVERITY) in SEVERITY ? (row.severity as keyof typeof SEVERITY) : "medium"];
+  const sev =
+    SEVERITY[
+      (row.severity as keyof typeof SEVERITY) in SEVERITY
+        ? (row.severity as keyof typeof SEVERITY)
+        : "medium"
+    ];
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center"
+      onClick={onClose}
+    >
       <div
         className="bg-background w-full sm:max-w-lg max-h-[90vh] overflow-y-auto rounded-t-2xl sm:rounded-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="sticky top-0 bg-card/95 backdrop-blur border-b border-border flex items-center justify-between px-4 h-12">
           <h2 className="text-base font-bold text-foreground truncate pr-2">{row.disease_name}</h2>
-          <button onClick={onClose} aria-label="বন্ধ" className="h-9 w-9 rounded-full flex items-center justify-center active:bg-muted">
+          <button
+            onClick={onClose}
+            aria-label="বন্ধ"
+            className="h-9 w-9 rounded-full flex items-center justify-center active:bg-muted"
+          >
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -155,7 +190,11 @@ function ResultModal({ row, onClose }: { row: HistoryRow; onClose: () => void })
         <div className="p-4 space-y-4">
           <div className="rounded-2xl bg-card border border-border p-4 flex gap-3">
             {row.image_url ? (
-              <img src={row.image_url} alt="" className="h-20 w-20 rounded-xl object-cover bg-muted shrink-0" />
+              <img
+                src={row.image_url}
+                alt=""
+                className="h-20 w-20 rounded-xl object-cover bg-muted shrink-0"
+              />
             ) : (
               <div className="h-20 w-20 rounded-xl bg-muted shrink-0 flex items-center justify-center">
                 <Leaf className="h-8 w-8 text-muted-foreground" />
@@ -164,7 +203,12 @@ function ResultModal({ row, onClose }: { row: HistoryRow; onClose: () => void })
             <div className="flex-1 min-w-0">
               <h3 className="text-base font-bold text-foreground">{row.disease_name}</h3>
               <p className="text-xs text-muted-foreground mt-0.5">ফসল: {row.crop_type}</p>
-              <span className={cn("inline-flex items-center gap-1 mt-2 px-2.5 py-1 rounded-full border text-xs font-bold", sev.color)}>
+              <span
+                className={cn(
+                  "inline-flex items-center gap-1 mt-2 px-2.5 py-1 rounded-full border text-xs font-bold",
+                  sev.color,
+                )}
+              >
                 {sev.dot} তীব্রতা: {sev.label}
               </span>
               <p className="text-[10px] text-muted-foreground mt-2">{bnDate(row.created_at)}</p>
@@ -180,7 +224,9 @@ function ResultModal({ row, onClose }: { row: HistoryRow; onClose: () => void })
           {r?.treatments?.length > 0 && (
             <Section icon="💊" title="চিকিৎসা পদ্ধতি" defaultOpen>
               <ol className="text-sm text-foreground space-y-2 list-decimal pl-5">
-                {r.treatments.map((t, i) => <li key={i}>{t}</li>)}
+                {r.treatments.map((t, i) => (
+                  <li key={i}>{t}</li>
+                ))}
               </ol>
             </Section>
           )}
@@ -188,7 +234,12 @@ function ResultModal({ row, onClose }: { row: HistoryRow; onClose: () => void })
           {r?.prevention?.length > 0 && (
             <Section icon="🛡️" title="প্রতিরোধ ব্যবস্থা">
               <ul className="text-sm text-foreground space-y-2">
-                {r.prevention.map((p, i) => <li key={i} className="flex gap-2"><span>•</span>{p}</li>)}
+                {r.prevention.map((p, i) => (
+                  <li key={i} className="flex gap-2">
+                    <span>•</span>
+                    {p}
+                  </li>
+                ))}
               </ul>
             </Section>
           )}
@@ -198,7 +249,8 @@ function ResultModal({ row, onClose }: { row: HistoryRow; onClose: () => void })
               <ul className="text-sm text-foreground divide-y divide-border">
                 {r.cost.map((c, i) => (
                   <li key={i} className="flex justify-between py-2">
-                    <span>{c.name}</span><span className="font-bold">{c.price}</span>
+                    <span>{c.name}</span>
+                    <span className="font-bold">{c.price}</span>
                   </li>
                 ))}
               </ul>
@@ -211,8 +263,16 @@ function ResultModal({ row, onClose }: { row: HistoryRow; onClose: () => void })
 }
 
 function Section({
-  icon, title, children, defaultOpen = false,
-}: { icon: string; title: string; children: React.ReactNode; defaultOpen?: boolean }) {
+  icon,
+  title,
+  children,
+  defaultOpen = false,
+}: {
+  icon: string;
+  title: string;
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+}) {
   const [open, setOpen] = useState(defaultOpen);
   return (
     <div className="rounded-2xl bg-card border border-border overflow-hidden">
@@ -223,7 +283,9 @@ function Section({
         <span className="font-bold text-foreground text-base flex items-center gap-2">
           <span>{icon}</span> {title}
         </span>
-        <ChevronDown className={cn("h-5 w-5 text-muted-foreground transition-transform", open && "rotate-180")} />
+        <ChevronDown
+          className={cn("h-5 w-5 text-muted-foreground transition-transform", open && "rotate-180")}
+        />
       </button>
       {open && <div className="px-4 pb-4">{children}</div>}
     </div>

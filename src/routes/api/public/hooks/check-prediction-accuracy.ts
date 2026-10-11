@@ -55,8 +55,7 @@ export const Route = createFileRoute("/api/public/hooks/check-prediction-accurac
 
           let actual: number | null = null;
           if (actualRows && actualRows.length > 0) {
-            actual =
-              actualRows.reduce((s, r) => s + Number(r.price), 0) / actualRows.length;
+            actual = actualRows.reduce((s, r) => s + Number(r.price), 0) / actualRows.length;
           } else {
             // Fall back to govt prices
             const sinceDate = new Date(Date.now() - 5 * 24 * 3600 * 1000)
@@ -114,8 +113,7 @@ export const Route = createFileRoute("/api/public/hooks/check-prediction-accurac
           results,
         });
       },
-      GET: async () =>
-        Response.json({ ok: true, hint: "POST to run; scheduled via pg_cron" }),
+      GET: async () => Response.json({ ok: true, hint: "POST to run; scheduled via pg_cron" }),
     },
   },
 });

@@ -710,49 +710,57 @@ function ReminderTab({
       ) : (
         <div className="space-y-3">
           {[...reminders]
-            .sort((a, b) => Number(a.is_done) - Number(b.is_done) || a.reminder_date.localeCompare(b.reminder_date))
+            .sort(
+              (a, b) =>
+                Number(a.is_done) - Number(b.is_done) ||
+                a.reminder_date.localeCompare(b.reminder_date),
+            )
             .map((reminder) => {
-            const today = todayIso();
-            const isToday = !reminder.is_done && reminder.reminder_date === today;
-            const overdue = !reminder.is_done && reminder.reminder_date < today;
-            return (
-              <div
-                key={reminder.id}
-                className={`flex items-center gap-3 rounded-2xl border p-4 ${reminder.is_done ? "border-emerald-200 bg-emerald-50/70" : overdue ? "border-destructive/30 bg-destructive/5" : isToday ? "border-amber-200 bg-amber-50" : "border-border bg-card"}`}
-              >
-                <button
-                  type="button"
-                  onClick={() => onComplete(reminder)}
-                  className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 ${reminder.is_done ? "border-primary bg-primary text-primary-foreground" : "border-amber-400 text-amber-600"}`}
-                  aria-label={reminder.is_done ? "আবার চালু করুন" : "সম্পন্ন হিসেবে টিক দিন"}
+              const today = todayIso();
+              const isToday = !reminder.is_done && reminder.reminder_date === today;
+              const overdue = !reminder.is_done && reminder.reminder_date < today;
+              return (
+                <div
+                  key={reminder.id}
+                  className={`flex items-center gap-3 rounded-2xl border p-4 ${reminder.is_done ? "border-emerald-200 bg-emerald-50/70" : overdue ? "border-destructive/30 bg-destructive/5" : isToday ? "border-amber-200 bg-amber-50" : "border-border bg-card"}`}
                 >
-                  {reminder.is_done ? <Check className="h-4 w-4" /> : <Bell className="h-4 w-4" />}
-                </button>
-                <div className="min-w-0 flex-1">
-                  <p
-                    className={`text-sm font-bold ${reminder.is_done ? "text-emerald-800 line-through" : "text-gray-900"}`}
+                  <button
+                    type="button"
+                    onClick={() => onComplete(reminder)}
+                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 ${reminder.is_done ? "border-primary bg-primary text-primary-foreground" : "border-amber-400 text-amber-600"}`}
+                    aria-label={reminder.is_done ? "আবার চালু করুন" : "সম্পন্ন হিসেবে টিক দিন"}
                   >
-                    {reminder.title}
-                  </p>
-                  <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                    {reminder.crop_type} · {dateLabel(reminder.reminder_date)}
-                    {isToday ? " · আজ" : ""}
-                    {overdue ? " · তারিখ পেরিয়ে গেছে" : ""}
-                    {reminder.is_done ? " · সম্পন্ন" : ""}
-                  </p>
-                  {reminder.note && <p className="mt-1 text-xs text-gray-600">{reminder.note}</p>}
+                    {reminder.is_done ? (
+                      <Check className="h-4 w-4" />
+                    ) : (
+                      <Bell className="h-4 w-4" />
+                    )}
+                  </button>
+                  <div className="min-w-0 flex-1">
+                    <p
+                      className={`text-sm font-bold ${reminder.is_done ? "text-emerald-800 line-through" : "text-gray-900"}`}
+                    >
+                      {reminder.title}
+                    </p>
+                    <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                      {reminder.crop_type} · {dateLabel(reminder.reminder_date)}
+                      {isToday ? " · আজ" : ""}
+                      {overdue ? " · তারিখ পেরিয়ে গেছে" : ""}
+                      {reminder.is_done ? " · সম্পন্ন" : ""}
+                    </p>
+                    {reminder.note && <p className="mt-1 text-xs text-gray-600">{reminder.note}</p>}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => onRemove(reminder)}
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                    aria-label="রিমাইন্ডার বাদ দিন"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => onRemove(reminder)}
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-                  aria-label="রিমাইন্ডার বাদ দিন"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
-              </div>
-            );
-          })}
+              );
+            })}
         </div>
       )}
     </>
@@ -879,8 +887,7 @@ function DiaryForm({
                   className="diary-textarea w-full resize-none bg-transparent pb-5 pl-14 pr-6 pt-8 text-base text-[#3E4A42] outline-none selection:bg-[#DFF3E7] placeholder:text-[#B4A98C]"
                   style={{
                     lineHeight: "40px",
-                    backgroundImage:
-                      "linear-gradient(transparent, transparent 39px, #E5E7EB 39px)",
+                    backgroundImage: "linear-gradient(transparent, transparent 39px, #E5E7EB 39px)",
                     backgroundSize: "100% 40px",
                     backgroundAttachment: "local",
                   }}

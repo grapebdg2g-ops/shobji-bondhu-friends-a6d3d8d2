@@ -12,12 +12,14 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/crop-planner/my-plans")({
   component: MyPlansPage,
   head: () => ({
-    meta: [{ title: "আমার ফসল পরিকল্পনা — কৃষক বন্ধু" },
+    meta: [
+      { title: "আমার ফসল পরিকল্পনা — কৃষক বন্ধু" },
       { property: "og:title", content: "আমার ফসল পরিকল্পনা — কৃষক বন্ধু" },
       { property: "og:description", content: "ফসলের পরিচর্যা ও কৃষি পরিকল্পনা — কৃষক বন্ধু।" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "description", content: "ফসলের পরিচর্যা ও কৃষি পরিকল্পনা — কৃষক বন্ধু।" },],
+      { name: "description", content: "ফসলের পরিচর্যা ও কৃষি পরিকল্পনা — কৃষক বন্ধু।" },
+    ],
   }),
 });
 
@@ -42,7 +44,10 @@ function MyPlansPage() {
 
   useEffect(() => {
     if (loading) return;
-    if (!user) { navigate({ to: "/login" }); return; }
+    if (!user) {
+      navigate({ to: "/login" });
+      return;
+    }
     (async () => {
       const { data } = await supabase
         .from("user_crop_plans" as never)
@@ -56,16 +61,29 @@ function MyPlansPage() {
 
   async function handleDelete(id: string) {
     if (!confirm("এই পরিকল্পনা মুছে ফেলবেন?")) return;
-    const { error } = await supabase.from("user_crop_plans" as never).delete().eq("id", id);
-    if (error) { toast.error("মুছতে ব্যর্থ"); return; }
+    const { error } = await supabase
+      .from("user_crop_plans" as never)
+      .delete()
+      .eq("id", id);
+    if (error) {
+      toast.error("মুছতে ব্যর্থ");
+      return;
+    }
     setPlans((p) => p.filter((x) => x.id !== id));
     toast.success("মুছে ফেলা হয়েছে");
   }
 
   return (
     <main className="min-h-screen bg-[#F0FFF4] md:max-w-[560px] md:mx-auto pb-24">
-      <header className="px-5 pt-8 pb-6 rounded-b-3xl text-white" style={{ background: "var(--gradient-brand)" }}>
-        <Link to="/crop-planner" aria-label="ফিরে যান" className="h-9 w-9 rounded-full bg-white/15 flex items-center justify-center">
+      <header
+        className="px-5 pt-8 pb-6 rounded-b-3xl text-white"
+        style={{ background: "var(--gradient-brand)" }}
+      >
+        <Link
+          to="/crop-planner"
+          aria-label="ফিরে যান"
+          className="h-9 w-9 rounded-full bg-white/15 flex items-center justify-center"
+        >
           <ArrowLeft className="h-5 w-5" />
         </Link>
         <h1 className="mt-4 text-2xl font-bold">আমার ফসল পরিকল্পনা</h1>
@@ -98,17 +116,30 @@ function MyPlansPage() {
             const todayTask = stage?.tasks[0];
 
             return (
-              <div key={p.id} className="bg-white rounded-2xl p-4 shadow-sm ring-1 ring-emerald-100">
+              <div
+                key={p.id}
+                className="bg-white rounded-2xl p-4 shadow-sm ring-1 ring-emerald-100"
+              >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <span className="text-2xl"><CropIcon crop={p.crop_type} fallback={icon} /></span>
+                    <span className="text-2xl">
+                      <CropIcon crop={p.crop_type} fallback={icon} />
+                    </span>
                     <div>
                       <div className="font-bold text-gray-900">{p.crop_type}</div>
-                      {p.is_gap && <div className="inline-block mt-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5">🛡️ GAP নিয়ম মেনে চাষ</div>}
-                      <div className="text-[11px] text-gray-500">রোপণ: {formatBnDate(new Date(p.planting_date))}</div>
+                      {p.is_gap && (
+                        <div className="inline-block mt-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5">
+                          🛡️ GAP নিয়ম মেনে চাষ
+                        </div>
+                      )}
+                      <div className="text-[11px] text-gray-500">
+                        রোপণ: {formatBnDate(new Date(p.planting_date))}
+                      </div>
                     </div>
                   </div>
-                  <span className={`text-[10px] font-bold px-2 py-1 rounded-full ${p.is_active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"}`}>
+                  <span
+                    className={`text-[10px] font-bold px-2 py-1 rounded-full ${p.is_active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"}`}
+                  >
                     {p.is_active ? "সক্রিয় ✅" : "বন্ধ"}
                   </span>
                 </div>
@@ -116,10 +147,18 @@ function MyPlansPage() {
                   অগ্রগতি: {toBn(days)}/{toBn(total)} দিন
                 </div>
                 <div className="h-2 bg-emerald-100 rounded-full overflow-hidden mb-2">
-                  <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${pct}%` }} />
+                  <div
+                    className="h-full bg-emerald-500 rounded-full"
+                    style={{ width: `${pct}%` }}
+                  />
                 </div>
                 {stage && (
-                  <p className="text-xs text-gray-700">বর্তমান: <b>{stage.icon} {stage.name}</b></p>
+                  <p className="text-xs text-gray-700">
+                    বর্তমান:{" "}
+                    <b>
+                      {stage.icon} {stage.name}
+                    </b>
+                  </p>
                 )}
                 {todayTask && (
                   <p className="text-xs text-amber-700 mt-1">⚡ আজকের কাজ: {todayTask.title}</p>

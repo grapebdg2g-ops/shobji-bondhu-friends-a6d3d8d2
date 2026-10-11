@@ -58,10 +58,7 @@ function detectCategory(q: string): string {
   return "general";
 }
 
-function buildSystemPrompt(
-  ctx?: z.infer<typeof UserContextSchema>,
-  masterDataContext?: string,
-) {
+function buildSystemPrompt(ctx?: z.infer<typeof UserContextSchema>, masterDataContext?: string) {
   const name = ctx?.name || "কৃষক ভাই";
   const district = ctx?.district || "চট্টগ্রাম";
   const upazila = ctx?.upazila || "নবীনগর";
@@ -165,7 +162,12 @@ export const chatWithAI = createServerFn({ method: "POST" })
   .handler(
     async ({
       data,
-    }): Promise<{ reply: string; source: "cache" | "gemini"; cacheId: string | null; similarity?: number }> => {
+    }): Promise<{
+      reply: string;
+      source: "cache" | "gemini";
+      cacheId: string | null;
+      similarity?: number;
+    }> => {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
       const lastUser = [...data.messages].reverse().find((m) => m.role === "user");
@@ -177,10 +179,11 @@ export const chatWithAI = createServerFn({ method: "POST" })
       const singleTurn = data.messages.length <= 2;
 
       // Enrich question with crop/disease/season context for better embedding match
-      const enrichedQuestion = userQuestion
-        + (cropType ? ` [ফসল: ${cropType}]` : "")
-        + (disease ? ` [সমস্যা: ${disease}]` : "")
-        + ` [মৌসুম: ${season}]`;
+      const enrichedQuestion =
+        userQuestion +
+        (cropType ? ` [ফসল: ${cropType}]` : "") +
+        (disease ? ` [সমস্যা: ${disease}]` : "") +
+        ` [মৌসুম: ${season}]`;
 
       let embedding: number[] | null = null;
       if (userQuestion && singleTurn && !data.skipCache) {
@@ -191,20 +194,29 @@ export const chatWithAI = createServerFn({ method: "POST" })
       // across crops/regions; see migration 20260904010300)
       const district = data.userContext?.district?.trim() || null;
       if (embedding) {
-        const { data: hits } = await supabaseAdmin.rpc("search_cache" as never, {
-          query_embedding: embedding as unknown as string,
-          similarity_threshold: 0.82,
-          max_results: 1,
-          filter_category: category,
-          filter_season: season,
-          filter_crop: cropType,
-          filter_district: district,
-        } as never);
-        const arr = (hits as Array<{ id: string; answer: string; similarity: number }> | null) ?? [];
+        const { data: hits } = await supabaseAdmin.rpc(
+          "search_cache" as never,
+          {
+            query_embedding: embedding as unknown as string,
+            similarity_threshold: 0.82,
+            max_results: 1,
+            filter_category: category,
+            filter_season: season,
+            filter_crop: cropType,
+            filter_district: district,
+          } as never,
+        );
+        const arr =
+          (hits as Array<{ id: string; answer: string; similarity: number }> | null) ?? [];
         if (arr.length > 0) {
           const hit = arr[0];
           await supabaseAdmin.rpc("increment_cache_hit" as never, { _id: hit.id } as never);
-          return { reply: hit.answer, source: "cache", cacheId: hit.id, similarity: hit.similarity };
+          return {
+            reply: hit.answer,
+            source: "cache",
+            cacheId: hit.id,
+            similarity: hit.similarity,
+          };
         }
       }
 
@@ -237,11 +249,14 @@ export const recordCacheFeedback = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     // One vote per user enforced in DB (ai_cache_votes PK); voter comes from
     // the verified auth context, never from client input.
-    await supabaseAdmin.rpc("record_cache_feedback" as never, {
-      _id: data.cacheId,
-      _helpful: data.helpful,
-      _voter: (context as { userId?: string }).userId ?? null,
-    } as never);
+    await supabaseAdmin.rpc(
+      "record_cache_feedback" as never,
+      {
+        _id: data.cacheId,
+        _helpful: data.helpful,
+        _voter: (context as { userId?: string }).userId ?? null,
+      } as never,
+    );
     return { ok: true };
   });
 

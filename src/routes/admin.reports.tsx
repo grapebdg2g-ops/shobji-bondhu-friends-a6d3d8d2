@@ -74,14 +74,26 @@ function ReportsPage() {
     mutationFn: async (r: any) => {
       if (r.content_id && r.content_type) {
         const tableMap: Record<string, string> = {
-          post: "posts", exchange: "exchanges", price: "prices", comment: "post_comments", group_chat: "group_chats",
+          post: "posts",
+          exchange: "exchanges",
+          price: "prices",
+          comment: "post_comments",
+          group_chat: "group_chats",
         };
         const tbl = tableMap[r.content_type];
-        if (tbl) await supabase.from(tbl as any).delete().eq("id", r.content_id);
+        if (tbl)
+          await supabase
+            .from(tbl as any)
+            .delete()
+            .eq("id", r.content_id);
       }
       await supabase
         .from("user_reports")
-        .update({ status: "actioned", reviewed_by: user?.id, reviewed_at: new Date().toISOString() })
+        .update({
+          status: "actioned",
+          reviewed_by: user?.id,
+          reviewed_at: new Date().toISOString(),
+        })
         .eq("id", r.id);
       if (user) {
         await supabase.from("admin_actions").insert({
@@ -132,13 +144,27 @@ function ReportsPage() {
             onClick={() => setType(t)}
             className={`px-3 py-1 rounded-full text-xs font-semibold ${type === t ? "bg-purple-600 text-white" : "bg-gray-100 text-gray-700"}`}
           >
-            {t === "all" ? "সব" : t === "post" ? "পোস্ট" : t === "exchange" ? "বিনিময়" : t === "price" ? "দাম" : t === "group_chat" ? "গ্রুপ চ্যাট" : "মন্তব্য"}
+            {t === "all"
+              ? "সব"
+              : t === "post"
+                ? "পোস্ট"
+                : t === "exchange"
+                  ? "বিনিময়"
+                  : t === "price"
+                    ? "দাম"
+                    : t === "group_chat"
+                      ? "গ্রুপ চ্যাট"
+                      : "মন্তব্য"}
           </button>
         ))}
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
-        {isLoading && <div className="p-3"><Skeleton className="h-24 w-full" /></div>}
+        {isLoading && (
+          <div className="p-3">
+            <Skeleton className="h-24 w-full" />
+          </div>
+        )}
         {!isLoading && reports.length === 0 && (
           <p className="text-center text-gray-400 py-10 text-sm">কোনো রিপোর্ট নেই</p>
         )}
@@ -155,19 +181,25 @@ function ReportsPage() {
                       r.status === "pending"
                         ? "bg-amber-100 text-amber-700"
                         : r.status === "actioned"
-                        ? "bg-emerald-100 text-emerald-700"
-                        : "bg-gray-100 text-gray-600"
+                          ? "bg-emerald-100 text-emerald-700"
+                          : "bg-gray-100 text-gray-600"
                     }`}
                   >
                     {r.status}
                   </span>
-                  <p className="text-xs text-gray-500">{format(new Date(r.created_at), "d MMM, HH:mm")}</p>
+                  <p className="text-xs text-gray-500">
+                    {format(new Date(r.created_at), "d MMM, HH:mm")}
+                  </p>
                 </div>
                 <p className="mt-1 text-sm font-semibold text-gray-900">কারণ: {r.reason}</p>
                 {r.description && <p className="text-xs text-gray-600 mt-0.5">{r.description}</p>}
                 <p className="text-[11px] text-gray-400 mt-1">Content ID: {r.content_id || "—"}</p>
                 {r.content_type === "group_chat" && r.content_id && (
-                  <Link to="/groups/$groupId" params={{ groupId: r.content_id }} className="mt-1 inline-block text-xs font-bold text-purple-700 underline">
+                  <Link
+                    to="/groups/$groupId"
+                    params={{ groupId: r.content_id }}
+                    className="mt-1 inline-block text-xs font-bold text-purple-700 underline"
+                  >
                     গ্রুপ চ্যাট ও সব মেসেজ দেখুন →
                   </Link>
                 )}

@@ -27,7 +27,21 @@ interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 export const BengaliButton = forwardRef<HTMLButtonElement, Props>(
-  ({ variant = "primary", size = "lg", fullWidth, loading, leftIcon, rightIcon, className, children, disabled, ...rest }, ref) => (
+  (
+    {
+      variant = "primary",
+      size = "lg",
+      fullWidth,
+      loading,
+      leftIcon,
+      rightIcon,
+      className,
+      children,
+      disabled,
+      ...rest
+    },
+    ref,
+  ) => (
     <button
       ref={ref}
       disabled={disabled || loading}
@@ -40,11 +54,15 @@ export const BengaliButton = forwardRef<HTMLButtonElement, Props>(
       )}
       {...rest}
     >
-      {loading ? <span className="text-base font-semibold">লোড হচ্ছে...</span> : <>
-        {leftIcon}
-        {children}
-        {rightIcon}
-      </>}
+      {loading ? (
+        <span className="text-base font-semibold">লোড হচ্ছে...</span>
+      ) : (
+        <>
+          {leftIcon}
+          {children}
+          {rightIcon}
+        </>
+      )}
     </button>
   ),
 );

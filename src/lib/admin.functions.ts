@@ -17,10 +17,12 @@ async function ensureAdmin(userId: string) {
 export const hardDeleteUser = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
-    z.object({
-      userId: z.string().uuid(),
-      reason: z.string().max(500).optional(),
-    }).parse(input),
+    z
+      .object({
+        userId: z.string().uuid(),
+        reason: z.string().max(500).optional(),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const adminId = context.userId;
@@ -47,7 +49,13 @@ type CacheStats = {
   helpful: number;
   unhelpful: number;
   byCategory: Array<{ category: string; count: number; hits: number }>;
-  topQuestions: Array<{ id: string; question: string; hit_count: number; helpful_count: number; unhelpful_count: number }>;
+  topQuestions: Array<{
+    id: string;
+    question: string;
+    hit_count: number;
+    helpful_count: number;
+    unhelpful_count: number;
+  }>;
 };
 
 export const getCacheStats = createServerFn({ method: "GET" })
@@ -58,15 +66,16 @@ export const getCacheStats = createServerFn({ method: "GET" })
       .from("ai_chat_cache" as never)
       .select("id, question, category, hit_count, helpful_count, unhelpful_count, expires_at")
       .limit(5000);
-    const list = (rows as Array<{
-      id: string;
-      question: string;
-      category: string | null;
-      hit_count: number;
-      helpful_count: number;
-      unhelpful_count: number;
-      expires_at: string;
-    }> | null) ?? [];
+    const list =
+      (rows as Array<{
+        id: string;
+        question: string;
+        category: string | null;
+        hit_count: number;
+        helpful_count: number;
+        unhelpful_count: number;
+        expires_at: string;
+      }> | null) ?? [];
     const now = Date.now();
     const active = list.filter((r) => new Date(r.expires_at).getTime() > now);
     const totalHits = active.reduce((s, r) => s + (r.hit_count || 0), 0);
@@ -103,4 +112,3 @@ export const getCacheStats = createServerFn({ method: "GET" })
       topQuestions,
     };
   });
-

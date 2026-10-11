@@ -3,11 +3,17 @@ import assert from "node:assert/strict";
 import { mentionsPrice, normalizePrice, isPlausible } from "./price-from-text";
 
 it("৮০০ টাকা মণ = ২০ টাকা কেজি", () => {
-  assert.deepEqual(normalizePrice({ product_name: "টমেটো", price: 800, unit: "মণ", price_type: "wholesale" }), { price: 20, unit: "কেজি" });
+  assert.deepEqual(
+    normalizePrice({ product_name: "টমেটো", price: 800, unit: "মণ", price_type: "wholesale" }),
+    { price: 20, unit: "কেজি" },
+  );
 });
 
 it("কেজির দাম অপরিবর্তিত থাকে", () => {
-  assert.deepEqual(normalizePrice({ product_name: "টমেটো", price: 20, unit: "কেজি", price_type: "wholesale" }), { price: 20, unit: "কেজি" });
+  assert.deepEqual(
+    normalizePrice({ product_name: "টমেটো", price: 20, unit: "কেজি", price_type: "wholesale" }),
+    { price: 20, unit: "কেজি" },
+  );
 });
 
 it("বাংলা সংখ্যা ও টাকা থাকলে দাম শনাক্ত হয়", () => {

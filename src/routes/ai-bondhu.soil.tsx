@@ -79,8 +79,7 @@ const NUTRIENT_LEVELS = [
 
 const AREA_UNITS = ["শতক", "বিঘা", "একর", "হেক্টর"] as const;
 
-const toBn = (v: number | string) =>
-  String(v).replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[Number(d)]);
+const toBn = (v: number | string) => String(v).replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[Number(d)]);
 
 function scoreColor(score: number) {
   if (score >= 80) return { ring: "text-emerald-600", bg: "bg-emerald-600", soft: "bg-emerald-50" };
@@ -205,10 +204,12 @@ function SoilAnalysisPage() {
     setExtractionNotes([]);
     setExtracting(true);
     try {
-      const files = await Promise.all(nextFiles.map(async (file) => ({
-        name: file.name,
-        ...(await fileToOptimizedBase64(file)),
-      })));
+      const files = await Promise.all(
+        nextFiles.map(async (file) => ({
+          name: file.name,
+          ...(await fileToOptimizedBase64(file)),
+        })),
+      );
       const extracted = await extractFn({ data: { files } });
       applyExtraction(extracted);
       setExtractionNotes(extracted.notes);
@@ -349,7 +350,9 @@ function SoilAnalysisPage() {
                   <Calculator className="h-5 w-5" />
                 </span>
                 <span>
-                  <span className="block text-sm font-black text-gray-900">সরাসরি সারের হিসাব দরকার?</span>
+                  <span className="block text-sm font-black text-gray-900">
+                    সরাসরি সারের হিসাব দরকার?
+                  </span>
                   <span className="mt-0.5 block text-[11px] text-gray-500">
                     মাটি পরীক্ষা ছাড়াই সার ক্যালকুলেটরে ফসলভিত্তিক ডোজ বের করুন
                   </span>
@@ -375,19 +378,25 @@ function SoilAnalysisPage() {
                   disabled={extracting || uploadedFiles.length >= 3}
                   className="flex w-full items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-emerald-200 bg-emerald-50/60 px-4 py-5 text-left transition hover:border-emerald-400 disabled:opacity-60"
                 >
-                  {extracting ? <Loader2 className="h-6 w-6 animate-spin text-emerald-600" /> : <Camera className="h-6 w-6 text-emerald-600" />}
+                  {extracting ? (
+                    <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
+                  ) : (
+                    <Camera className="h-6 w-6 text-emerald-600" />
+                  )}
                   <span>
                     <span className="block text-sm font-black text-emerald-900">
                       {extracting ? "রিপোর্ট পড়া হচ্ছে..." : "মাটির ছবি বা রিপোর্ট আপলোড করুন"}
                     </span>
                     <span className="mt-1 block text-[11px] text-emerald-700">
-                      SRDI "সার সুপারিশ কার্ড", ল্যাব রিপোর্ট বা মাটির ছবি · JPG, PNG বা PDF · সর্বোচ্চ ৩টি
+                      SRDI "সার সুপারিশ কার্ড", ল্যাব রিপোর্ট বা মাটির ছবি · JPG, PNG বা PDF ·
+                      সর্বোচ্চ ৩টি
                     </span>
                   </span>
                 </button>
                 <p className="mt-2 text-[10px] leading-relaxed text-gray-400">
                   হাতে লেখা সার সুপারিশ কার্ড থেকেও pH, EC (লবণাক্ততা), N-P-K, গন্ধক, দস্তা, বোরন,
-                  ক্যালশিয়াম ও ম্যাগনেসিয়ামের শ্রেণী পড়ে ফর্মে বসে যাবে। ছক স্পষ্ট দেখা যায় এমন সোজা ছবি তুলুন।
+                  ক্যালশিয়াম ও ম্যাগনেসিয়ামের শ্রেণী পড়ে ফর্মে বসে যাবে। ছক স্পষ্ট দেখা যায় এমন
+                  সোজা ছবি তুলুন।
                 </p>
                 {docType && (
                   <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-black text-emerald-700">
@@ -397,10 +406,24 @@ function SoilAnalysisPage() {
                 {uploadedFiles.length > 0 && (
                   <div className="mt-3 space-y-2">
                     {uploadedFiles.map((file) => (
-                      <div key={`${file.name}-${file.lastModified}`} className="flex items-center gap-2 rounded-xl bg-gray-50 px-3 py-2 text-xs">
-                        {file.type === "application/pdf" ? <FileText className="h-4 w-4 text-red-500" /> : <Camera className="h-4 w-4 text-emerald-600" />}
-                        <span className="min-w-0 flex-1 truncate font-bold text-gray-700">{file.name}</span>
-                        <button type="button" onClick={() => removeFile(file.name)} className="rounded-full p-1 text-gray-400 hover:bg-white hover:text-red-500" aria-label={`${file.name} সরান`}>
+                      <div
+                        key={`${file.name}-${file.lastModified}`}
+                        className="flex items-center gap-2 rounded-xl bg-gray-50 px-3 py-2 text-xs"
+                      >
+                        {file.type === "application/pdf" ? (
+                          <FileText className="h-4 w-4 text-red-500" />
+                        ) : (
+                          <Camera className="h-4 w-4 text-emerald-600" />
+                        )}
+                        <span className="min-w-0 flex-1 truncate font-bold text-gray-700">
+                          {file.name}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => removeFile(file.name)}
+                          className="rounded-full p-1 text-gray-400 hover:bg-white hover:text-red-500"
+                          aria-label={`${file.name} সরান`}
+                        >
                           <X className="h-4 w-4" />
                         </button>
                       </div>
@@ -411,7 +434,9 @@ function SoilAnalysisPage() {
                   <div className="mt-3 rounded-xl bg-amber-50 p-3 text-[11px] leading-relaxed text-amber-800">
                     <p className="font-black">AI-এর পড়া তথ্য যাচাই করুন</p>
                     <ul className="mt-1 list-disc space-y-0.5 pl-4">
-                      {extractionNotes.map((note, index) => <li key={`${note}-${index}`}>{note}</li>)}
+                      {extractionNotes.map((note, index) => (
+                        <li key={`${note}-${index}`}>{note}</li>
+                      ))}
                     </ul>
                   </div>
                 )}
@@ -517,9 +542,17 @@ function SoilAnalysisPage() {
                   <NutrientSelect label="নাইট্রোজেন (N)" value={nitrogen} onChange={setNitrogen} />
                   <NutrientSelect label="ফসফরাস (P)" value={phosphorus} onChange={setPhosphorus} />
                   <NutrientSelect label="পটাশিয়াম (K)" value={potassium} onChange={setPotassium} />
-                  <NutrientSelect label="জৈব উপাদান" value={organicMatter} onChange={setOrganicMatter} />
+                  <NutrientSelect
+                    label="জৈব উপাদান"
+                    value={organicMatter}
+                    onChange={setOrganicMatter}
+                  />
                   <NutrientSelect label="ক্যালশিয়াম (Ca)" value={calcium} onChange={setCalcium} />
-                  <NutrientSelect label="ম্যাগনেসিয়াম (Mg)" value={magnesium} onChange={setMagnesium} />
+                  <NutrientSelect
+                    label="ম্যাগনেসিয়াম (Mg)"
+                    value={magnesium}
+                    onChange={setMagnesium}
+                  />
                   <NutrientSelect label="গন্ধক (S)" value={sulfur} onChange={setSulfur} />
                   <div>
                     <label className="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">
@@ -530,7 +563,11 @@ function SoilAnalysisPage() {
                         inputMode="decimal"
                         value={ecValue == null ? "" : String(ecValue)}
                         onChange={(e) => {
-                          const n = parseFloat(e.target.value.replace(/[০-৯]/g, (d) => String("০১২৩৪৫৬৭৮৯".indexOf(d))));
+                          const n = parseFloat(
+                            e.target.value.replace(/[০-৯]/g, (d) =>
+                              String("০১২৩৪৫৬৭৮৯".indexOf(d)),
+                            ),
+                          );
                           setEcValue(Number.isFinite(n) && n >= 0 ? n : null);
                         }}
                         placeholder="যেমন: ১.২"
@@ -576,7 +613,8 @@ function SoilAnalysisPage() {
 
               <div className="flex items-start gap-2 rounded-2xl bg-emerald-50 p-3 text-[11px] leading-relaxed text-emerald-800 border border-emerald-100">
                 <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                পুষ্টির মাত্রা জানা না থাকলেও চলবে — সেক্ষেত্রে BARI-এর সাধারণ সুপারিশ ধরে হিসাব হবে।
+                পুষ্টির মাত্রা জানা না থাকলেও চলবে — সেক্ষেত্রে BARI-এর সাধারণ সুপারিশ ধরে হিসাব
+                হবে।
               </div>
 
               <BengaliButton
@@ -780,7 +818,14 @@ function ResultView({ result, onReset }: { result: SoilAnalysisResult; onReset: 
       <div className="rounded-3xl bg-white p-6 shadow-sm border border-emerald-50 text-center">
         <div className="relative mx-auto h-28 w-28">
           <svg viewBox="0 0 100 100" className="h-full w-full -rotate-90">
-            <circle cx="50" cy="50" r="42" strokeWidth="10" className="stroke-gray-100" fill="none" />
+            <circle
+              cx="50"
+              cy="50"
+              r="42"
+              strokeWidth="10"
+              className="stroke-gray-100"
+              fill="none"
+            />
             <circle
               cx="50"
               cy="50"
@@ -920,7 +965,10 @@ function ResultView({ result, onReset }: { result: SoilAnalysisResult; onReset: 
             </p>
             <div className="mt-2 flex flex-wrap gap-2">
               {result.salinity.tolerantCrops.map((c) => (
-                <span key={c} className="rounded-full bg-white px-3 py-1.5 text-[11px] font-bold text-gray-700 border border-gray-100">
+                <span
+                  key={c}
+                  className="rounded-full bg-white px-3 py-1.5 text-[11px] font-bold text-gray-700 border border-gray-100"
+                >
                   {c}
                 </span>
               ))}
@@ -928,8 +976,6 @@ function ResultView({ result, onReset }: { result: SoilAnalysisResult; onReset: 
           </div>
         )}
       </div>
-
-
 
       {/* Dose table */}
       <div className="rounded-3xl bg-white p-5 shadow-sm border border-emerald-50">
@@ -958,8 +1004,16 @@ function ResultView({ result, onReset }: { result: SoilAnalysisResult; onReset: 
 
       {/* Organic & management */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <ListCard icon={Leaf} title="জৈব ব্যবস্থাপনা" items={result.recommendations.organicAmendments} />
-        <ListCard icon={ClipboardList} title="চাষাবাদ পরামর্শ" items={result.recommendations.soilManagement} />
+        <ListCard
+          icon={Leaf}
+          title="জৈব ব্যবস্থাপনা"
+          items={result.recommendations.organicAmendments}
+        />
+        <ListCard
+          icon={ClipboardList}
+          title="চাষাবাদ পরামর্শ"
+          items={result.recommendations.soilManagement}
+        />
       </div>
 
       {result.suitableCrops.length > 0 && (

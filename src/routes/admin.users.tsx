@@ -3,17 +3,36 @@ import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Search, MoreVertical, CheckCircle2, Ban, ShieldAlert, UserCog, Eye, Trash2 } from "lucide-react";
+import {
+  Search,
+  MoreVertical,
+  CheckCircle2,
+  Ban,
+  ShieldAlert,
+  UserCog,
+  Eye,
+  Trash2,
+} from "lucide-react";
 import { hardDeleteUser } from "@/lib/admin.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/contexts/user-context";
 import type { AppRole } from "@/hooks/use-role";
 import { RoleBadge } from "@/components/krishi/role-badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
-  DropdownMenuSeparator, DropdownMenuLabel,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,12 +63,23 @@ type AdminProfile = {
 const ROLES: AppRole[] = ["farmer", "expert", "moderator", "admin"];
 const RANK: Record<AppRole, number> = { farmer: 0, expert: 1, moderator: 2, admin: 3 };
 const ROLE_BN: Record<AppRole, string> = {
-  farmer: "কৃষক", expert: "বিশেষজ্ঞ", moderator: "মডারেটর", admin: "প্রশাসক",
+  farmer: "কৃষক",
+  expert: "বিশেষজ্ঞ",
+  moderator: "মডারেটর",
+  admin: "প্রশাসক",
 };
 
-async function logAction(adminId: string, action_type: string, target_id: string | null, details: Record<string, unknown>) {
+async function logAction(
+  adminId: string,
+  action_type: string,
+  target_id: string | null,
+  details: Record<string, unknown>,
+) {
   await supabase.from("admin_actions").insert({
-    admin_id: adminId, action_type, target_id, details: details as never,
+    admin_id: adminId,
+    action_type,
+    target_id,
+    details: details as never,
   });
 }
 
@@ -76,7 +106,9 @@ function UsersPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, name, district, upazila, is_verified, is_suspended, suspension_until, expert_specialty, expert_institution, posts_count, last_active, created_at")
+        .select(
+          "id, name, district, upazila, is_verified, is_suspended, suspension_until, expert_specialty, expert_institution, posts_count, last_active, created_at",
+        )
         .order("created_at", { ascending: false })
         .limit(500);
       if (error) throw error;
@@ -84,8 +116,11 @@ function UsersPage() {
       const ids = rows.map((r) => r.id);
       const phoneMap = new Map<string, string | null>();
       if (ids.length) {
-        const { data: phones } = await supabase.rpc("admin_get_phones" as never, { _ids: ids } as never);
-        for (const r of ((phones as { id: string; phone: string | null }[] | null) ?? [])) {
+        const { data: phones } = await supabase.rpc(
+          "admin_get_phones" as never,
+          { _ids: ids } as never,
+        );
+        for (const r of (phones as { id: string; phone: string | null }[] | null) ?? []) {
           phoneMap.set(r.id, r.phone);
         }
       }
@@ -97,7 +132,7 @@ function UsersPage() {
     queryKey: ["admin", "users", "roles"],
     queryFn: async () => {
       const { data } = await supabase.from("user_roles").select("user_id, role");
-      return ((data as { user_id: string; role: AppRole }[] | null) ?? []);
+      return (data as { user_id: string; role: AppRole }[] | null) ?? [];
     },
   });
 
@@ -114,7 +149,8 @@ function UsersPage() {
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     let list = profiles.filter((p) => {
-      if (q && !(p.name?.toLowerCase().includes(q) || p.phone?.toLowerCase().includes(q))) return false;
+      if (q && !(p.name?.toLowerCase().includes(q) || p.phone?.toLowerCase().includes(q)))
+        return false;
       if (districtFilter && p.district !== districtFilter) return false;
       if (verifiedFilter === "yes" && !p.is_verified) return false;
       if (verifiedFilter === "no" && p.is_verified) return false;
@@ -128,13 +164,23 @@ function UsersPage() {
       return true;
     });
     if (sortBy === "active") {
-      list = [...list].sort((a, b) =>
-        (new Date(b.last_active ?? 0).getTime()) - (new Date(a.last_active ?? 0).getTime()));
+      list = [...list].sort(
+        (a, b) => new Date(b.last_active ?? 0).getTime() - new Date(a.last_active ?? 0).getTime(),
+      );
     } else if (sortBy === "posts") {
       list = [...list].sort((a, b) => (b.posts_count ?? 0) - (a.posts_count ?? 0));
     }
     return list;
-  }, [profiles, search, districtFilter, verifiedFilter, suspendedFilter, roleFilter, sortBy, rolesByUser]);
+  }, [
+    profiles,
+    search,
+    districtFilter,
+    verifiedFilter,
+    suspendedFilter,
+    roleFilter,
+    sortBy,
+    rolesByUser,
+  ]);
 
   const districts = useMemo(() => {
     const s = new Set<string>();
@@ -147,7 +193,9 @@ function UsersPage() {
       const { error: delErr } = await supabase.from("user_roles").delete().eq("user_id", userId);
       if (delErr) throw delErr;
       const { error: insErr } = await supabase.from("user_roles").insert({
-        user_id: userId, role: newRole, granted_by: user?.id ?? null,
+        user_id: userId,
+        role: newRole,
+        granted_by: user?.id ?? null,
       });
       if (insErr) throw insErr;
       if (user?.id) await logAction(user.id, "role_change", userId, { role: newRole });
@@ -161,19 +209,37 @@ function UsersPage() {
   });
 
   const verifyExpert = useMutation({
-    mutationFn: async ({ userId, specialty, institution, note }: { userId: string; specialty: string; institution: string; note: string }) => {
-      const { error } = await supabase.from("profiles").update({
-        is_verified: true,
-        verified_at: new Date().toISOString(),
-        verified_by: user?.id ?? null,
-        expert_specialty: specialty || null,
-        expert_institution: institution || null,
-      }).eq("id", userId);
+    mutationFn: async ({
+      userId,
+      specialty,
+      institution,
+      note,
+    }: {
+      userId: string;
+      specialty: string;
+      institution: string;
+      note: string;
+    }) => {
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          is_verified: true,
+          verified_at: new Date().toISOString(),
+          verified_by: user?.id ?? null,
+          expert_specialty: specialty || null,
+          expert_institution: institution || null,
+        })
+        .eq("id", userId);
       if (error) throw error;
       // ensure has expert role
-      await supabase.from("user_roles").insert({ user_id: userId, role: "expert", granted_by: user?.id ?? null }).select();
+      await supabase
+        .from("user_roles")
+        .insert({ user_id: userId, role: "expert", granted_by: user?.id ?? null })
+        .select();
       await supabase.from("notifications").insert({
-        user_id: userId, type: "verify", title: "✅ বিশেষজ্ঞ যাচাই হয়েছে",
+        user_id: userId,
+        type: "verify",
+        title: "✅ বিশেষজ্ঞ যাচাই হয়েছে",
         body: `আপনি ${specialty || "কৃষি"} বিশেষজ্ঞ হিসেবে যাচাই হয়েছেন${institution ? " (" + institution + ")" : ""}`,
       });
       if (user?.id) await logAction(user.id, "verify", userId, { specialty, institution, note });
@@ -187,14 +253,29 @@ function UsersPage() {
   });
 
   const suspendUser = useMutation({
-    mutationFn: async ({ userId, reason, days }: { userId: string; reason: string; days: number }) => {
-      const patch = days > 0
-        ? { is_suspended: true, suspension_reason: reason, suspension_until: new Date(Date.now() + days * 86400_000).toISOString() }
-        : { is_suspended: true, suspension_reason: reason, suspension_until: null };
+    mutationFn: async ({
+      userId,
+      reason,
+      days,
+    }: {
+      userId: string;
+      reason: string;
+      days: number;
+    }) => {
+      const patch =
+        days > 0
+          ? {
+              is_suspended: true,
+              suspension_reason: reason,
+              suspension_until: new Date(Date.now() + days * 86400_000).toISOString(),
+            }
+          : { is_suspended: true, suspension_reason: reason, suspension_until: null };
       const { error } = await supabase.from("profiles").update(patch).eq("id", userId);
       if (error) throw error;
       await supabase.from("notifications").insert({
-        user_id: userId, type: "warn", title: "⚠️ আপনার অ্যাকাউন্ট বরখাস্ত",
+        user_id: userId,
+        type: "warn",
+        title: "⚠️ আপনার অ্যাকাউন্ট বরখাস্ত",
         body: reason + (days > 0 ? ` (${days} দিন)` : " (স্থায়ী)"),
       });
       if (user?.id) await logAction(user.id, "suspend", userId, { reason, days });
@@ -209,9 +290,14 @@ function UsersPage() {
 
   const unsuspend = useMutation({
     mutationFn: async (userId: string) => {
-      const { error } = await supabase.from("profiles").update({
-        is_suspended: false, suspension_reason: null, suspension_until: null,
-      }).eq("id", userId);
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          is_suspended: false,
+          suspension_reason: null,
+          suspension_until: null,
+        })
+        .eq("id", userId);
       if (error) throw error;
       if (user?.id) await logAction(user.id, "unsuspend", userId, {});
     },
@@ -227,7 +313,8 @@ function UsersPage() {
     onSuccess: () => {
       toast.success("অ্যাকাউন্ট স্থায়ীভাবে মুছে ফেলা হয়েছে");
       qc.invalidateQueries({ queryKey: ["admin", "users"] });
-      setDeleteFor(null); setDeleteReason("");
+      setDeleteFor(null);
+      setDeleteReason("");
     },
     onError: (e: Error) => toast.error(e.message || "মুছতে ব্যর্থ"),
   });
@@ -235,7 +322,10 @@ function UsersPage() {
   const warnUser = useMutation({
     mutationFn: async ({ userId, message }: { userId: string; message: string }) => {
       await supabase.from("notifications").insert({
-        user_id: userId, type: "warn", title: "⚠️ সতর্কবার্তা", body: message,
+        user_id: userId,
+        type: "warn",
+        title: "⚠️ সতর্কবার্তা",
+        body: message,
       });
       if (user?.id) await logAction(user.id, "warn", userId, { message });
     },
@@ -251,32 +341,60 @@ function UsersPage() {
       <div className="bg-white rounded-xl border border-gray-200 p-3 grid grid-cols-1 md:grid-cols-6 gap-2">
         <div className="md:col-span-2 relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="নাম বা ফোন..." className="pl-9" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="নাম বা ফোন..."
+            className="pl-9"
+          />
         </div>
-        <select value={roleFilter} onChange={(e) => setRoleFilter(e.target.value as never)}
-          className="h-9 rounded-md border border-input bg-background px-2 text-sm">
+        <select
+          value={roleFilter}
+          onChange={(e) => setRoleFilter(e.target.value as never)}
+          className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+        >
           <option value="all">সব রোল</option>
-          {ROLES.map((r) => <option key={r} value={r}>{ROLE_BN[r]}</option>)}
+          {ROLES.map((r) => (
+            <option key={r} value={r}>
+              {ROLE_BN[r]}
+            </option>
+          ))}
         </select>
-        <select value={districtFilter} onChange={(e) => setDistrictFilter(e.target.value)}
-          className="h-9 rounded-md border border-input bg-background px-2 text-sm">
+        <select
+          value={districtFilter}
+          onChange={(e) => setDistrictFilter(e.target.value)}
+          className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+        >
           <option value="">সব জেলা</option>
-          {districts.map((d) => <option key={d} value={d}>{d}</option>)}
+          {districts.map((d) => (
+            <option key={d} value={d}>
+              {d}
+            </option>
+          ))}
         </select>
-        <select value={verifiedFilter} onChange={(e) => setVerifiedFilter(e.target.value as never)}
-          className="h-9 rounded-md border border-input bg-background px-2 text-sm">
+        <select
+          value={verifiedFilter}
+          onChange={(e) => setVerifiedFilter(e.target.value as never)}
+          className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+        >
           <option value="all">যাচাই: সব</option>
           <option value="yes">যাচাইকৃত</option>
           <option value="no">অযাচাই</option>
         </select>
-        <select value={suspendedFilter} onChange={(e) => setSuspendedFilter(e.target.value as never)}
-          className="h-9 rounded-md border border-input bg-background px-2 text-sm">
+        <select
+          value={suspendedFilter}
+          onChange={(e) => setSuspendedFilter(e.target.value as never)}
+          className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+        >
           <option value="all">স্থিতি: সব</option>
           <option value="yes">স্থগিত</option>
           <option value="no">সক্রিয়</option>
         </select>
-        <select value={sortBy} onChange={(e) => setSortBy(e.target.value as never)}
-          className="h-9 rounded-md border border-input bg-background px-2 text-sm md:col-start-6">
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value as never)}
+          className="h-9 rounded-md border border-input bg-background px-2 text-sm md:col-start-6"
+        >
           <option value="new">নতুন</option>
           <option value="active">সক্রিয়</option>
           <option value="posts">পোস্ট সংখ্যা</option>
@@ -300,11 +418,20 @@ function UsersPage() {
             </tr>
           </thead>
           <tbody>
-            {isLoading && Array.from({ length: 5 }).map((_, i) => (
-              <tr key={i}><td colSpan={7} className="p-2"><Skeleton className="h-10 w-full" /></td></tr>
-            ))}
+            {isLoading &&
+              Array.from({ length: 5 }).map((_, i) => (
+                <tr key={i}>
+                  <td colSpan={7} className="p-2">
+                    <Skeleton className="h-10 w-full" />
+                  </td>
+                </tr>
+              ))}
             {!isLoading && filtered.length === 0 && (
-              <tr><td colSpan={7} className="text-center py-8 text-gray-400">কেউ নেই</td></tr>
+              <tr>
+                <td colSpan={7} className="text-center py-8 text-gray-400">
+                  কেউ নেই
+                </td>
+              </tr>
             )}
             {filtered.map((p) => {
               const roles = rolesByUser.get(p.id) ?? ["farmer"];
@@ -321,7 +448,9 @@ function UsersPage() {
                           <p className="font-semibold truncate max-w-[140px]">{p.name || "—"}</p>
                           <RoleBadge role={top} verified={p.is_verified} />
                           {p.is_suspended && (
-                            <span className="text-[9px] font-bold px-1 py-0.5 rounded bg-red-100 text-red-700">স্থগিত</span>
+                            <span className="text-[9px] font-bold px-1 py-0.5 rounded bg-red-100 text-red-700">
+                              স্থগিত
+                            </span>
                           )}
                         </div>
                         {p.expert_specialty && (
@@ -354,10 +483,16 @@ function UsersPage() {
                           <CheckCircle2 className="h-4 w-4" /> বিশেষজ্ঞ যাচাই
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuLabel className="text-[10px] text-gray-500">রোল পরিবর্তন</DropdownMenuLabel>
+                        <DropdownMenuLabel className="text-[10px] text-gray-500">
+                          রোল পরিবর্তন
+                        </DropdownMenuLabel>
                         {ROLES.map((r) => (
-                          <DropdownMenuItem key={r} onSelect={() => setRole.mutate({ userId: p.id, newRole: r })}>
-                            <UserCog className="h-4 w-4" /> {ROLE_BN[r]}{top === r ? " ✓" : ""}
+                          <DropdownMenuItem
+                            key={r}
+                            onSelect={() => setRole.mutate({ userId: p.id, newRole: r })}
+                          >
+                            <UserCog className="h-4 w-4" /> {ROLE_BN[r]}
+                            {top === r ? " ✓" : ""}
                           </DropdownMenuItem>
                         ))}
                         <DropdownMenuSeparator />
@@ -369,7 +504,10 @@ function UsersPage() {
                             <CheckCircle2 className="h-4 w-4" /> স্থগিতাদেশ তুলুন
                           </DropdownMenuItem>
                         ) : (
-                          <DropdownMenuItem onSelect={() => setSuspendFor(p)} className="text-red-600">
+                          <DropdownMenuItem
+                            onSelect={() => setSuspendFor(p)}
+                            className="text-red-600"
+                          >
                             <Ban className="h-4 w-4" /> বরখাস্ত করুন
                           </DropdownMenuItem>
                         )}
@@ -415,15 +553,18 @@ function UsersPage() {
         onSubmit={(message) => warnFor && warnUser.mutate({ userId: warnFor.id, message })}
       />
 
-      <Dialog open={!!deleteFor} onOpenChange={(o) => !o && (setDeleteFor(null), setDeleteReason(""))}>
+      <Dialog
+        open={!!deleteFor}
+        onOpenChange={(o) => !o && (setDeleteFor(null), setDeleteReason(""))}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="text-red-700">স্থায়ীভাবে মুছুন</DialogTitle>
           </DialogHeader>
           <div className="space-y-3 text-sm">
             <p className="text-gray-700">
-              <b>{deleteFor?.name || "ব্যবহারকারী"}</b> এর অ্যাকাউন্ট ও সব ডেটা স্থায়ীভাবে মুছে যাবে।
-              এটি ফেরত আনা যাবে না।
+              <b>{deleteFor?.name || "ব্যবহারকারী"}</b> এর অ্যাকাউন্ট ও সব ডেটা স্থায়ীভাবে মুছে
+              যাবে। এটি ফেরত আনা যাবে না।
             </p>
             <Textarea
               value={deleteReason}
@@ -433,13 +574,21 @@ function UsersPage() {
             />
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => { setDeleteFor(null); setDeleteReason(""); }}>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setDeleteFor(null);
+                setDeleteReason("");
+              }}
+            >
               বাতিল
             </Button>
             <Button
               variant="destructive"
               disabled={hardDelete.isPending || !deleteFor}
-              onClick={() => deleteFor && hardDelete.mutate({ userId: deleteFor.id, reason: deleteReason })}
+              onClick={() =>
+                deleteFor && hardDelete.mutate({ userId: deleteFor.id, reason: deleteReason })
+              }
             >
               {hardDelete.isPending ? "মুছছি..." : "হ্যাঁ, স্থায়ীভাবে মুছুন"}
             </Button>
@@ -456,16 +605,53 @@ function UserDetailDialog({ userId, onClose }: { userId: string | null; onClose:
     enabled: !!userId,
     queryFn: async () => {
       const [prof, posts, exch, dx, reports, phoneRpc] = await Promise.all([
-        supabase.from("profiles").select("id, name, district, upazila, crops, role, created_at, updated_at, avatar_url, bio, posts_count, exchanges_count, prices_count, is_verified, is_suspended, suspension_reason, suspension_until, verified_at, verified_by, expert_specialty, expert_institution, last_active, total_reports").eq("id", userId!).single(),
-        supabase.from("posts").select("id, content, created_at").eq("user_id", userId!).order("created_at", { ascending: false }).limit(10),
-        supabase.from("exchanges").select("id, title, created_at").eq("user_id", userId!).order("created_at", { ascending: false }).limit(10),
-        supabase.from("disease_history").select("id, disease_name, crop_type, created_at").eq("user_id", userId!).order("created_at", { ascending: false }).limit(10),
-        supabase.from("user_reports").select("id, reason, created_at, status").eq("reported_user_id", userId!).order("created_at", { ascending: false }).limit(10),
+        supabase
+          .from("profiles")
+          .select(
+            "id, name, district, upazila, crops, role, created_at, updated_at, avatar_url, bio, posts_count, exchanges_count, prices_count, is_verified, is_suspended, suspension_reason, suspension_until, verified_at, verified_by, expert_specialty, expert_institution, last_active, total_reports",
+          )
+          .eq("id", userId!)
+          .single(),
+        supabase
+          .from("posts")
+          .select("id, content, created_at")
+          .eq("user_id", userId!)
+          .order("created_at", { ascending: false })
+          .limit(10),
+        supabase
+          .from("exchanges")
+          .select("id, title, created_at")
+          .eq("user_id", userId!)
+          .order("created_at", { ascending: false })
+          .limit(10),
+        supabase
+          .from("disease_history")
+          .select("id, disease_name, crop_type, created_at")
+          .eq("user_id", userId!)
+          .order("created_at", { ascending: false })
+          .limit(10),
+        supabase
+          .from("user_reports")
+          .select("id, reason, created_at, status")
+          .eq("reported_user_id", userId!)
+          .order("created_at", { ascending: false })
+          .limit(10),
         supabase.rpc("admin_get_phones" as never, { _ids: [userId!] } as never),
       ]);
-      const phone = ((phoneRpc.data as { id: string; phone: string | null }[] | null) ?? [])[0]?.phone ?? null;
-      const profile = prof.data ? ({ ...(prof.data as Record<string, unknown>), phone } as typeof prof.data & { phone: string | null }) : null;
-      return { profile, posts: posts.data ?? [], exchanges: exch.data ?? [], disease: dx.data ?? [], reports: reports.data ?? [] };
+      const phone =
+        ((phoneRpc.data as { id: string; phone: string | null }[] | null) ?? [])[0]?.phone ?? null;
+      const profile = prof.data
+        ? ({ ...(prof.data as Record<string, unknown>), phone } as typeof prof.data & {
+            phone: string | null;
+          })
+        : null;
+      return {
+        profile,
+        posts: posts.data ?? [],
+        exchanges: exch.data ?? [],
+        disease: dx.data ?? [],
+        reports: reports.data ?? [],
+      };
     },
   });
 
@@ -483,8 +669,18 @@ function UserDetailDialog({ userId, onClose }: { userId: string | null; onClose:
               <Info label="ফোন" value={data.profile.phone} />
               <Info label="জেলা" value={data.profile.district} />
               <Info label="উপজেলা" value={data.profile.upazila} />
-              <Info label="যোগদান" value={format(new Date(data.profile.created_at), "d MMM yyyy")} />
-              <Info label="সর্বশেষ সক্রিয়" value={data.profile.last_active ? format(new Date(data.profile.last_active), "d MMM yyyy") : "—"} />
+              <Info
+                label="যোগদান"
+                value={format(new Date(data.profile.created_at), "d MMM yyyy")}
+              />
+              <Info
+                label="সর্বশেষ সক্রিয়"
+                value={
+                  data.profile.last_active
+                    ? format(new Date(data.profile.last_active), "d MMM yyyy")
+                    : "—"
+                }
+              />
               <Info label="পোস্ট" value={toBn(data.profile.posts_count)} />
               <Info label="বিনিময়" value={toBn(data.profile.exchanges_count)} />
             </section>
@@ -547,7 +743,9 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 function VerifyDialog({
-  profile, onClose, onSubmit,
+  profile,
+  onClose,
+  onSubmit,
 }: {
   profile: AdminProfile | null;
   onClose: () => void;
@@ -559,20 +757,41 @@ function VerifyDialog({
   return (
     <Dialog open={!!profile} onOpenChange={(o) => !o && onClose()}>
       <DialogContent>
-        <DialogHeader><DialogTitle>বিশেষজ্ঞ যাচাই — {profile?.name}</DialogTitle></DialogHeader>
+        <DialogHeader>
+          <DialogTitle>বিশেষজ্ঞ যাচাই — {profile?.name}</DialogTitle>
+        </DialogHeader>
         <div className="space-y-2">
-          <select value={specialty} onChange={(e) => setSpecialty(e.target.value)}
-            className="w-full h-9 rounded-md border border-input bg-background px-2 text-sm">
+          <select
+            value={specialty}
+            onChange={(e) => setSpecialty(e.target.value)}
+            className="w-full h-9 rounded-md border border-input bg-background px-2 text-sm"
+          >
             <option value="">বিশেষত্ব নির্বাচন</option>
-            <option>ধান</option><option>সবজি</option><option>ফল</option>
-            <option>পশুপালন</option><option>মৎস্য</option>
+            <option>ধান</option>
+            <option>সবজি</option>
+            <option>ফল</option>
+            <option>পশুপালন</option>
+            <option>মৎস্য</option>
           </select>
-          <Input value={institution} onChange={(e) => setInstitution(e.target.value)} placeholder="প্রতিষ্ঠান (BRRI, BAU…)" />
-          <Textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="যাচাই নোট" rows={3} />
+          <Input
+            value={institution}
+            onChange={(e) => setInstitution(e.target.value)}
+            placeholder="প্রতিষ্ঠান (BRRI, BAU…)"
+          />
+          <Textarea
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder="যাচাই নোট"
+            rows={3}
+          />
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>বাতিল</Button>
-          <Button onClick={() => onSubmit(specialty, institution, note)} disabled={!specialty}>যাচাই করুন</Button>
+          <Button variant="outline" onClick={onClose}>
+            বাতিল
+          </Button>
+          <Button onClick={() => onSubmit(specialty, institution, note)} disabled={!specialty}>
+            যাচাই করুন
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -580,7 +799,9 @@ function VerifyDialog({
 }
 
 function SuspendDialog({
-  profile, onClose, onSubmit,
+  profile,
+  onClose,
+  onSubmit,
 }: {
   profile: AdminProfile | null;
   onClose: () => void;
@@ -591,21 +812,37 @@ function SuspendDialog({
   return (
     <Dialog open={!!profile} onOpenChange={(o) => !o && onClose()}>
       <DialogContent>
-        <DialogHeader><DialogTitle>বরখাস্ত করুন — {profile?.name}</DialogTitle></DialogHeader>
+        <DialogHeader>
+          <DialogTitle>বরখাস্ত করুন — {profile?.name}</DialogTitle>
+        </DialogHeader>
         <div className="space-y-2">
-          <Textarea value={reason} onChange={(e) => setReason(e.target.value)} placeholder="কারণ" rows={2} />
+          <Textarea
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            placeholder="কারণ"
+            rows={2}
+          />
           <div className="flex gap-2">
             {[1, 7, 30, 0].map((d) => (
-              <button key={d} onClick={() => setDays(d)}
-                className={`flex-1 h-9 rounded-md text-xs font-bold border ${days === d ? "bg-red-600 text-white border-red-600" : "bg-white border-input"}`}>
+              <button
+                key={d}
+                onClick={() => setDays(d)}
+                className={`flex-1 h-9 rounded-md text-xs font-bold border ${days === d ? "bg-red-600 text-white border-red-600" : "bg-white border-input"}`}
+              >
                 {d === 0 ? "স্থায়ী" : `${toBn(d)} দিন`}
               </button>
             ))}
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>বাতিল</Button>
-          <Button variant="destructive" disabled={!reason.trim()} onClick={() => onSubmit(reason.trim(), days)}>
+          <Button variant="outline" onClick={onClose}>
+            বাতিল
+          </Button>
+          <Button
+            variant="destructive"
+            disabled={!reason.trim()}
+            onClick={() => onSubmit(reason.trim(), days)}
+          >
             নিশ্চিত
           </Button>
         </DialogFooter>
@@ -615,7 +852,9 @@ function SuspendDialog({
 }
 
 function WarnDialog({
-  profile, onClose, onSubmit,
+  profile,
+  onClose,
+  onSubmit,
 }: {
   profile: AdminProfile | null;
   onClose: () => void;
@@ -625,11 +864,22 @@ function WarnDialog({
   return (
     <Dialog open={!!profile} onOpenChange={(o) => !o && onClose()}>
       <DialogContent>
-        <DialogHeader><DialogTitle>সতর্কবার্তা — {profile?.name}</DialogTitle></DialogHeader>
-        <Textarea value={msg} onChange={(e) => setMsg(e.target.value)} placeholder="বার্তা লিখুন" rows={3} />
+        <DialogHeader>
+          <DialogTitle>সতর্কবার্তা — {profile?.name}</DialogTitle>
+        </DialogHeader>
+        <Textarea
+          value={msg}
+          onChange={(e) => setMsg(e.target.value)}
+          placeholder="বার্তা লিখুন"
+          rows={3}
+        />
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>বাতিল</Button>
-          <Button disabled={!msg.trim()} onClick={() => onSubmit(msg.trim())}>পাঠান</Button>
+          <Button variant="outline" onClick={onClose}>
+            বাতিল
+          </Button>
+          <Button disabled={!msg.trim()} onClick={() => onSubmit(msg.trim())}>
+            পাঠান
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -42,7 +42,10 @@ export function usePostReactions(postId: string, visiblePostIds: string[] = [pos
   const { user: profileUser } = useUser();
   const queryClient = useQueryClient();
   const postIdsKey = useMemo(
-    () => Array.from(new Set(visiblePostIds.filter(Boolean))).sort().join(","),
+    () =>
+      Array.from(new Set(visiblePostIds.filter(Boolean)))
+        .sort()
+        .join(","),
     [visiblePostIds],
   );
   const postIds = useMemo(() => postIdsKey.split(",").filter(Boolean), [postIdsKey]);
@@ -76,11 +79,17 @@ export function usePostReactions(postId: string, visiblePostIds: string[] = [pos
     if (postIds.length === 0) return;
     const channel = supabase
       .channel(`post-reaction-${postId}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "post_reactions", filter: `post_id=eq.${postId}` }, () => {
-        void queryClient.invalidateQueries({ queryKey });
-      })
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "post_reactions", filter: `post_id=eq.${postId}` },
+        () => {
+          void queryClient.invalidateQueries({ queryKey });
+        },
+      )
       .subscribe();
-    return () => { void supabase.removeChannel(channel); };
+    return () => {
+      void supabase.removeChannel(channel);
+    };
   }, [postId, postIds.length, queryClient, queryKey]);
 
   const state = useMemo<ReactionState>(() => {

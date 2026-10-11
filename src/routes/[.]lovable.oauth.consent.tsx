@@ -11,9 +11,14 @@ type Details = {
   redirect_to?: string;
   user?: { email?: string } | null;
 };
-type Result = { data: { redirect_url?: string; redirect_to?: string } | null; error: { message: string } | null };
+type Result = {
+  data: { redirect_url?: string; redirect_to?: string } | null;
+  error: { message: string } | null;
+};
 type OAuthApi = {
-  getAuthorizationDetails: (id: string) => Promise<{ data: Details | null; error: { message: string } | null }>;
+  getAuthorizationDetails: (
+    id: string,
+  ) => Promise<{ data: Details | null; error: { message: string } | null }>;
   approveAuthorization: (id: string) => Promise<Result>;
   denyAuthorization: (id: string) => Promise<Result>;
 };
@@ -39,15 +44,25 @@ export const Route = createFileRoute("/.lovable/oauth/consent")({
     const { data: s } = await supabase.auth.getSession();
     return { details: data, email: s.session?.user.email ?? "" };
   },
-  head: () => ({ meta: [{ title: "সংযোগ অনুমোদন — কৃষক বন্ধু" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({
+    meta: [{ title: "সংযোগ অনুমোদন — কৃষক বন্ধু" }, { name: "robots", content: "noindex" }],
+  }),
   component: Consent,
-  pendingComponent: () => <main className="min-h-screen flex items-center justify-center text-muted-foreground">লোড হচ্ছে…</main>,
+  pendingComponent: () => (
+    <main className="min-h-screen flex items-center justify-center text-muted-foreground">
+      লোড হচ্ছে…
+    </main>
+  ),
   errorComponent: ({ error }) => (
     <main className="min-h-screen flex items-center justify-center p-6 text-center">
       <div className="max-w-sm rounded-2xl bg-card p-6 shadow">
         <h1 className="text-lg font-bold">অনুরোধটি খোলা যায়নি</h1>
-        <p className="mt-2 text-sm text-muted-foreground">লিংকটির মেয়াদ শেষ হতে পারে। আবার সংযোগ করার চেষ্টা করুন।</p>
-        <p className="mt-2 text-xs text-muted-foreground">{String((error as Error)?.message ?? error)}</p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          লিংকটির মেয়াদ শেষ হতে পারে। আবার সংযোগ করার চেষ্টা করুন।
+        </p>
+        <p className="mt-2 text-xs text-muted-foreground">
+          {String((error as Error)?.message ?? error)}
+        </p>
       </div>
     </main>
   ),
@@ -74,9 +89,17 @@ function Consent() {
     const { data, error } = approve
       ? await oauth().approveAuthorization(authorization_id)
       : await oauth().denyAuthorization(authorization_id);
-    if (error) { setBusy(false); setError(error.message); return; }
+    if (error) {
+      setBusy(false);
+      setError(error.message);
+      return;
+    }
     const target = data?.redirect_url ?? data?.redirect_to;
-    if (!target) { setBusy(false); setError("অনুমোদন সার্ভার থেকে ফেরত ঠিকানা পাওয়া যায়নি।"); return; }
+    if (!target) {
+      setBusy(false);
+      setError("অনুমোদন সার্ভার থেকে ফেরত ঠিকানা পাওয়া যায়নি।");
+      return;
+    }
     window.location.href = target;
   }
 
@@ -88,22 +111,46 @@ function Consent() {
           <h1 className="text-xl font-bold">{client}-কে কৃষক বন্ধুর সাথে সংযুক্ত করবেন?</h1>
         </div>
         <p className="text-sm text-muted-foreground">
-          {client} আপনার হয়ে কৃষক বন্ধুর টুল ব্যবহার করতে পারবে: ফসল গাইড দেখা, বাজারদর দেখা এবং বাজারদর জমা দেওয়া।
+          {client} আপনার হয়ে কৃষক বন্ধুর টুল ব্যবহার করতে পারবে: ফসল গাইড দেখা, বাজারদর দেখা এবং
+          বাজারদর জমা দেওয়া।
         </p>
-        {email && <p className="text-sm">প্রবেশ করা অ্যাকাউন্ট: <b>{email}</b></p>}
+        {email && (
+          <p className="text-sm">
+            প্রবেশ করা অ্যাকাউন্ট: <b>{email}</b>
+          </p>
+        )}
         {details?.client?.redirect_uri && (
-          <p className="text-xs text-muted-foreground break-all">ফেরত ঠিকানা: {details.client.redirect_uri}</p>
+          <p className="text-xs text-muted-foreground break-all">
+            ফেরত ঠিকানা: {details.client.redirect_uri}
+          </p>
         )}
         {scopes.length > 0 && (
           <ul className="text-sm list-disc pl-5 space-y-1">
-            {scopes.map((s) => <li key={s}>{scopeLabel(s)}</li>)}
+            {scopes.map((s) => (
+              <li key={s}>{scopeLabel(s)}</li>
+            ))}
           </ul>
         )}
-        <p className="text-xs text-muted-foreground">এটি অ্যাপের অনুমতি বা নিরাপত্তা নিয়ম এড়িয়ে যায় না।</p>
-        {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+        <p className="text-xs text-muted-foreground">
+          এটি অ্যাপের অনুমতি বা নিরাপত্তা নিয়ম এড়িয়ে যায় না।
+        </p>
+        {error && (
+          <p role="alert" className="text-sm text-destructive">
+            {error}
+          </p>
+        )}
         <div className="flex gap-3">
-          <Button variant="outline" className="flex-1" disabled={busy} onClick={() => decide(false)}>সংযোগ বাতিল</Button>
-          <Button className="flex-1" disabled={busy} onClick={() => decide(true)}>অনুমোদন দিন</Button>
+          <Button
+            variant="outline"
+            className="flex-1"
+            disabled={busy}
+            onClick={() => decide(false)}
+          >
+            সংযোগ বাতিল
+          </Button>
+          <Button className="flex-1" disabled={busy} onClick={() => decide(true)}>
+            অনুমোদন দিন
+          </Button>
         </div>
       </div>
     </main>

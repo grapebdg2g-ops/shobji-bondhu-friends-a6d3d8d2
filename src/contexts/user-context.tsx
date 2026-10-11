@@ -47,13 +47,18 @@ export function UserProvider({ children }: { children: ReactNode }) {
     supabase.auth.getSession().then(({ data }) => {
       if (mounted) setUid(data.session?.user.id ?? null);
     });
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_e, session) => {
       if (!mounted) return;
       const nextUid = session?.user.id ?? null;
       setUid(nextUid);
       if (!nextUid) qc.setQueryData(profileKey(null), null);
     });
-    return () => { mounted = false; subscription.unsubscribe(); };
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, [qc]);
 
   const query = useQuery({

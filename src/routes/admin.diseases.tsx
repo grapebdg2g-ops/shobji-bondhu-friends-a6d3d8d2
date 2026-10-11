@@ -35,9 +35,7 @@ function DiseasesPage() {
     const t = q.trim().toLowerCase();
     if (!t) return rows;
     return rows.filter(
-      (r) =>
-        r.disease_name?.toLowerCase().includes(t) ||
-        r.crop_type?.toLowerCase().includes(t),
+      (r) => r.disease_name?.toLowerCase().includes(t) || r.crop_type?.toLowerCase().includes(t),
     );
   }, [rows, q]);
 
@@ -58,8 +56,8 @@ function DiseasesPage() {
     s === "high"
       ? "bg-red-100 text-red-700 border-red-300"
       : s === "medium"
-      ? "bg-amber-100 text-amber-700 border-amber-300"
-      : "bg-emerald-100 text-emerald-700 border-emerald-300";
+        ? "bg-amber-100 text-amber-700 border-amber-300"
+        : "bg-emerald-100 text-emerald-700 border-emerald-300";
 
   return (
     <div className="space-y-4">
@@ -119,7 +117,11 @@ function DiseasesPage() {
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
-        {isLoading && <div className="p-3"><Skeleton className="h-24 w-full" /></div>}
+        {isLoading && (
+          <div className="p-3">
+            <Skeleton className="h-24 w-full" />
+          </div>
+        )}
         {!isLoading && filtered.length === 0 && (
           <p className="text-center text-gray-400 py-10 text-sm">কোনো রেকর্ড নেই</p>
         )}
