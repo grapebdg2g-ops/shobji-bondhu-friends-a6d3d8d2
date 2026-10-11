@@ -5306,7 +5306,7 @@ export const getRecommendedCrops = (params: {
 }): CropData[] => {
   const { soilType, waterAvail, month, goal } = params;
 
-  let crops = getAllCrops().filter((c) => {
+  const crops = getAllCrops().filter((c) => {
     const soilOk = c.soilTypes.includes(soilType);
     const waterOk =
       waterAvail === "বেশি" ||

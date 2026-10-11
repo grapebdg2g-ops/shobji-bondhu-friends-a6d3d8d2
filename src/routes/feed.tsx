@@ -17,7 +17,6 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
-import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/contexts/user-context";
 import { useFeed, type FeedFilters, type Post, type PostType } from "@/hooks/use-feed";
@@ -41,11 +40,11 @@ import { useAuthorAvatars } from "@/hooks/use-author-avatars";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const feedSearchSchema = z.object({
-  filter: fallback(z.enum(["all", "help", "success"]), "all").default("all"),
+  filter: z.enum(["all", "help", "success"]).catch("all"),
 });
 
 export const Route = createFileRoute("/feed")({
-  validateSearch: zodValidator(feedSearchSchema),
+  validateSearch: feedSearchSchema,
   component: FeedPage,
   head: () => ({
     meta: [

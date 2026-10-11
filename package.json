@@ -9,7 +9,9 @@
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "format:check": "prettier --check src",
+    "test": "bun test"
   },
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.25.5",
@@ -48,7 +50,6 @@
     "@tanstack/react-router": "1.170.41",
     "@tanstack/react-start": "1.168.60",
     "@tanstack/router-plugin": "1.168.42",
-    "@tanstack/zod-adapter": "^1.167.0",
     "@types/web-push": "^3.6.4",
     "browser-image-compression": "^2.0.2",
     "canvas-confetti": "^1.9.4",

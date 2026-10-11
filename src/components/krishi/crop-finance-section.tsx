@@ -162,16 +162,14 @@ export function CropFinanceSection({
   async function add() {
     const title = (pick === CUSTOM ? customTitle : pick).trim();
     if (!title) return toast.error("তালিকা থেকে নির্বাচন করুন বা নিজের নাম লিখুন");
-    const { error } = await supabase
-      .from("crop_plan_finances")
-      .insert({
-        user_id: userId,
-        plan_id: planId,
-        entry_type: tab,
-        title: title.slice(0, 80),
-        amount: Math.max(0, Number(amount) || 0),
-        entry_date: entryDate || todayIso(),
-      });
+    const { error } = await supabase.from("crop_plan_finances").insert({
+      user_id: userId,
+      plan_id: planId,
+      entry_type: tab,
+      title: title.slice(0, 80),
+      amount: Math.max(0, Number(amount) || 0),
+      entry_date: entryDate || todayIso(),
+    });
     if (error) return toast.error("যোগ করা যায়নি");
     setPick("");
     setCustomTitle("");
