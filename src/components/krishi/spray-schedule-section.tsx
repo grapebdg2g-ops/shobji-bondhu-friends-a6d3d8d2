@@ -106,7 +106,7 @@ export function SprayScheduleSection({ userId, planId, cropType, plantingDate, d
     return `গত স্প্রেতে ${mine[0].system} ${mine[0].group} গ্রুপ দিয়েছেন — একই গ্রুপ পরপর দিলে পোকা/রোগ ওষুধ সহ্য করতে শেখে।${alt ? ` এবার দিন: ${alt.name}` : " এবার অন্য গ্রুপের ওষুধ দিন।"}`;
   }
 
-  const next = main.find((e) => !completions.has(e.id) && e.day >= days - 3);
+  const next = displayMain.find((e) => !completions.has(e.id) && e.day >= days - 3);
   const nextDose = doseFor(next);
 
   async function setReminders() {
@@ -136,19 +136,14 @@ export function SprayScheduleSection({ userId, planId, cropType, plantingDate, d
               {overdue && <span className="text-destructive font-semibold"> · তারিখ পেরিয়েছে</span>}
             </p>
           </div>
-          {isGap && e.problem && !isSprayAllowedUnderGap(cropType, harvestDay - e.day) && (
-            <span className="shrink-0 rounded bg-destructive/10 text-destructive text-[10px] font-bold px-1.5 py-0.5">GAP ⛔</span>
+          {isGap && e.problem && isSprayAllowedUnderGap(cropType, harvestDay - e.day) && (
+            <span className="shrink-0 rounded bg-primary/10 text-primary text-[10px] font-bold px-1.5 py-0.5">GAP ✓</span>
           )}
           {done ? <Check className="h-5 w-5 text-primary" /> : isOpen ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
         </button>
         {isOpen && (
           <div className="px-3 pb-3 space-y-2 text-sm">
             <p className="text-foreground/80">{e.desc}</p>
-            {isGap && e.problem && !isSprayAllowedUnderGap(cropType, harvestDay - e.day) && (
-              <p className="rounded-lg bg-destructive/10 p-2 text-xs text-destructive font-semibold">
-                🛡️ GAP নিয়ম: এই স্প্রের সময়ে ফসল তোলার আনুমানিক {toBn(Math.max(0, harvestDay - e.day))} দিন বাকি — GAP অনুযায়ী রাসায়নিক স্প্রে করা যাবে না। নিচের জৈব বিকল্প ব্যবহার করুন।
-              </p>
-            )}
             {e.problem && (
               <div className="rounded-lg bg-card p-2.5 ring-1 ring-border space-y-1">
                 {e.problem.chemicals.map((c) => {
