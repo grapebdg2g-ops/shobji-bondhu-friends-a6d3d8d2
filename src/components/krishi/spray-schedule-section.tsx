@@ -20,7 +20,8 @@ import {
 import { Bell, Check, SprayCan, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
 import {
-  applyGapSchedule,
+  applyPhiSafety,
+  harvestStartFor,
   buildSpraySchedule,
   syncSprayReminders,
   type SprayEvent,
@@ -29,7 +30,6 @@ import { TOMATO_SPRAY_NOTES } from "@/lib/tomato-spray-schedule";
 import { addDays, formatBnDate } from "@/lib/bn-date";
 import { toBn } from "@/lib/bn";
 import { getAllChemicalInfo, getBioOptions } from "@/data/crop-knowledge";
-import { isSprayAllowedUnderGap } from "@/data/gap-protocol";
 
 type Props = {
   userId: string;
@@ -110,7 +110,7 @@ export function SprayScheduleSection({
   const harvestDay = harvestStartFor(cropType);
   // GAP mode: chemical sprays inside the PHI window are replaced by safe bio alternatives.
   const displayMain = useMemo(
-    () => (isGap ? applyGapSchedule(main, cropType) : main),
+    () => applyPhiSafety(main, cropType, !!isGap),
     [isGap, main, cropType],
   );
   if (events.length === 0) return null;
@@ -183,7 +183,7 @@ export function SprayScheduleSection({
               )}
             </p>
           </div>
-          {isGap && e.problem && isSprayAllowedUnderGap(cropType, harvestDay - e.day) && (
+          {isGap && e.problem && (
             <span className="shrink-0 rounded bg-primary/10 text-primary text-[10px] font-bold px-1.5 py-0.5">
               GAP ✓
             </span>
