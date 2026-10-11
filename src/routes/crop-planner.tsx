@@ -118,7 +118,7 @@ function CropPlannerPage() {
   // Loading auto-advance
   useEffect(() => {
     if (screen !== "loading") return;
-    const t = setTimeout(() => setScreen("results"), 2000);
+    const t = setTimeout(() => setScreen("results"), 400);
     return () => clearTimeout(t);
   }, [screen]);
 
