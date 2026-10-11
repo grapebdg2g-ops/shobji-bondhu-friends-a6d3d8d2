@@ -26,7 +26,7 @@ export function GapProtocolSection({ cropType, plantingDate, daysUntilHarvest, c
 
   const done = tasks.filter((t) => completions.has(t.id)).length;
   const pct = Math.round((done / tasks.length) * 100);
-  const inPhi = daysUntilHarvest <= profile.phiDays;
+  const inPhi = daysUntilHarvest <= prof.phiDays;
 
   function printReport() {
     const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
@@ -42,7 +42,7 @@ export function GapProtocolSection({ cropType, plantingDate, daysUntilHarvest, c
     if (!w) return toast.error("পপআপ চালু করুন");
     w.document.write(`<html><head><meta charset="utf-8"><title>GAP রিপোর্ট — ${esc(cropType)}</title><link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&display=swap" rel="stylesheet"><style>body{font-family:'Tiro Bangla',serif;padding:24px;color:#111}table{width:100%;border-collapse:collapse;margin-bottom:12px}td,th{border:1px solid #999;padding:6px;text-align:left;vertical-align:top}.c{text-align:center;font-weight:bold}.d{font-size:12px;color:#444}h1{margin:0}h3{margin:16px 0 6px}.sum td{font-weight:bold}</style></head><body>
 <h1>কৃষক বন্ধু — GAP (উত্তম কৃষি চর্চা) উৎপাদন রিপোর্ট</h1>
-<table class="sum"><tr><td>কৃষক</td><td>${esc(user?.name ?? "—")}</td></tr>${loc ? `<tr><td>এলাকা</td><td>${esc(loc)}</td></tr>` : ""}<tr><td>ফসল</td><td>${esc(cropType)}</td></tr><tr><td>রোপণের তারিখ</td><td>${formatBnDate(plantingDate)}</td></tr><tr><td>রিপোর্টের তারিখ</td><td>${formatBnDate(new Date().toISOString().slice(0, 10))}</td></tr><tr><td>মূল বালাই</td><td>${esc(profile.keyPests.join(", "))}</td></tr><tr><td>PHI (স্প্রে বন্ধের নিয়ম)</td><td>ফসল তোলার ${toBn(profile.phiDays)} দিন আগে রাসায়নিক স্প্রে বন্ধ</td></tr></table>
+<table class="sum"><tr><td>কৃষক</td><td>${esc(user?.name ?? "—")}</td></tr>${loc ? `<tr><td>এলাকা</td><td>${esc(loc)}</td></tr>` : ""}<tr><td>ফসল</td><td>${esc(cropType)}</td></tr><tr><td>রোপণের তারিখ</td><td>${formatBnDate(plantingDate)}</td></tr><tr><td>রিপোর্টের তারিখ</td><td>${formatBnDate(new Date().toISOString().slice(0, 10))}</td></tr><tr><td>মূল বালাই</td><td>${esc(prof.keyPests.join(", "))}</td></tr><tr><td>PHI (স্প্রে বন্ধের নিয়ম)</td><td>ফসল তোলার ${toBn(prof.phiDays)} দিন আগে রাসায়নিক স্প্রে বন্ধ</td></tr></table>
 <h3>সারসংক্ষেপ</h3><p>সম্পন্ন: <b>${toBn(done)}</b> / ${toBn(tasks.length)} টি কাজ (${toBn(pct)}%)${inPhi ? " — <b>সতর্কতা: বর্তমানে PHI উইন্ডোর মধ্যে, রাসায়নিক স্প্রে নিষিদ্ধ</b>" : ""}</p>
 ${phaseRows}
 <p style="margin-top:48px">কৃষকের স্বাক্ষর: ____________________ &nbsp;&nbsp;&nbsp; পরিদর্শকের স্বাক্ষর: ____________________</p>
@@ -71,7 +71,7 @@ ${phaseRows}
         {inPhi && (
           <p className="mt-3 flex items-start gap-2 rounded-xl bg-destructive/10 p-2 text-xs text-destructive font-semibold">
             <AlertTriangle className="h-4 w-4 shrink-0" />
-            সংগ্রহের {toBn(profile.phiDays)} দিনের মধ্যে — এখন কোনো রাসায়নিক স্প্রে করবেন না (GAP নিয়ম)।
+            সংগ্রহের {toBn(prof.phiDays)} দিনের মধ্যে — এখন কোনো রাসায়নিক স্প্রে করবেন না (GAP নিয়ম)।
           </p>
         )}
       </div>
