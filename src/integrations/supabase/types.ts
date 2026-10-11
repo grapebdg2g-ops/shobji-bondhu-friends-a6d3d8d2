@@ -1382,6 +1382,53 @@ export type Database = {
         }
         Relationships: []
       }
+      spray_logs: {
+        Row: {
+          created_at: string
+          dose: string | null
+          event_id: string | null
+          id: string
+          phi_days: number
+          plan_id: string
+          product: string
+          shotok: number | null
+          sprayed_on: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          dose?: string | null
+          event_id?: string | null
+          id?: string
+          phi_days?: number
+          plan_id: string
+          product: string
+          shotok?: number | null
+          sprayed_on?: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          dose?: string | null
+          event_id?: string | null
+          id?: string
+          phi_days?: number
+          plan_id?: string
+          product?: string
+          shotok?: number | null
+          sprayed_on?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "spray_logs_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "user_crop_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_crop_plans: {
         Row: {
           created_at: string
@@ -1392,6 +1439,7 @@ export type Database = {
           land_shotok: number | null
           planting_date: string
           user_id: string
+          variety: string | null
           yield_kg: number | null
         }
         Insert: {
@@ -1403,6 +1451,7 @@ export type Database = {
           land_shotok?: number | null
           planting_date: string
           user_id: string
+          variety?: string | null
           yield_kg?: number | null
         }
         Update: {
@@ -1414,6 +1463,7 @@ export type Database = {
           land_shotok?: number | null
           planting_date?: string
           user_id?: string
+          variety?: string | null
           yield_kg?: number | null
         }
         Relationships: []

@@ -11,6 +11,9 @@ import {
   UserRoundPlus,
   Users,
   MessageCircle,
+  Sprout,
+  NotebookPen,
+  ClipboardList,
 } from "lucide-react";
 import { useDirectThreads } from "@/hooks/use-direct-messages";
 import { useGroupThreads } from "@/hooks/use-group-chats";
@@ -32,6 +35,9 @@ const RIGHT: Tab[] = [
 ];
 
 const QUICK_ACTIONS = [
+  { to: "/crop-guide", label: "আমার ফসল", Icon: Sprout },
+  { to: "/crop-planner", label: "ফসল পরিকল্পনা", Icon: ClipboardList },
+  { to: "/crop-diary", label: "ফসল ডায়েরি", Icon: NotebookPen },
   { to: "/disease-detection", label: "রোগ শনাক্ত", Icon: ScanSearch },
   { to: "/ai-bondhu/chat", label: "AI বন্ধুকে জিজ্ঞেস করুন", Icon: MessageSquareText },
   { to: "/feed", label: "কমিউনিটিতে যান", Icon: Newspaper },

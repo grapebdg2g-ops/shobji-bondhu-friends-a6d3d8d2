@@ -1,4 +1,6 @@
-// Tomato-specific spray schedule supplied by the farmer/agronomist:
+// Tomato spray schedule (farmer/agronomist input, revised to IPM thresholds,
+// rotation caps and harvest-window safety). Not DAE-certified — label wins.
+// Original notes:
 // day-offset nutrient sprays, transplant Trichoderma drench, and fixed
 // calendar-date pest sprays with a late-blight spray 3 days after each.
 import { PESTICIDE_GUIDE } from "@/data/pesticide-guide";
@@ -103,7 +105,11 @@ function nextDate(planting: Date, month: number, day: number): Date {
 
 const dayDiff = (a: Date, b: Date) => Math.round((a.getTime() - b.getTime()) / 86400000);
 
-export function buildTomatoSchedule(plantingDate: string, totalDays: number): SprayEvent[] {
+export function buildTomatoSchedule(
+  plantingDate: string,
+  totalDays: number,
+  harvestStartDay = totalDays,
+): SprayEvent[] {
   const p = new Date(plantingDate);
   const planting = new Date(p.getFullYear(), p.getMonth(), p.getDate());
   const events: SprayEvent[] = [];
@@ -193,6 +199,7 @@ export function buildTomatoSchedule(plantingDate: string, totalDays: number): Sp
     "ম্যানকোজেব + কার্বেন্ডাজিম স্প্রে",
     "ছত্রাকজনিত রোগ (ব্লাইট, উইল্ট) প্রতিরোধে পুরো গাছে স্প্রে করুন।",
     "disease",
+    "tomato-earlyblight",
   );
   const wfm = "সাদা মাছি + মাকড় দমন স্প্রে";
   const wfmDesc = "সাদা মাছি ও মাকড়ের ঔষধ একসাথে — পাতার নিচের দিকে ভালোভাবে স্প্রে করুন।";
@@ -204,25 +211,49 @@ export function buildTomatoSchedule(plantingDate: string, totalDays: number): Sp
     fixed("wfm", nextDate(planting, m, d), wfm, wfmDesc, "pest", "tomato-whitefly");
   }
 
-  // From 22 Dec: every 5 days whitefly + mite + fruit borer, late blight 3 days after each, until crop ends.
+  // From 22 Dec: IPM-based check every 10 days (not a blind 5-day loop).
+  // Chemical rotation alternates targets, late blight is capped at 3 sprays (metalaxyl
+  // label limit) and no long-PHI chemical is scheduled inside the harvest window.
   const end = addDays(planting, totalDays);
-  for (let d = nextDate(planting, 12, 22); d <= end; d = addDays(d, 5)) {
-    fixed(
-      "wfmfb",
-      d,
-      "সাদা মাছি + মাকড় + ফল ছিদ্রকারী পোকা স্প্রে",
-      "তিনটি পোকার ঔষধ একসাথে — পুরো গাছে, বিশেষত ফুল, ফল ও পাতার নিচে।",
-      "pest",
-      "tomato-fruitborer",
-    );
-    fixed(
-      "lb",
-      addDays(d, 3),
-      "লেট ব্লাইট (টমেটো) প্রতিরোধ স্প্রে",
-      "কীটনাশক স্প্রের ৩ দিন পর লেট ব্লাইটের ঔষধ পাতা ও কান্ডে স্প্রে করুন।",
-      "disease",
-      "tomato-lateblight",
-    );
+  const SAFE_BEFORE_HARVEST = 14;
+  const pestTargets = ["tomato-fruitborer", "tomato-whitefly", "tomato-redmite"] as const;
+  let pestCount = 0;
+  let lbCount = 0;
+  for (let d = nextDate(planting, 12, 22); d <= end; d = addDays(d, 10)) {
+    const day = dayDiff(d, planting);
+    if (day + SAFE_BEFORE_HARVEST >= harvestStartDay) {
+      fixed(
+        "scout",
+        d,
+        "পর্যবেক্ষণ ও জৈব দমন (সংগ্রহের সময়)",
+        "ফসল তোলার সময় রাসায়নিক নয়। ১০টি গাছ দেখুন; পোকা থাকলে নিম তেল ৫ মিলি/লিটার বা বিটি, ফেরোমন ও হলুদ ফাঁদ ব্যবহার করুন।",
+        "pest",
+      );
+      continue;
+    }
+    const target = pestTargets[pestCount % pestTargets.length];
+    if (pestCount < 4 && prob(target)) {
+      fixed(
+        `ipm-${target}`,
+        d,
+        `পর্যবেক্ষণ করে প্রয়োজনে স্প্রে: ${prob(target)!.name}`,
+        "আগে ১০টি গাছ দেখুন — অন্তত ২টিতে ক্ষতি থাকলে তবেই স্প্রে করুন। আগের স্প্রের ওষুধের গ্রুপ বদলে দিন।",
+        "pest",
+        target,
+      );
+      pestCount++;
+    }
+    if (lbCount < 3) {
+      fixed(
+        "lb",
+        addDays(d, 3),
+        "লেট ব্লাইট প্রতিরোধ (কুয়াশা/আর্দ্র আবহাওয়ায়)",
+        "শুধু কুয়াশা, টানা মেঘলা বা বৃষ্টির পরে স্প্রে করুন। মেটালাক্সিল মৌসুমে ৩ বারের বেশি নয়।",
+        "disease",
+        "tomato-lateblight",
+      );
+      lbCount++;
+    }
   }
 
   for (const n of NUTRIENTS) {
@@ -245,5 +276,5 @@ export const TOMATO_SPRAY_NOTES = [
   "বৃষ্টি হলে পরের দিন কপার জাতীয় ছত্রাকনাশক (যেমন কপার অক্সিক্লোরাইড) স্প্রে করুন।",
   "আকাশে মেঘ থাকলে স্প্রের সাথে স্টিকার (আঠা) মিশিয়ে নিন, যাতে বৃষ্টির পানিতে ঔষধ ধুয়ে না যায়।",
   "ফসলে জরুরি কোনো পোকামাকড় বা ছত্রাকের আক্রমণ দেখা গেলে শিডিউলের তারিখ না থাকলেও দমনের জন্য স্প্রে করে ফেলুন।",
-  "গাছে লিফ মাইনার (পাতায় সাদা সরু দাগ) দেখা দিলে ফিপ্রোনিল ৪০% + থায়ামেথক্সাম ২০% গ্রুপের কীটনাশক যেমন ইনতেফা কোম্পানির দামার স্প্রে করুন।",
+  "গাছে লিফ মাইনার (পাতায় সাদা সরু দাগ) দেখা দিলে ফিপ্রোনিল ৪০% + থায়ামেথক্সাম ২০% গ্রুপের কীটনাশক লেবেলের মাত্রায় স্প্রে করুন। ফিপ্রোনিল মাছ ও মৌমাছির জন্য মারাত্মক — পুকুরের কাছে ও ফুল ফোটার সময় দেবেন না; ফসল তোলার অন্তত ১৪ দিন আগে বন্ধ করুন।",
 ];

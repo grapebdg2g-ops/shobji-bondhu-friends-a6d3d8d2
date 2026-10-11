@@ -1,3 +1,4 @@
+import { stageAtDay } from "@/lib/crop-stage";
 // Structured agronomy knowledge layered on top of master-crop-data.ts.
 // Pesticide chemistry (IRAC/FRAC, PHI, safety), stage irrigation, IPM rules, resistance checks.
 import { getAllCrops, type CropData, type Stage } from "./master-crop-data";
@@ -21,8 +22,138 @@ export interface ActiveIngredient {
 
 export const ACTIVE_INGREDIENTS: ActiveIngredient[] = [
   {
+    id: "fenpyroximate",
+    keywords: ["ফেনপাইরক্সিমেট", "fenpyroximate"],
+    ingredient: "ফেনপাইরক্সিমেট",
+    formulation: "৫% এসসি",
+    system: "IRAC",
+    group: "21A",
+    groupName: "METI মাকড়নাশক",
+    phiDays: 3,
+    toxicity: "মাঝারি",
+    safety: "মাছের জন্য বিষাক্ত — পুকুরের কাছে স্প্রে নয়",
+    organic: "প্রচুর পানির ঝাপটা ও সালফার (জৈব অনুমোদিত) — গরমে নয়",
+  },
+  {
+    id: "chlorothalonil",
+    keywords: ["ক্লোরোথ্যালোনিল", "chlorothalonil"],
+    ingredient: "ক্লোরোথ্যালোনিল",
+    formulation: "৭৫% ডব্লিউপি",
+    system: "FRAC",
+    group: "M05",
+    groupName: "বহুমুখী (মাল্টি-সাইট)",
+    phiDays: 7,
+    toxicity: "মাঝারি",
+    safety: "চোখ ও ত্বকে জ্বালা — চশমা ও গ্লাভস পরুন",
+    organic: "ট্রাইকোডার্মা/ব্যাসিলাস সাবটিলিস স্প্রে; আক্রান্ত পাতা সরান",
+  },
+  {
+    id: "thiophanate",
+    keywords: ["থায়োফানেট", "thiophanate"],
+    ingredient: "থায়োফানেট মিথাইল",
+    formulation: "৭০% ডব্লিউপি",
+    system: "FRAC",
+    group: "1",
+    groupName: "বেনজিমিডাজল",
+    phiDays: 14,
+    toxicity: "কম",
+    safety: "কার্বেন্ডাজিমের একই গ্রুপ — পরপর ব্যবহার করবেন না",
+    organic: "ট্রাইকোডার্মা দিয়ে মাটি ও বীজ শোধন",
+  },
+  {
+    id: "triadimefon",
+    keywords: ["ট্রাইডিমেফন", "triadimefon"],
+    ingredient: "ট্রাইডিমেফন",
+    formulation: "২৫% ডব্লিউপি",
+    system: "FRAC",
+    group: "3",
+    groupName: "ট্রায়াজোল (DMI)",
+    phiDays: 14,
+    toxicity: "মাঝারি",
+    safety: "মৌসুমে ২ বারের বেশি নয়",
+    organic: "সালফার বা দুধ-পানি (১:৯) স্প্রে",
+  },
+  {
+    id: "carboxin-thiram",
+    keywords: ["কার্বক্সিন", "থিরাম", "carboxin", "thiram"],
+    ingredient: "কার্বক্সিন + থিরাম",
+    formulation: "৭৫% ডব্লিউপি (বীজ শোধন)",
+    system: "FRAC",
+    group: "7",
+    groupName: "SDHI + মাল্টি-সাইট",
+    phiDays: 0,
+    toxicity: "মাঝারি",
+    safety: "শুধু বীজ শোধনে — শোধিত বীজ খাবেন না বা পশুকে দেবেন না",
+    organic: "ট্রাইকোডার্মা ৫ গ্রাম/কেজি বীজে মেখে শোধন",
+  },
+  {
+    id: "cartap",
+    keywords: ["কার্টাপ", "cartap"],
+    ingredient: "কার্টাপ হাইড্রোক্লোরাইড",
+    formulation: "৫০% এসপি",
+    system: "IRAC",
+    group: "14",
+    groupName: "নেরেইসটক্সিন",
+    phiDays: 14,
+    toxicity: "মাঝারি",
+    safety: "মাছ ও রেশমপোকার জন্য বিষাক্ত",
+    organic: "ফেরোমন ফাঁদ, আলোর ফাঁদ ও পার্চিং (ডাল পোঁতা)",
+  },
+  {
+    id: "fenobucarb",
+    keywords: ["ফেনোবুকার্ব", "fenobucarb"],
+    ingredient: "ফেনোবুকার্ব (BPMC)",
+    formulation: "৫০% ইসি",
+    system: "IRAC",
+    group: "1A",
+    groupName: "কার্বামেট",
+    phiDays: 14,
+    toxicity: "বেশি",
+    safety: "মাছ ও মানুষের জন্য বিষাক্ত — PPE বাধ্যতামূলক",
+    organic: "জমির পানি শুকিয়ে AWD; গাছের গোড়ায় আলো-বাতাস বাড়ান",
+  },
+  {
+    id: "malathion",
+    keywords: ["ম্যালাথিয়ন", "malathion"],
+    ingredient: "ম্যালাথিয়ন",
+    formulation: "৫৭% ইসি",
+    system: "IRAC",
+    group: "1B",
+    groupName: "অর্গানোফসফেট",
+    phiDays: 7,
+    toxicity: "বেশি",
+    safety: "মৌমাছি ও মাছের জন্য বিষাক্ত; খালি পেটে স্প্রে নয়",
+    organic: "নিম তেল ৫ মিলি/লিটার + সাবান পানি",
+  },
+  {
+    id: "carbofuran",
+    keywords: ["কার্বোফুরান", "ফুরাডান", "carbofuran"],
+    ingredient: "কার্বোফুরান",
+    formulation: "৫% জি (দানাদার)",
+    system: "IRAC",
+    group: "1A",
+    groupName: "কার্বামেট",
+    phiDays: 30,
+    toxicity: "বেশি",
+    safety: "WHO শ্রেণী Ib — অত্যন্ত বিষাক্ত; GAP চাষে নিষিদ্ধ; পাখি ও মাছ মারা যায়; শুধু কৃষি কর্মকর্তার পরামর্শে",
+    organic: "হাতবাছাই, ছাই ছিটানো, গুড়-ভূষির বিষটোপের বদলে মেটারহিজিয়াম",
+  },
+  {
+    id: "tricyclazole",
+    keywords: ["ট্রাইসাইক্লাজল", "tricyclazole"],
+    ingredient: "ট্রাইসাইক্লাজল",
+    formulation: "৭৫% ডব্লিউপি",
+    system: "FRAC",
+    group: "16.1",
+    groupName: "মেলানিন সংশ্লেষণ রোধক",
+    phiDays: 21,
+    toxicity: "মাঝারি",
+    safety: "মাছের জন্য ক্ষতিকর — সেচের পানিতে মিশতে দেবেন না",
+    organic: "সুষম ইউরিয়া (বেশি নয়), সিউডোমোনাস স্প্রে",
+  },
+  {
     id: "abamectin",
-    keywords: ["এবামেক্টিন", "ভার্টিম্যাক", "abamectin"],
+    keywords: ["এবামেক্টিন", "অ্যাবামেকটিন", "এবামেকটিন", "ভার্টিম্যাক", "abamectin"],
     ingredient: "এবামেক্টিন",
     formulation: "১.৮% ইসি",
     system: "IRAC",
@@ -36,7 +167,7 @@ export const ACTIVE_INGREDIENTS: ActiveIngredient[] = [
   },
   {
     id: "emamectin",
-    keywords: ["ইমামেক্টিন", "emamectin"],
+    keywords: ["ইমামেক্টিন", "এমামেকটিন", "ইমামেকটিন", "এমামেক্টিন", "emamectin"],
     ingredient: "ইমামেক্টিন বেনজোয়েট",
     formulation: "৫% এসজি",
     system: "IRAC",
@@ -62,7 +193,7 @@ export const ACTIVE_INGREDIENTS: ActiveIngredient[] = [
   },
   {
     id: "dimethoate",
-    keywords: ["ডাইমিথয়েট", "dimethoate"],
+    keywords: ["ডাইমিথয়েট", "ডাইমেথোয়েট", "ডাইমেথয়েট", "dimethoate"],
     ingredient: "ডাইমিথয়েট",
     formulation: "৪০% ইসি",
     system: "IRAC",
@@ -403,11 +534,7 @@ export function findCrop(idOrName: string): CropData | null {
 }
 
 export function getStageAtDay(crop: CropData, day: number): Stage | null {
-  if (!crop.stages.length) return null;
-  return (
-    crop.stages.find((s) => day >= s.startDay && day < s.endDay) ??
-    (day < crop.stages[0].startDay ? crop.stages[0] : crop.stages[crop.stages.length - 1])
-  );
+  return stageAtDay(crop.stages, day);
 }
 
 // ── Irrigation ──────────────────────────────────────

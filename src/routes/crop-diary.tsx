@@ -1,3 +1,4 @@
+import { stageAtDay } from "@/lib/crop-stage";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
@@ -119,8 +120,7 @@ function CropDiaryPage() {
       if (!guide) continue;
       const days = Math.max(0, daysSince(plan.planting_date));
       const stage =
-        guide.stages.find((s) => days >= s.startDay && days < s.endDay) ??
-        guide.stages[guide.stages.length - 1];
+        stageAtDay(guide.stages, days);
       if (!stage) continue;
       stage.tasks.slice(0, 2).forEach((task, index) => {
         result.push({ plan, stageName: stage.name, task, index, taskId: `${stage.id}::${index}` });

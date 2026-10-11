@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { syncSprayReminders } from "@/lib/spray-schedule";
 import { isGapEligible } from "@/data/gap-protocol";
 import { ShieldCheck } from "lucide-react";
+import { bn as bnLocale } from "date-fns/locale";
 
 export const Route = createFileRoute("/crop-guide/new/$crop")({
   component: NewCropPlan,
@@ -46,7 +47,7 @@ export const Route = createFileRoute("/crop-guide/new/$crop")({
   errorComponent: ({ error, reset }) => (
     <div className="min-h-screen flex items-center justify-center p-6 text-center">
       <div>
-        <p className="text-gray-700 mb-3">ত্রুটি: {(error as Error).message}</p>
+        <p className="text-gray-700 mb-3">তথ্য আনা যায়নি — ইন্টারনেট দেখে আবার চেষ্টা করুন।</p>
         <button onClick={reset} className="text-emerald-600 font-semibold">
           পুনরায় চেষ্টা
         </button>
@@ -63,6 +64,10 @@ function NewCropPlan() {
   const [saving, setSaving] = useState(false);
   const gapEligible = isGapEligible(crop);
   const [gap, setGap] = useState(false);
+  const [variety, setVariety] = useState("");
+  const [land, setLand] = useState("");
+  const landNum =
+    parseFloat(land.replace(/[০-৯]/g, (d) => String("০১২৩৪৫৬৭৮৯".indexOf(d)))) || null;
 
   async function handleSave() {
     if (!user) {
@@ -77,6 +82,8 @@ function NewCropPlan() {
         crop_type: crop,
         planting_date: toIsoDate(date),
         is_gap: gapEligible && gap,
+        variety: variety || null,
+        land_shotok: landNum,
       } as never)
       .select("id")
       .single();
@@ -111,7 +118,7 @@ function NewCropPlan() {
           <Link
             to="/crop-guide"
             aria-label="ফিরে যান"
-            className="h-9 w-9 rounded-full bg-white/15 flex items-center justify-center"
+            className="h-11 w-11 rounded-full bg-white/15 flex items-center justify-center"
           >
             <ArrowLeft className="h-5 w-5" />
           </Link>
@@ -148,10 +155,40 @@ function NewCropPlan() {
                 selected={date}
                 onSelect={(d) => d && setDate(d)}
                 initialFocus
+                locale={bnLocale}
                 className="p-3 pointer-events-auto"
               />
             </PopoverContent>
           </Popover>
+
+          <label className="mt-4 block text-sm font-semibold text-gray-900">
+            জাত (ঐচ্ছিক)
+            <select
+              value={variety}
+              onChange={(e) => setVariety(e.target.value)}
+              className="mt-1 w-full min-h-12 rounded-xl border border-emerald-200 bg-white px-3 text-base"
+            >
+              <option value="">জানি না / যেকোনো</option>
+              {guide.varieties.map((v) => (
+                <option key={v} value={v}>
+                  {v}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="mt-3 block text-sm font-semibold text-gray-900">
+            জমির পরিমাণ (শতক, ঐচ্ছিক)
+            <input
+              inputMode="decimal"
+              value={land}
+              onChange={(e) => setLand(e.target.value)}
+              placeholder="যেমন ২০"
+              className="mt-1 w-full min-h-12 rounded-xl border border-emerald-200 bg-white px-3 text-base"
+            />
+            <span className="block mt-1 text-xs font-normal text-gray-500">
+              জমি দিলে স্প্রের ড্রাম আর খরচের হিসাব নিজে নিজে হবে।
+            </span>
+          </label>
 
           <div className="mt-4 text-xs text-gray-600 space-y-1">
             <p>

@@ -1,3 +1,4 @@
+import { stageAtDay } from "@/lib/crop-stage";
 import { createFileRoute } from "@tanstack/react-router";
 import { isAuthorizedCronRequest, unauthorizedCronResponse } from "@/lib/cron-auth.server";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
@@ -98,8 +99,7 @@ export const Route = createFileRoute("/api/public/hooks/crop-reminders")({
             Math.floor((Date.now() - new Date(plan.planting_date).getTime()) / 86400000),
           );
           const stage =
-            guide.stages.find((s) => days >= s.startDay && days < s.endDay) ??
-            guide.stages[guide.stages.length - 1];
+            stageAtDay(guide.stages, days);
           if (!stage) continue;
           const titles = stage.tasks
             .slice(0, 2)

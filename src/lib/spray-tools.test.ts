@@ -6,6 +6,9 @@ describe("spray tools", () => {
   it("parses Bengali dose per litre", () => {
     assert.deepEqual(parseDosePerLiter("০.৫ গ্রাম / লিটার পানি"), { amount: 0.5, unit: "গ্রাম" });
   });
+  it("seed-treatment dose per kg is not treated as a tank dose", () => {
+    assert.equal(parseDosePerLiter("২ গ্রাম / কেজি বীজ"), null);
+  });
   it("20 shotok needs 40 L = 3 tanks of 16 L, 16 ml per tank at 1 ml/L", () => {
     const p = tankPlan(20, 1);
     assert.equal(p.waterLiters, 40);

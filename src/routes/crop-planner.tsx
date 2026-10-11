@@ -118,7 +118,7 @@ function CropPlannerPage() {
   // Loading auto-advance
   useEffect(() => {
     if (screen !== "loading") return;
-    const t = setTimeout(() => setScreen("results"), 2000);
+    const t = setTimeout(() => setScreen("results"), 400);
     return () => clearTimeout(t);
   }, [screen]);
 
@@ -214,7 +214,7 @@ function CropPlannerPage() {
             </button>
 
             <Link
-              to="/crop-planner/my-plans"
+              to="/crop-guide"
               className="block text-center text-sm text-emerald-700 font-semibold py-3"
             >
               📋 আমার সংরক্ষিত পরিকল্পনা দেখুন →
