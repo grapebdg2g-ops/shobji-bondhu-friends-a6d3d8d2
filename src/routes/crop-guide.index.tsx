@@ -1,3 +1,4 @@
+import { stageAtDay } from "@/lib/crop-stage";
 import { CropIcon } from "@/components/krishi/crop-icon";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
@@ -158,8 +159,7 @@ function CropGuideIndex() {
                 ? Math.min(100, Math.round((days / guide.totalDays) * 100))
                 : 100;
               const currentStage =
-                guide.stages.find((s) => days >= s.startDay && days < s.endDay) ??
-                guide.stages[guide.stages.length - 1];
+                stageAtDay(guide.stages, days)!;
               const done = !p.is_active;
               return (
                 <div

@@ -1,3 +1,4 @@
+import { stageAtDay } from "@/lib/crop-stage";
 // Structured agronomy knowledge layered on top of master-crop-data.ts.
 // Pesticide chemistry (IRAC/FRAC, PHI, safety), stage irrigation, IPM rules, resistance checks.
 import { getAllCrops, type CropData, type Stage } from "./master-crop-data";
@@ -403,11 +404,7 @@ export function findCrop(idOrName: string): CropData | null {
 }
 
 export function getStageAtDay(crop: CropData, day: number): Stage | null {
-  if (!crop.stages.length) return null;
-  return (
-    crop.stages.find((s) => day >= s.startDay && day < s.endDay) ??
-    (day < crop.stages[0].startDay ? crop.stages[0] : crop.stages[crop.stages.length - 1])
-  );
+  return stageAtDay(crop.stages, day);
 }
 
 // ── Irrigation ──────────────────────────────────────

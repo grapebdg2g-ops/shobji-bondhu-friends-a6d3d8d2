@@ -25,6 +25,8 @@ export type WaterNeed = "কম" | "মাঝারি" | "বেশি";
 export type RiskLevel = "কম" | "মাঝারি" | "বেশি";
 export type Category = "ধান্য" | "সবজি" | "মসলা" | "তেল" | "কন্দাল";
 
+import { stageAtDay } from "@/lib/crop-stage";
+
 export interface Variety {
   name: string;
   type: "উফশী" | "হাইব্রিড" | "স্থানীয়";
@@ -5396,10 +5398,7 @@ export const getCurrentStage = (cropId: string, plantingDate: Date): Stage | nul
     (Date.now() - plantingDate.getTime()) / (1000 * 60 * 60 * 24),
   );
 
-  return (
-    crop.stages.find((s) => daysSincePlanting >= s.startDay && daysSincePlanting <= s.endDay) ||
-    null
-  );
+  return stageAtDay(crop.stages, daysSincePlanting);
 };
 
 // Get current month's calendar events

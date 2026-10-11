@@ -1,3 +1,4 @@
+import { stageAtDay } from "@/lib/crop-stage";
 import { CropIcon } from "@/components/krishi/crop-icon";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -118,13 +119,7 @@ function PlanAdvisory() {
   const days = plan ? Math.max(0, daysSince(plan.planting_date)) : 0;
   const currentStage = useMemo(() => {
     if (!guide) return null;
-    return (
-      guide.stages.find((s) => days >= s.startDay && days < s.endDay) ??
-      guide.stages[
-        Math.min(guide.stages.length - 1, guide.stages.findIndex((s) => days < s.startDay) - 1)
-      ] ??
-      guide.stages[guide.stages.length - 1]
-    );
+    return stageAtDay(guide.stages, days);
   }, [guide, days]);
 
   // Auto-expand current stage

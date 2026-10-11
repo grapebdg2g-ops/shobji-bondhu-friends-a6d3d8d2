@@ -1,3 +1,4 @@
+import { stageAtDay } from "@/lib/crop-stage";
 import { CropIcon } from "@/components/krishi/crop-icon";
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
@@ -33,7 +34,7 @@ export function CropAdvisoryWidget() {
         const guide = FARMING_STAGES[p.crop_type];
         if (!guide) continue;
         const days = Math.max(0, daysSince(p.planting_date));
-        const stage = guide.stages.find((s) => days >= s.startDay && days < s.endDay);
+        const stage = stageAtDay(guide.stages, days);
         if (!stage || stage.tasks.length === 0) continue;
         const pendingIndex = stage.tasks.findIndex(
           (_task, index) => !completions.has(`${p.id}::${stage.id}::${index}`),
