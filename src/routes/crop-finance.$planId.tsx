@@ -26,7 +26,7 @@ export const Route = createFileRoute("/crop-finance/$planId")({
   }),
   component: FinancePage,
   errorComponent: ({ error }) => (
-    <div className="p-6 text-center">ত্রুটি: {(error as Error).message}</div>
+    <div className="p-6 text-center">তথ্য আনা যায়নি — ইন্টারনেট দেখে আবার চেষ্টা করুন।</div>
   ),
   notFoundComponent: () => <div className="p-6 text-center">পরিকল্পনা পাওয়া যায়নি</div>,
 });
