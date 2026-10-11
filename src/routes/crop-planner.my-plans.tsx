@@ -26,6 +26,7 @@ type Plan = {
   crop_type: string;
   planting_date: string;
   is_active: boolean;
+  is_gap?: boolean | null;
   created_at: string;
 };
 
@@ -103,6 +104,7 @@ function MyPlansPage() {
                     <span className="text-2xl"><CropIcon crop={p.crop_type} fallback={icon} /></span>
                     <div>
                       <div className="font-bold text-gray-900">{p.crop_type}</div>
+                      {p.is_gap && <div className="inline-block mt-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5">🛡️ GAP নিয়ম মেনে চাষ</div>}
                       <div className="text-[11px] text-gray-500">রোপণ: {formatBnDate(new Date(p.planting_date))}</div>
                     </div>
                   </div>
