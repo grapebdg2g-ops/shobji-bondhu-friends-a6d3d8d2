@@ -14,6 +14,8 @@ export function bnToNum(s: string): string {
 
 /** Parses "১ মিলি / লিটার পানি" → { amount: 1, unit: "মিলি" }. */
 export function parseDosePerLiter(dose: string): { amount: number; unit: "মিলি" | "গ্রাম" } | null {
+  // Only per-litre spray doses; seed (per kg) or granular (per acre) doses are not tank doses.
+  if (!/লিটার|litre|liter|\/\s*l\b/i.test(dose)) return null;
   const m = bnToNum(dose).match(/([\d.]+)\s*(মিলি|গ্রাম|ml|g)/i);
   if (!m) return null;
   const amount = parseFloat(m[1]);
