@@ -57,7 +57,7 @@ function LoginPage() {
 
   const handleGoogle = async () => {
     setLoading(true);
-    const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
+    const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: returnUrl() });
     if (r.error) { toast.error("Google সাইন-ইন ব্যর্থ"); setLoading(false); return; }
     if (r.redirected) return;
     await afterLogin();
@@ -116,7 +116,7 @@ function LoginPage() {
     const { data, error } = await supabase.auth.signUp({
       email: regEmail,
       password: regPassword,
-      options: { emailRedirectTo: window.location.origin },
+      options: { emailRedirectTo: returnUrl() },
     });
     if (error) { toast.error(error.message); setLoading(false); return; }
     if (data.session) {
