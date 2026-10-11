@@ -216,7 +216,7 @@ export function buildTomatoSchedule(
   // label limit) and no long-PHI chemical is scheduled inside the harvest window.
   const end = addDays(planting, totalDays);
   const SAFE_BEFORE_HARVEST = 14;
-  const pestTargets = ["tomato-fruitborer", "tomato-whitefly", "tomato-mite"] as const;
+  const pestTargets = ["tomato-fruitborer", "tomato-whitefly", "tomato-redmite"] as const;
   let pestCount = 0;
   let lbCount = 0;
   for (let d = nextDate(planting, 12, 22); d <= end; d = addDays(d, 10)) {
