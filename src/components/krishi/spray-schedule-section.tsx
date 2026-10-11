@@ -96,8 +96,8 @@ export function SprayScheduleSection({ userId, planId, cropType, plantingDate, d
 
   function rotationWarning(e: SprayEvent): string | null {
     if (!e.problem) return null;
-    const idx = main.indexOf(e);
-    const prev = [...main.slice(0, idx)].reverse().find((p) => completions.has(p.id) && p.problem);
+    const idx = displayMain.indexOf(e);
+    const prev = [...displayMain.slice(0, idx)].reverse().find((p) => completions.has(p.id) && p.problem);
     if (!prev?.problem) return null;
     const prevGroups = new Set(getAllChemicalInfo(prev.problem.chemicals[0]?.name ?? "").filter((a) => !a.group.startsWith("M")).map(groupKey));
     const mine = getAllChemicalInfo(e.problem.chemicals[0]?.name ?? "").filter((a) => prevGroups.has(groupKey(a)));
