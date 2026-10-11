@@ -1,3 +1,4 @@
+import { harvestStartFor } from "@/lib/spray-schedule";
 import { stageAtDay } from "@/lib/crop-stage";
 import { CropIcon } from "@/components/krishi/crop-icon";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
@@ -72,6 +73,8 @@ type Plan = {
   planting_date: string;
   is_active: boolean;
   is_gap?: boolean;
+  variety?: string | null;
+  land_shotok?: number | null;
 };
 
 function PlanAdvisory() {
@@ -87,6 +90,23 @@ function PlanAdvisory() {
     idx: number;
   } | null>(null);
   const [loaded, setLoaded] = useState(false);
+  const [phiUntil, setPhiUntil] = useState<{ date: Date; product: string } | null>(null);
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("spray_logs")
+      .select("product, sprayed_on, phi_days")
+      .eq("plan_id", planId)
+      .then(({ data }) => {
+        let best: { date: Date; product: string } | null = null;
+        for (const r of data ?? []) {
+          const d = new Date(r.sprayed_on);
+          d.setDate(d.getDate() + r.phi_days);
+          if (!best || d > best.date) best = { date: d, product: r.product };
+        }
+        setPhiUntil(best && best.date > new Date() ? best : null);
+      });
+  }, [user, planId, allCompletions]);
   const stageRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   useEffect(() => {
@@ -207,7 +227,7 @@ function PlanAdvisory() {
           <Link
             to="/crop-guide"
             aria-label="ফিরে যান"
-            className="h-9 w-9 rounded-full bg-white/15 flex items-center justify-center"
+            className="h-11 w-11 rounded-full bg-white/15 flex items-center justify-center"
           >
             <ArrowLeft className="h-5 w-5" />
           </Link>
@@ -259,8 +279,37 @@ function PlanAdvisory() {
         </div>
       </header>
 
-      {/* Crop finance ledger — sticky, always on top */}
-      {user && <CropFinanceSection userId={user.id} planId={planId} cropType={plan.crop_type} />}
+      {/* Today — what the farmer needs first */}
+      <section className="px-5 mt-5">
+        <div className="bg-white rounded-2xl p-4 shadow-sm ring-1 ring-emerald-200 space-y-3">
+          <p className="text-base font-bold text-gray-900">
+            📅 আজ — {toBn(days)}তম দিন · {currentStage.icon} {currentStage.name}
+          </p>
+          {phiUntil && (
+            <p className="rounded-xl bg-red-50 p-3 text-sm font-bold text-red-700">
+              ⛔ {formatBnDate(phiUntil.date)} পর্যন্ত এই জমির ফসল তুলবেন না ({phiUntil.product.split(" (")[0]})
+            </p>
+          )}
+          {(() => {
+            const pending = currentStage.tasks
+              .map((t, i) => ({ t, i }))
+              .filter(({ i }) => !completions.has(taskId(currentStage.id, i)))
+              .slice(0, 3);
+            if (!pending.length)
+              return <p className="text-sm text-emerald-700">✅ এই ধাপের সব কাজ শেষ।</p>;
+            return pending.map(({ t, i }) => (
+              <button
+                key={i}
+                onClick={() => markComplete(currentStage.id, i)}
+                className="w-full min-h-12 flex items-center gap-3 rounded-xl bg-emerald-50 px-3 py-2 text-left"
+              >
+                <span className="h-7 w-7 shrink-0 rounded-lg ring-2 ring-emerald-500 bg-white" />
+                <span className="text-base text-gray-900">{t.title}</span>
+              </button>
+            ));
+          })()}
+        </div>
+      </section>
 
       {/* Planting info card */}
       <section className="px-5 mt-5">
@@ -283,7 +332,7 @@ function PlanAdvisory() {
             <strong>মৌসুম:</strong> {guide.season}
           </p>
           <p className="text-gray-700">
-            <strong>জাত:</strong> {guide.varieties.slice(0, 2).join(", ")}
+            <strong>জাত:</strong> {plan.variety || guide.varieties.slice(0, 2).join(", ")}
           </p>
           <p className="text-gray-700">
             <strong>আনুমানিক ফলন:</strong> {guide.yield}
@@ -311,11 +360,13 @@ function PlanAdvisory() {
         </button>
       </section>
 
+      {user && <CropFinanceSection userId={user.id} planId={planId} cropType={plan.crop_type} />}
+
       {plan.is_gap && (
         <GapProtocolSection
           cropType={plan.crop_type}
           plantingDate={plan.planting_date}
-          daysUntilHarvest={guide.totalDays - days}
+          daysUntilHarvest={harvestStartFor(plan.crop_type) - days}
           completions={completions}
           onComplete={async (tid) => {
             if (completions.has(tid)) return;
@@ -345,6 +396,7 @@ function PlanAdvisory() {
           days={days}
           completions={completions}
           isGap={!!plan.is_gap}
+          landShotok={plan.land_shotok ?? null}
           onComplete={async (tid) => {
             if (completions.has(tid)) return;
             try {
