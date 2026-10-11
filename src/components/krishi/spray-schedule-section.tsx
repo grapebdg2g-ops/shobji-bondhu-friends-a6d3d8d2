@@ -8,7 +8,7 @@ import { groupKey } from "@/data/crop-knowledge";
 import { evaluateSprayWeather, parseDosePerLiter, tankPlan, mixRank, MIX_LABELS, tankMixWarnings, maxPhiDays, phiConflict, TANK_LITERS, LITERS_PER_SHOTOK } from "@/lib/spray-tools";
 import { Bell, Check, SprayCan, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
-import { buildSpraySchedule, syncSprayReminders, type SprayEvent } from "@/lib/spray-schedule";
+import { applyGapSchedule, buildSpraySchedule, syncSprayReminders, type SprayEvent } from "@/lib/spray-schedule";
 import { TOMATO_SPRAY_NOTES } from "@/lib/tomato-spray-schedule";
 import { addDays, formatBnDate } from "@/lib/bn-date";
 import { toBn } from "@/lib/bn";
