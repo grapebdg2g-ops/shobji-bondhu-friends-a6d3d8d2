@@ -15,4 +15,5 @@
 - [x] App-styled delete confirmation (chat, moderation)
 - [x] District search; phone +880 normalization
 - [ ] Guest preview of prices
-- [ ] Forecast range band + disclaimer; real online status; feed one-tap reaction
+- [x] Forecast range band + disclaimer; removed fake online dot in message list
+- [ ] Feed one-tap reaction; larger dose/money text; consistent page widths + back button
