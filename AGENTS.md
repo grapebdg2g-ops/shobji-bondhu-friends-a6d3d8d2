@@ -1,5 +1,7 @@
 # Project architecture rules
 
+- Serve the landing community preview through an anonymous, read-only server function with an explicit field allowlist and bounded latest-post query; never expose private profiles or use admin access for it.
+
 - Keep the introduction, market prices and static crop guides public through the shared public-page matcher and navigation; anonymous database access is read-only for market data, while personal plans and write actions require authentication.
 
 - Fetch reactions for all visible posts under one shared React Query key; this prevents one database request per post while preserving per-post optimistic updates.- Keep `.env` tracked in git (not in .gitignore); the hosted build reads VITE_SUPABASE_* from it — ignoring it breaks the preview with "Missing Supabase environment variable(s)".
