@@ -119,8 +119,7 @@ function CropDiaryPage() {
       const guide = FARMING_STAGES[plan.crop_type];
       if (!guide) continue;
       const days = Math.max(0, daysSince(plan.planting_date));
-      const stage =
-        stageAtDay(guide.stages, days);
+      const stage = stageAtDay(guide.stages, days);
       if (!stage) continue;
       stage.tasks.slice(0, 2).forEach((task, index) => {
         result.push({ plan, stageName: stage.name, task, index, taskId: `${stage.id}::${index}` });

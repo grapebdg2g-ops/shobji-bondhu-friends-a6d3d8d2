@@ -104,7 +104,11 @@ export function eventPhiDays(e: SprayEvent): number {
  * harvest day becomes a safe bio alternative. GAP plans additionally honour the
  * crop's stricter GAP PHI.
  */
-export function applyPhiSafety(events: SprayEvent[], cropType: string, isGap = false): SprayEvent[] {
+export function applyPhiSafety(
+  events: SprayEvent[],
+  cropType: string,
+  isGap = false,
+): SprayEvent[] {
   const harvestDay = harvestStartFor(cropType);
   const gapPhi = isGap ? (getGapProfile(cropType)?.phiDays ?? 0) : 0;
   return events.map((e) => {

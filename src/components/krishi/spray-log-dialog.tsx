@@ -74,7 +74,9 @@ export function SprayLogDialog({ event, planId, userId, land, onClose, onSaved }
                 type="checkbox"
                 className="mt-0.5 h-6 w-6 shrink-0 accent-primary"
                 checked={checked[i]}
-                onChange={(e) => setChecked((p) => p.map((v, j) => (j === i ? e.target.checked : v)))}
+                onChange={(e) =>
+                  setChecked((p) => p.map((v, j) => (j === i ? e.target.checked : v)))
+                }
               />
               {c}
             </label>
@@ -83,7 +85,11 @@ export function SprayLogDialog({ event, planId, userId, land, onClose, onSaved }
 
         <label className="block text-sm font-semibold text-foreground">
           কোন ওষুধ দিয়েছেন
-          <select value={product} onChange={(e) => setProduct(e.target.value)} className={`${field} mt-1`}>
+          <select
+            value={product}
+            onChange={(e) => setProduct(e.target.value)}
+            className={`${field} mt-1`}
+          >
             {options.map((o) => (
               <option key={o} value={o}>
                 {o}
@@ -94,21 +100,40 @@ export function SprayLogDialog({ event, planId, userId, land, onClose, onSaved }
           </select>
         </label>
         {product === "__other" && (
-          <input value={other} onChange={(e) => setOther(e.target.value)} placeholder="ওষুধের নাম" className={field} />
+          <input
+            value={other}
+            onChange={(e) => setOther(e.target.value)}
+            placeholder="ওষুধের নাম"
+            className={field}
+          />
         )}
         <div className="grid grid-cols-2 gap-3">
           <label className="block text-sm font-semibold text-foreground">
             তারিখ
-            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={`${field} mt-1`} />
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className={`${field} mt-1`}
+            />
           </label>
           <label className="block text-sm font-semibold text-foreground">
             জমি (শতক)
-            <input inputMode="decimal" value={shotok} onChange={(e) => setShotok(e.target.value)} className={`${field} mt-1`} />
+            <input
+              inputMode="decimal"
+              value={shotok}
+              onChange={(e) => setShotok(e.target.value)}
+              className={`${field} mt-1`}
+            />
           </label>
         </div>
         <label className="block text-sm font-semibold text-foreground">
           মাত্রা
-          <input value={dose} onChange={(e) => setDose(e.target.value)} className={`${field} mt-1`} />
+          <input
+            value={dose}
+            onChange={(e) => setDose(e.target.value)}
+            className={`${field} mt-1`}
+          />
         </label>
         {phi > 0 && (
           <p className="rounded-xl bg-destructive/10 p-3 text-sm font-semibold text-destructive">
@@ -117,7 +142,10 @@ export function SprayLogDialog({ event, planId, userId, land, onClose, onSaved }
         )}
 
         <div className="grid grid-cols-2 gap-3 pt-1">
-          <button onClick={onClose} className="min-h-12 rounded-xl ring-1 ring-border font-bold text-foreground">
+          <button
+            onClick={onClose}
+            className="min-h-12 rounded-xl ring-1 ring-border font-bold text-foreground"
+          >
             বাতিল
           </button>
           <button
@@ -146,8 +174,14 @@ export function FirstAidCard() {
         <li>জোর করে বমি করাবেন না; অজ্ঞান হলে কিছু খাওয়াবেন না।</li>
         <li>ওষুধের বোতল/লেবেল সঙ্গে নিয়ে দ্রুত নিকটস্থ হাসপাতালে যান।</li>
         <li>
-          জরুরি সেবা: <a href="tel:999" className="font-bold text-destructive underline">৯৯৯</a> · স্বাস্থ্য বাতায়ন:{" "}
-          <a href="tel:16263" className="font-bold text-destructive underline">১৬২৬৩</a>
+          জরুরি সেবা:{" "}
+          <a href="tel:999" className="font-bold text-destructive underline">
+            ৯৯৯
+          </a>{" "}
+          · স্বাস্থ্য বাতায়ন:{" "}
+          <a href="tel:16263" className="font-bold text-destructive underline">
+            ১৬২৬৩
+          </a>
         </li>
       </ul>
     </details>

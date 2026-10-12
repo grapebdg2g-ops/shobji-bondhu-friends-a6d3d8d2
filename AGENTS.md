@@ -14,3 +14,4 @@
 - Keep GAP (good agricultural practice) protocol rules in src/data/gap-protocol.ts keyed by Bangla crop name and gated by user_crop_plans.is_gap; GAP checklist completions reuse crop_task_completions with 'gap:' task ids.
 - Compute the current crop stage only via `stageAtDay` and harvest start via `firstHarvestDay` (src/lib/crop-stage.ts); master stages are normalized to cover 0..totalDays so every screen agrees.
 - Spray harvest-safety (PHI) uses the longest PHI of every offered chemical counted from first harvest, applied to all plans via `applyPhiSafety`; real sprays are recorded in `spray_logs` behind a safety checklist.
+- Scale stage timelines to the chosen variety only via scaleGuide/varietyDays (src/lib/crop-timeline.ts), clamped ±30%; keeps every screen and reminder on one timeline.
