@@ -15,3 +15,4 @@
 - Compute the current crop stage only via `stageAtDay` and harvest start via `firstHarvestDay` (src/lib/crop-stage.ts); master stages are normalized to cover 0..totalDays so every screen agrees.
 - Spray harvest-safety (PHI) uses the longest PHI of every offered chemical counted from first harvest, applied to all plans via `applyPhiSafety`; real sprays are recorded in `spray_logs` behind a safety checklist.
 - Scale stage timelines to the chosen variety only via scaleGuide/varietyDays (src/lib/crop-timeline.ts), clamped ±30%; keeps every screen and reminder on one timeline.
+- Save crop checklist ticks with stableTaskId (src/lib/task-id.ts, title-based) and read via isTaskDone, which also honours legacy index ids; reordering guide tasks must never move a farmer's tick.
