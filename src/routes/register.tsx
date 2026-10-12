@@ -5,15 +5,9 @@ import logo from "@/assets/logo.webp";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { DISTRICTS, CROPS, getUpazilas } from "@/lib/bd-data";
+import { CROPS } from "@/lib/bd-data";
+import { DistrictUpazilaPicker } from "@/components/krishi/district-upazila-picker";
 import { toast } from "sonner";
 import { useUser } from "@/contexts/user-context";
 
@@ -105,43 +99,13 @@ function RegisterPage() {
           />
         </div>
 
-        <div>
-          <Label className="text-base font-semibold">জেলা</Label>
-          <Select
-            value={district}
-            onValueChange={(v) => {
-              setDistrict(v);
-              setUpazila("");
-            }}
-          >
-            <SelectTrigger className="h-13 text-base mt-1.5">
-              <SelectValue placeholder="জেলা নির্বাচন করুন" />
-            </SelectTrigger>
-            <SelectContent className="max-h-72">
-              {DISTRICTS.map((d) => (
-                <SelectItem key={d} value={d} className="text-base">
-                  {d}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div>
-          <Label className="text-base font-semibold">উপজেলা</Label>
-          <Select value={upazila} onValueChange={setUpazila} disabled={!district}>
-            <SelectTrigger className="h-13 text-base mt-1.5">
-              <SelectValue placeholder={district ? "উপজেলা নির্বাচন করুন" : "আগে জেলা বেছে নিন"} />
-            </SelectTrigger>
-            <SelectContent className="max-h-72">
-              {getUpazilas(district).map((u) => (
-                <SelectItem key={u} value={u} className="text-base">
-                  {u}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        <DistrictUpazilaPicker
+          district={district}
+          upazila={upazila}
+          onDistrictChange={setDistrict}
+          onUpazilaChange={setUpazila}
+          required
+        />
 
         <div>
           <Label className="text-base font-semibold mb-2 block">আপনার ফসল</Label>
