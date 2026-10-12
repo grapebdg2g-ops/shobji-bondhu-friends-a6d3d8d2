@@ -1,17 +1,18 @@
-import { describe, expect, it } from "vitest";
+import { describe, it } from "node:test";
+import assert from "node:assert/strict";
 import { isTaskDone, legacyUpgrades, stableTaskId } from "./task-id";
 
 describe("stable task ids", () => {
   it("does not depend on task position", () => {
-    expect(stableTaskId("seedling", "সেচ দিন")).toBe(stableTaskId("seedling", "সেচ দিন"));
-    expect(stableTaskId("seedling", "সেচ দিন")).not.toBe(stableTaskId("seedling", "সার দিন"));
+    assert.equal(stableTaskId("seedling", "সেচ দিন"), stableTaskId("seedling", "সেচ দিন"));
+    assert.notEqual(stableTaskId("seedling", "সেচ দিন"), stableTaskId("seedling", "সার দিন"));
   });
   it("still honours old index-based ticks", () => {
-    expect(isTaskDone(new Set(["seedling::1"]), "seedling", "x", 1)).toBe(true);
-    expect(isTaskDone(new Set(["seedling::1"]), "seedling", "x", 0)).toBe(false);
+    assert.equal(isTaskDone(new Set(["seedling::1"]), "seedling", "x", 1), true);
+    assert.equal(isTaskDone(new Set(["seedling::1"]), "seedling", "x", 0), false);
   });
   it("lists old ticks to re-save under the stable id", () => {
     const stages = [{ id: "s", tasks: [{ title: "a" }, { title: "b" }] }];
-    expect(legacyUpgrades(new Set(["s::1"]), stages)).toEqual([stableTaskId("s", "b")]);
+    assert.deepEqual(legacyUpgrades(new Set(["s::1"]), stages), [stableTaskId("s", "b")]);
   });
 });
