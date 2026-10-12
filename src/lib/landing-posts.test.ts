@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest";
+import { describe, it } from "node:test";
+import assert from "node:assert/strict";
 import { latestLandingPosts, type LandingPost } from "./landing-posts";
 
 describe("landing community preview", () => {
@@ -9,8 +10,8 @@ describe("landing community preview", () => {
       created_at: `2026-10-${String(i + 1).padStart(2, "0")}T00:00:00Z`,
     }));
     const result = latestLandingPosts(posts);
-    expect(result).toHaveLength(10);
-    expect(result[0].id).toBe("11");
-    expect(result[9].id).toBe("2");
+    assert.equal(result.length, 10);
+    assert.equal(result[0].id, "11");
+    assert.equal(result[9].id, "2");
   });
 });

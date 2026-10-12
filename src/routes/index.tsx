@@ -48,7 +48,7 @@ function Index() {
             <p className="mt-4 text-3xl font-bold leading-relaxed">আমরা কৃষক মিলে করব বাজারদর,<br />ঠকব নাকো আর।</p>
             <p className="mt-4 text-xl">কৃষকের বিশ্বস্ত সঙ্গী</p>
             <p className="mt-4 text-base leading-7">আজকের বাজারদর, ফসলের চাষ পদ্ধতি ও কৃষি পরামর্শ—বাংলায়, আপনার হাতের কাছে।</p>
-            <div className="mt-6 flex flex-wrap gap-3"><Button size="lg" variant="secondary" asChild><Link to="/prices"><TrendingUp />আজকের বাজারদর<ArrowRight /></Link></Button><Button variant="outline" asChild><Link to="/vegetable-guide">ফসল গাইড</Link></Button></div>
+            <div className="mt-6 flex flex-wrap gap-3"><Button size="lg" variant="secondary" asChild><Link to="/prices"><TrendingUp />আজকের বাজারদর<ArrowRight /></Link></Button><Button variant="secondary" asChild><Link to="/vegetable-guide">ফসল গাইড</Link></Button></div>
           </div>
         </div>
       </section>
