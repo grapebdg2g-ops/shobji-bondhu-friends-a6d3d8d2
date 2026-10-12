@@ -1,5 +1,6 @@
 import { harvestStartFor } from "@/lib/spray-schedule";
 import { stageAtDay } from "@/lib/crop-stage";
+import { scaleGuide, varietyDays } from "@/lib/crop-timeline";
 import { CropIcon } from "@/components/krishi/crop-icon";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -126,7 +127,10 @@ function PlanAdvisory() {
     })();
   }, [loading, user, planId, navigate]);
 
-  const guide = plan ? FARMING_STAGES[plan.crop_type] : null;
+  const guide = useMemo(() => {
+    const g = plan ? FARMING_STAGES[plan.crop_type] : null;
+    return g && plan ? scaleGuide(g, varietyDays(plan.crop_type, plan.variety)) : g;
+  }, [plan]);
   const completions = useMemo(
     () =>
       new Set(
