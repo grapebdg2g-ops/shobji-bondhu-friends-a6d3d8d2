@@ -1,3 +1,4 @@
+import { normalizeBdPhone } from "@/lib/bd-phone";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Mail, Phone, ChevronRight, UserPlus, LogIn, Eye, EyeOff, KeyRound } from "lucide-react";
@@ -89,10 +90,12 @@ function LoginPage() {
   };
 
   const handleSendOtp = async () => {
-    if (!phone) return toast.error("ফোন নম্বর দিন");
+    const normalized = normalizeBdPhone(phone);
+    if (!normalized) return toast.error("সঠিক মোবাইল নম্বর দিন (যেমন 017XXXXXXXX)");
     if (otpCooldown > 0) return;
+    setPhone(normalized);
     setLoading(true);
-    const { error } = await supabase.auth.signInWithOtp({ phone });
+    const { error } = await supabase.auth.signInWithOtp({ phone: normalized });
     setLoading(false);
     if (error) return toast.error(error.message);
     setOtpSent(true);
@@ -113,7 +116,7 @@ function LoginPage() {
 
   const handleVerifyOtp = async () => {
     setLoading(true);
-    const { error } = await supabase.auth.verifyOtp({ phone, token: otp, type: "sms" });
+    const { error } = await supabase.auth.verifyOtp({ phone: normalizeBdPhone(phone) ?? phone, token: otp, type: "sms" });
     setLoading(false);
     if (error) return toast.error(error.message);
     await afterLogin();
@@ -307,7 +310,7 @@ function LoginPage() {
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                         className="h-12 text-base mt-1"
-                        placeholder="+8801XXXXXXXXX"
+                        placeholder="01XXXXXXXXX"
                       />
                     </div>
                     {otpSent && (
