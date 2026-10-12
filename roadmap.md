@@ -16,4 +16,4 @@
 - [x] District search; phone +880 normalization
 - [ ] Guest preview of prices
 - [x] Forecast range band + disclaimer; removed fake online dot in message list
-- [ ] Feed one-tap reaction; larger dose/money text; consistent page widths + back button
+- [x] Feed one-tap reaction; larger dose/money text; max-w-6xl page width + back button
