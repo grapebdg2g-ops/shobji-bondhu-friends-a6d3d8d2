@@ -19,6 +19,8 @@
 - [x] Feed one-tap reaction; larger dose/money text; max-w-6xl page width + back button
 
 ## Current request
+- [ ] Highlight market prices and farmer social connections; remove planning promotion from introduction
+- [ ] Show up to 10 real social posts safely and add contact number
 - [x] Match embedded finance header to brand gradient without visual glitches
 - [x] Make the full spray schedule section collapsible
 - [x] Verify public pages and anonymous writes; no current account plan available for live control check
