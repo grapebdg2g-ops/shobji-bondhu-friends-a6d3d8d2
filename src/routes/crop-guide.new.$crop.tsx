@@ -106,6 +106,18 @@ function NewCropPlan() {
     } catch {
       /* plan still saved */
     }
+    try {
+      const f = await syncFertilizerReminders(
+        user.id,
+        (data as { id: string }).id,
+        crop,
+        toIsoDate(date),
+        variety || null,
+      );
+      if (f > 0) toast.success(`${f}টি সার দেওয়ার রিমাইন্ডার সেট হয়েছে`);
+    } catch {
+      /* plan still saved */
+    }
     navigate({ to: "/crop-guide/plan/$planId", params: { planId: (data as { id: string }).id } });
   }
 

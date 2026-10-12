@@ -4,8 +4,51 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { configureVapid, sendWebPush } from "@/lib/push.server";
 import { getDistrictUpazilaLatLng } from "@/lib/bd-data";
 import { fetchForecast, evaluateAlert, type WeatherAlert } from "@/lib/weather.server";
+import { ipmWeatherAlerts } from "@/lib/ipm-weather";
 
 const MAX_PER_USER_PER_DAY = 3;
+
+/** Crop-specific IPM warnings for farmers in this area with active plans (once per crop per day). */
+async function sendIpmAlerts(
+  district: string,
+  upazila: string | null,
+  forecast: Awaited<ReturnType<typeof fetchForecast>>,
+) {
+  let subQ = supabaseAdmin.from("push_subscriptions").select("user_id").eq("district", district);
+  subQ = upazila ? subQ.eq("upazila", upazila) : subQ.is("upazila", null);
+  const { data: subs } = await subQ;
+  const userIds = Array.from(new Set((subs ?? []).map((s) => s.user_id)));
+  if (!userIds.length) return 0;
+  const since = new Date(Date.now() - 200 * 86400000).toISOString().slice(0, 10);
+  const { data: plans } = await supabaseAdmin
+    .from("user_crop_plans")
+    .select("user_id, crop_type")
+    .in("user_id", userIds)
+    .gte("planting_date", since);
+  const alerts = ipmWeatherAlerts(forecast, (plans ?? []).map((p) => p.crop_type));
+  let sent = 0;
+  for (const a of alerts) {
+    const { error } = await supabaseAdmin
+      .from("weather_alerts_sent")
+      .insert({ district, upazila, alert_type: `IPM_${a.crop}` });
+    if (error) continue; // already sent today
+    const users = Array.from(
+      new Set((plans ?? []).filter((p) => p.crop_type === a.crop).map((p) => p.user_id)),
+    );
+    if (!users.length) continue;
+    await supabaseAdmin.from("notifications").insert(
+      users.map((uid) => ({
+        user_id: uid,
+        type: "ipm_weather",
+        title: a.title,
+        body: a.body,
+        ref_type: "weather",
+      })),
+    );
+    sent += users.length;
+  }
+  return sent;
+}
 
 async function processLocation(district: string, upazila: string | null) {
   const [lat, lng] = getDistrictUpazilaLatLng(district, upazila);
@@ -17,8 +60,9 @@ async function processLocation(district: string, upazila: string | null) {
     return { district, upazila, skipped: true, reason: "forecast_error" };
   }
   const locLabel = upazila ? `${upazila}, ${district}` : district;
+  const ipmSent = await sendIpmAlerts(district, upazila, forecast);
   const alert = evaluateAlert(locLabel, forecast);
-  if (!alert) return { district, upazila, skipped: true, reason: "no_alert" };
+  if (!alert) return { district, upazila, skipped: true, reason: "no_alert", ipmSent };
 
   // Dedupe per (district, upazila, alert_type, day)
   const { error: dedupeErr } = await supabaseAdmin
