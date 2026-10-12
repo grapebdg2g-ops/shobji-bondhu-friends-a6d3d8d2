@@ -7,4 +7,5 @@
 - [x] Spray log with safety checklist, first-aid card, harvest-ban badge.
 - [x] Plan creation: variety + land; Bangla calendar; land shared with spray section.
 - [x] Plan page "today" card first; farming in bottom menu; duplicate plan list merged; friendly errors.
-- [ ] Variety-based timeline scaling, stable task IDs, computable fertilizer reminders, weather-triggered IPM alerts (next round).
+- [x] Variety-based timeline scaling, fertilizer reminders, weather-triggered IPM alerts, lint auto-fix (1673→44).
+- [ ] Stable task IDs (needs a data migration of existing checklist ticks — awaiting go-ahead).
