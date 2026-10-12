@@ -120,6 +120,13 @@
       "when": 1791746083393,
       "tag": "0016_spray_logs_and_plan_variety",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1791837865545,
+      "tag": "0017_public_market_price_reads",
+      "breakpoints": true
     }
   ]
 }
