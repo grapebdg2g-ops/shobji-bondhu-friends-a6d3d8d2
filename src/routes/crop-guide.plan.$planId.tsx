@@ -287,7 +287,8 @@ function PlanAdvisory() {
           </p>
           {phiUntil && (
             <p className="rounded-xl bg-red-50 p-3 text-sm font-bold text-red-700">
-              ⛔ {formatBnDate(phiUntil.date)} পর্যন্ত এই জমির ফসল তুলবেন না ({phiUntil.product.split(" (")[0]})
+              ⛔ {formatBnDate(phiUntil.date)} পর্যন্ত এই জমির ফসল তুলবেন না (
+              {phiUntil.product.split(" (")[0]})
             </p>
           )}
           {(() => {

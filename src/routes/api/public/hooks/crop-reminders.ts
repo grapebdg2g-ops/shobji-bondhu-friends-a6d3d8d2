@@ -98,8 +98,7 @@ export const Route = createFileRoute("/api/public/hooks/crop-reminders")({
             0,
             Math.floor((Date.now() - new Date(plan.planting_date).getTime()) / 86400000),
           );
-          const stage =
-            stageAtDay(guide.stages, days);
+          const stage = stageAtDay(guide.stages, days);
           if (!stage) continue;
           const titles = stage.tasks
             .slice(0, 2)

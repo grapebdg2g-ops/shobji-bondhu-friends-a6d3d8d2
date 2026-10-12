@@ -158,8 +158,7 @@ function CropGuideIndex() {
               const pct = p.is_active
                 ? Math.min(100, Math.round((days / guide.totalDays) * 100))
                 : 100;
-              const currentStage =
-                stageAtDay(guide.stages, days)!;
+              const currentStage = stageAtDay(guide.stages, days)!;
               const done = !p.is_active;
               return (
                 <div
