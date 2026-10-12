@@ -556,11 +556,13 @@ function HistoryChart({
   const midPred =
     ((prediction.predicted_price_range?.min ?? 0) + (prediction.predicted_price_range?.max ?? 0)) /
     2;
-  const future: Array<{ date: string; predicted: number }> = [];
+  const lo = prediction.predicted_price_range?.min ?? midPred;
+  const hi = prediction.predicted_price_range?.max ?? midPred;
+  const future: Array<{ date: string; predicted: number; low: number; high: number }> = [];
   for (let i = 1; i <= 7; i++) {
     const d = new Date(lastDate);
     d.setDate(d.getDate() + i);
-    future.push({ date: d.toISOString().slice(0, 10), predicted: midPred });
+    future.push({ date: d.toISOString().slice(0, 10), predicted: midPred, low: lo, high: hi });
   }
   const data = [
     ...past.map((p) => ({ ...p, predicted: undefined as number | undefined })),
@@ -569,6 +571,8 @@ function HistoryChart({
       app: undefined,
       govt: undefined,
       predicted: f.predicted,
+      low: f.low,
+      high: f.high,
     })),
   ];
   const firstFuture = future[0]?.date;
@@ -625,9 +629,14 @@ function HistoryChart({
               strokeDasharray="5 4"
               dot={false}
             />
+            <Line type="monotone" dataKey="high" name="সর্বোচ্চ" stroke="#10b981" strokeOpacity={0.45} strokeWidth={1} dot={false} />
+            <Line type="monotone" dataKey="low" name="সর্বনিম্ন" stroke="#10b981" strokeOpacity={0.45} strokeWidth={1} dot={false} />
           </LineChart>
         </ResponsiveContainer>
       </div>
+      <p className="mt-2 rounded-lg bg-amber-50 px-3 py-2 text-[13px] leading-snug text-amber-900">
+        ⚠️ পূর্বাভাস একটি আনুমানিক সীমা (সর্বনিম্ন–সর্বোচ্চ), নিশ্চিত দাম নয়। বিক্রির আগে স্থানীয় বাজারে যাচাই করুন।
+      </p>
       <div className="flex gap-3 text-xs text-gray-600 mt-2 flex-wrap">
         <span className="flex items-center gap-1">
           <span className="w-3 h-0.5 bg-blue-600 inline-block" /> অ্যাপ ডেটা
