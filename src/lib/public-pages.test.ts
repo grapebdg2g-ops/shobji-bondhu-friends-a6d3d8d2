@@ -1,4 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { describe, it } from "node:test";
+import assert from "node:assert/strict";
+const expect = (actual: unknown) => ({ toBe: (expected: unknown) => assert.equal(actual, expected) });
 import { isPublicPage } from "./public-pages";
 describe("public pages", () => {
   it("allows the introduction without login", () => expect(isPublicPage("/")).toBe(true));

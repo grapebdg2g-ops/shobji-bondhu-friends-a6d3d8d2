@@ -207,7 +207,7 @@ ${ENTRY_TYPES.filter((t) => totals[t] > 0)
           </span>
           <span className="inline-flex items-center gap-2 shrink-0">
             <span
-              className={`px-2 py-0.5 rounded-full text-[13px] font-bold ${profit >= 0 ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"}`}
+              className={`px-2 py-0.5 rounded-full text-[13px] font-bold ${embedded ? "border border-current" : profit >= 0 ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"}`}
             >
               নীট {profit >= 0 ? "লাভ" : "ক্ষতি"} {fmtBdt(Math.abs(profit))}
             </span>
