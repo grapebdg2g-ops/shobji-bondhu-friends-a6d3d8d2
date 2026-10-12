@@ -297,6 +297,9 @@ function PlanAdvisory() {
             })}
           </div>
         </div>
+        {user && (
+          <CropFinanceSection userId={user.id} planId={planId} cropType={plan.crop_type} embedded />
+        )}
       </header>
 
       {/* Today — what the farmer needs first */}
@@ -380,8 +383,6 @@ function PlanAdvisory() {
           <ArrowDown className="h-5 w-5 text-sky-600" />
         </button>
       </section>
-
-      {user && <CropFinanceSection userId={user.id} planId={planId} cropType={plan.crop_type} />}
 
       {plan.is_gap && (
         <GapProtocolSection
