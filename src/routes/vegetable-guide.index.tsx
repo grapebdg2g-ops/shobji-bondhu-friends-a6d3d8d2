@@ -5,6 +5,7 @@ import { ArrowLeft, Search, Flame, TrendingUp } from "lucide-react";
 import { getAllCrops, type Category, type RiskLevel } from "@/data/master-crop-data";
 import { toBn } from "@/lib/bn";
 import { CropAdvisoryWidget } from "@/components/krishi/crop-advisory-widget";
+import { useUser } from "@/contexts/user-context";
 
 export const Route = createFileRoute("/vegetable-guide/")({
   component: VegetableGuidePage,
@@ -67,6 +68,7 @@ function seasonText(seasons: string[], plantingMonths: number[]) {
 }
 
 function VegetableGuidePage() {
+  const { user } = useUser();
   const navigate = useNavigate();
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState<Filter>("সবজি");
@@ -87,7 +89,7 @@ function VegetableGuidePage() {
         style={{ background: "var(--gradient-brand)" }}
       >
         <button
-          onClick={() => navigate({ to: "/dashboard" })}
+          onClick={() => navigate({ to: user ? "/dashboard" : "/" })}
           className="h-9 w-9 rounded-full bg-white/15 flex items-center justify-center"
         >
           <ArrowLeft className="h-5 w-5" />

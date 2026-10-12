@@ -104,16 +104,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "বাংলাদেশের কৃষকদের জন্য সামাজিক প্ল্যাটফর্ম — বাজার দর, বিনিময়, রোগ শনাক্ত ও সংবাদ।",
       },
-      {
-        property: "og:image",
-        content:
-          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/9edbdc7f-1f8e-4740-9934-df7391e67e49/id-preview-3c5cd3a0--8650a8d8-8f85-4dd3-b151-3b951324aae3.lovable.app-1779703405092.png",
-      },
-      {
-        name: "twitter:image",
-        content:
-          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/9edbdc7f-1f8e-4740-9934-df7391e67e49/id-preview-3c5cd3a0--8650a8d8-8f85-4dd3-b151-3b951324aae3.lovable.app-1779703405092.png",
-      },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },

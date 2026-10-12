@@ -3,6 +3,8 @@ import { ArrowLeft } from "lucide-react";
 import { AppSidebar, useSidebar } from "./app-sidebar";
 import { BottomNav } from "./bottom-nav";
 import { useUser } from "@/contexts/user-context";
+import { PublicNav } from "./public-nav";
+import { isPublicPage } from "@/lib/public-pages";
 
 // Pages that render their own back button or are top-level tabs.
 const MAIN_TABS = ["/dashboard", "/prices", "/messages", "/profile", "/feed", "/ai-bondhu"];
@@ -22,6 +24,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     !/^\/crop-guide\/./.test(pathname);
   const hide = HIDDEN_ON.has(pathname) || pathname.startsWith("/groups/") || !user;
 
+  if (!user && isPublicPage(pathname)) return <><PublicNav />{children}</>;
   if (hide) return <>{children}</>;
 
   return (

@@ -4,6 +4,13 @@
 
 @custom-variant dark (&:is(.dark *));
 
+.brand-banner { background: var(--gradient-brand); color: var(--brand-on-gradient); }
+.finance-embedded { background: transparent; border-top: 1px solid var(--brand-divider); }
+.finance-embedded > button { color: var(--brand-on-gradient); }
+.finance-embedded > button:hover { background: var(--brand-divider); }
+.finance-embedded > button span, .finance-embedded > button svg { color: inherit; }
+.intro-shade { background: linear-gradient(90deg, var(--intro-scrim), transparent); }
+
 /*
  * Design system definition.
  *
@@ -72,6 +79,9 @@
 }
 
 :root {
+  --brand-on-gradient: oklch(0.99 0 0);
+  --brand-divider: oklch(1 0 0 / 18%);
+  --intro-scrim: oklch(0.2 0.04 150 / 85%);
   --radius: 0.625rem;
   --background: oklch(0.99 0.01 130);
   --foreground: oklch(0.2 0.03 150);
