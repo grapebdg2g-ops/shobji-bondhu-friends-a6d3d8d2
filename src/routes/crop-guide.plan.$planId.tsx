@@ -33,6 +33,7 @@ import { CropKnowledgePanel } from "@/components/krishi/crop-knowledge-panel";
 import { useCropCompletions } from "@/hooks/use-crop-completions";
 import { CropFinanceSection } from "@/components/krishi/crop-finance-section";
 import { GapProtocolSection } from "@/components/krishi/gap-protocol-section";
+import { isTaskDone, legacyUpgrades, stableTaskId } from "@/lib/task-id";
 
 export const Route = createFileRoute("/crop-guide/plan/$planId")({
   component: PlanAdvisory,
@@ -146,6 +147,15 @@ function PlanAdvisory() {
     return stageAtDay(guide.stages, days);
   }, [guide, days]);
 
+  // One-time upgrade of old index-based ticks to stable task IDs (old rows kept).
+  const upgraded = useRef(false);
+  useEffect(() => {
+    if (!guide || !user || upgraded.current || !allCompletions.size) return;
+    upgraded.current = true;
+    for (const tid of legacyUpgrades(completions, guide.stages))
+      complete.mutate({ planId, taskId: tid });
+  }, [guide, user, completions, allCompletions, complete, planId]);
+
   // Auto-expand current stage
   useEffect(() => {
     if (currentStage) setOpenStages(new Set([currentStage.id]));
@@ -171,8 +181,14 @@ function PlanAdvisory() {
 
   const totalPct = Math.min(100, Math.round((days / guide.totalDays) * 100));
 
+  function taskTitle(stageId: string, idx: number) {
+    return guide!.stages.find((s) => s.id === stageId)?.tasks[idx]?.title ?? "";
+  }
   function taskId(stageId: string, idx: number) {
-    return `${stageId}::${idx}`;
+    return stableTaskId(stageId, taskTitle(stageId, idx));
+  }
+  function taskDone(stageId: string, idx: number) {
+    return isTaskDone(completions, stageId, taskTitle(stageId, idx), idx);
   }
 
   function toggleStage(id: string) {
@@ -195,7 +211,7 @@ function PlanAdvisory() {
   async function markComplete(stageId: string, idx: number) {
     if (!user) return;
     const tid = taskId(stageId, idx);
-    if (completions.has(tid)) return;
+    if (taskDone(stageId, idx)) return;
     try {
       await complete.mutateAsync({ planId, taskId: tid });
     } catch {
@@ -298,7 +314,7 @@ function PlanAdvisory() {
           {(() => {
             const pending = currentStage.tasks
               .map((t, i) => ({ t, i }))
-              .filter(({ i }) => !completions.has(taskId(currentStage.id, i)))
+              .filter(({ i }) => !taskDone(currentStage.id, i))
               .slice(0, 3);
             if (!pending.length)
               return <p className="text-sm text-emerald-700">✅ এই ধাপের সব কাজ শেষ।</p>;
@@ -473,8 +489,7 @@ function PlanAdvisory() {
               {isOpen && (
                 <div className="px-4 pb-4 space-y-2">
                   {stage.tasks.map((task, idx) => {
-                    const tid = taskId(stage.id, idx);
-                    const done = completions.has(tid);
+                    const done = taskDone(stage.id, idx);
                     const cfg = TASK_TYPE_CONFIG[task.type as TaskType];
                     return (
                       <button
@@ -520,8 +535,7 @@ function PlanAdvisory() {
           {activeTask &&
             (() => {
               const cfg = TASK_TYPE_CONFIG[activeTask.task.type as TaskType];
-              const tid = taskId(activeTask.stage.id, activeTask.idx);
-              const done = completions.has(tid);
+              const done = taskDone(activeTask.stage.id, activeTask.idx);
               const isWarning =
                 activeTask.task.type === "disease" || activeTask.task.type === "pest";
               return (
