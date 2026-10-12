@@ -9,3 +9,10 @@
 - [x] Plan page "today" card first; farming in bottom menu; duplicate plan list merged; friendly errors.
 - [x] Variety-based timeline scaling, fertilizer reminders, weather-triggered IPM alerts, lint auto-fix (1673→44).
 - [x] Stable task IDs (title-based; old ticks honoured and re-saved).
+
+## UI/UX audit
+- [x] Zoom, lang=bn, safe-area, 44px buttons
+- [x] App-styled delete confirmation (chat, moderation)
+- [x] District search; phone +880 normalization
+- [ ] Guest preview of prices
+- [ ] Forecast range band + disclaimer; real online status; feed one-tap reaction

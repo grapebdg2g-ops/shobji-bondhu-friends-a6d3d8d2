@@ -16,6 +16,7 @@ import { AppErrorBoundary } from "@/components/krishi/app-error-boundary";
 import { PWAManager } from "@/components/krishi/pwa-manager";
 import { AppLayout } from "@/components/krishi/app-layout";
 import { SidebarProvider } from "@/components/krishi/app-sidebar";
+import { ConfirmHost } from "@/components/krishi/confirm-dialog";
 
 function NotFoundComponent() {
   return (
@@ -163,6 +164,7 @@ function RootComponent() {
             </AppLayout>
           </SidebarProvider>
           <PWAManager />
+          <ConfirmHost />
           <Toaster richColors position="top-center" />
         </UserProvider>
       </AppErrorBoundary>

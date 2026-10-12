@@ -1,3 +1,4 @@
+import { confirmAsk } from "@/components/krishi/confirm-dialog";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -164,8 +165,8 @@ function ModerationPage() {
                     </p>
                   </div>
                   <button
-                    onClick={() => {
-                      if (confirm("পোস্টটি স্থায়ীভাবে মুছে ফেলবেন?")) deletePost.mutate(p.id);
+                    onClick={async () => {
+                      if (await confirmAsk("পোস্টটি স্থায়ীভাবে মুছে ফেলবেন?")) deletePost.mutate(p.id);
                     }}
                     className="h-8 px-2 rounded-md bg-red-50 text-red-600 text-xs font-bold inline-flex items-center gap-1 shrink-0"
                   >
@@ -200,8 +201,8 @@ function ModerationPage() {
                   </p>
                 </div>
                 <button
-                  onClick={() => {
-                    if (confirm("বিনিময়টি মুছে ফেলবেন?")) deleteExchange.mutate(e.id);
+                  onClick={async () => {
+                    if (await confirmAsk("বিনিময়টি মুছে ফেলবেন?")) deleteExchange.mutate(e.id);
                   }}
                   className="h-8 px-2 rounded-md bg-red-50 text-red-600 text-xs font-bold inline-flex items-center gap-1 shrink-0"
                 >

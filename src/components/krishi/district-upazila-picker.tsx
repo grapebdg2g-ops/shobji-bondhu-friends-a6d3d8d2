@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { getDistricts, getUpazilas } from "@/data/bd-locations";
 
 type Props = {
@@ -26,7 +26,13 @@ export function DistrictUpazilaPicker({
   upazilaLabel = "উপজেলা",
   required,
 }: Props) {
-  const districts = useMemo(() => getDistricts(), []);
+  const [q, setQ] = useState("");
+  const all = useMemo(() => getDistricts(), []);
+  const districts = useMemo(() => {
+    const t = q.trim();
+    const list = t ? all.filter((d) => d.includes(t)) : all;
+    return district && !list.includes(district) ? [district, ...list] : list;
+  }, [all, q, district]);
   const upazilas = useMemo(() => getUpazilas(district), [district]);
 
   const handleDistrict = (val: string) => {
@@ -40,11 +46,19 @@ export function DistrictUpazilaPicker({
     <div className={wrap}>
       <label className="block">
         <span className="block text-sm font-semibold text-foreground mb-1.5">{districtLabel}</span>
+        <input
+          type="search"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="জেলা খুঁজুন…"
+          aria-label="জেলা খুঁজুন"
+          className="w-full h-11 px-3 mb-2 rounded-xl border border-input bg-background text-base focus:outline-none focus:ring-2 focus:ring-primary/30"
+        />
         <select
           required={required}
           value={district}
           onChange={(e) => handleDistrict(e.target.value)}
-          className="w-full h-11 px-3 rounded-xl border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+          className="w-full h-11 px-3 rounded-xl border border-input bg-background text-base focus:outline-none focus:ring-2 focus:ring-primary/30"
         >
           <option value="">— নির্বাচন করুন —</option>
           {districts.map((d) => (
@@ -62,7 +76,7 @@ export function DistrictUpazilaPicker({
           disabled={!district}
           value={upazila}
           onChange={(e) => onUpazilaChange(e.target.value)}
-          className="w-full h-11 px-3 rounded-xl border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-60 disabled:cursor-not-allowed"
+          className="w-full h-11 px-3 rounded-xl border border-input bg-background text-base focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-60 disabled:cursor-not-allowed"
         >
           <option value="">{district ? "— উপজেলা বেছে নিন —" : "আগে জেলা বেছে নিন"}</option>
           {upazilas.map((u) => (

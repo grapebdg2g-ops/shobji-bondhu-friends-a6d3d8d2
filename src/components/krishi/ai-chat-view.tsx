@@ -1,3 +1,4 @@
+import { confirmAsk } from "@/components/krishi/confirm-dialog";
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
@@ -392,7 +393,7 @@ export function AiChatView({ sessionId: initialSessionId }: { sessionId?: string
   };
 
   const deleteSession = async (id: string) => {
-    if (!confirm("এই চ্যাট মুছে ফেলবেন?")) return;
+    if (!(await confirmAsk("এই চ্যাট মুছে ফেলবেন?"))) return;
     const { error } = await supabase
       .from("chat_sessions" as never)
       .delete()
