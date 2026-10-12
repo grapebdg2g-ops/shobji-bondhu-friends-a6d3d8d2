@@ -1,3 +1,4 @@
+import { stableTaskId } from "@/lib/task-id";
 import { stageAtDay } from "@/lib/crop-stage";
 import { createFileRoute } from "@tanstack/react-router";
 import { isAuthorizedCronRequest, unauthorizedCronResponse } from "@/lib/cron-auth.server";
@@ -102,7 +103,11 @@ export const Route = createFileRoute("/api/public/hooks/crop-reminders")({
           if (!stage) continue;
           const titles = stage.tasks
             .slice(0, 2)
-            .filter((_, i) => !done.has(`${plan.id}::${stage.id}::${i}`))
+            .filter(
+              (t, i) =>
+                !done.has(`${plan.id}::${stage.id}::${i}`) &&
+                !done.has(`${plan.id}::${stableTaskId(stage.id, t.title)}`),
+            )
             .map((t) => t.title);
           if (titles.length)
             planTasks.push({
