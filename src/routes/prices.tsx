@@ -16,7 +16,14 @@ import { useMutedIds } from "@/hooks/use-muted-users";
 
 export const Route = createFileRoute("/prices")({
   component: PricesPage,
-  head: () => ({ meta: [{ title: "বাজার দর — কৃষক বন্ধু" }] }),
+  head: () => ({ meta: [
+    { title: "আজকের বাজারদর — কৃষক বন্ধু" },
+    { name: "description", content: "বাংলাদেশের জেলা ও উপজেলাভিত্তিক সরকারি DAM ও কৃষকদের বাজারদর, উৎস ও রিপোর্টের তারিখসহ।" },
+    { property: "og:title", content: "আজকের বাজারদর — কৃষক বন্ধু" },
+    { property: "og:description", content: "এলাকার সবজি ও কৃষিপণ্যের সর্বশেষ বাজারদর দেখুন, লগইন ছাড়াই।" },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
 });
 
 type Price = {
@@ -105,17 +112,9 @@ function PricesPage() {
 
   useEffect(() => {
     if (userLoading) return;
-    if (!user) {
-      navigate({ to: "/login" });
-      return;
-    }
-    if (!user.district) {
-      navigate({ to: "/register" });
-      return;
-    }
     if (!district) {
-      setDistrict(user.district);
-      setUpazila(user.upazila ?? "all");
+      setDistrict(user?.district || "ঢাকা");
+      setUpazila(user?.upazila ?? "all");
     }
   }, [user, userLoading, district, navigate]);
 
@@ -222,7 +221,7 @@ function PricesPage() {
       >
         <div className="flex items-center gap-3 text-white">
           <Link
-            to="/dashboard"
+            to={user ? "/dashboard" : "/"}
             className="h-10 w-10 rounded-full bg-white/15 flex items-center justify-center"
           >
             <ArrowLeft className="h-5 w-5" />
@@ -353,7 +352,7 @@ function PricesPage() {
                 <BengaliButton
                   variant="warning"
                   size="md"
-                  onClick={() => setOpen(true)}
+                  onClick={() => user ? setOpen(true) : navigate({ to: "/login" })}
                   leftIcon={<Plus className="h-5 w-5" />}
                 >
                   প্রথম দাম যোগ করুন
@@ -401,7 +400,7 @@ function PricesPage() {
                               : "খুচরা"}
                         </p>
                       </div>
-                      <ContentMenu
+                      {user && <ContentMenu
                         contentType="price"
                         contentId={p.id}
                         authorId={p.user_id}
@@ -415,7 +414,7 @@ function PricesPage() {
                           setPrices((cur) => cur.filter((x) => x.id !== p.id));
                           toast.success("মুছে ফেলা হয়েছে");
                         }}
-                      />
+                      />}
                     </div>
                   </div>
                   <div className="mt-3 pt-3 border-t border-border flex justify-between items-center text-xs text-muted-foreground">
@@ -450,7 +449,7 @@ function PricesPage() {
 
       {/* FAB */}
       <button
-        onClick={() => setOpen(true)}
+        onClick={() => user ? setOpen(true) : navigate({ to: "/login" })}
         className="fixed bottom-24 right-5 h-14 w-14 rounded-full bg-[#E07A2C] text-white shadow-lg flex items-center justify-center active:scale-95 transition"
         aria-label="দাম যোগ করুন"
       >
