@@ -10,6 +10,7 @@ import { useUser } from "@/contexts/user-context";
 import { formatBnDate, toIsoDate } from "@/lib/bn-date";
 import { toast } from "sonner";
 import { syncSprayReminders } from "@/lib/spray-schedule";
+import { syncFertilizerReminders } from "@/lib/fertilizer-reminders";
 import { isGapEligible } from "@/data/gap-protocol";
 import { ShieldCheck } from "lucide-react";
 import { bn as bnLocale } from "date-fns/locale";
