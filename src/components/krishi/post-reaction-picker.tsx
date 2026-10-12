@@ -12,6 +12,18 @@ export function PostReactionPicker({
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const closeTimerRef = useRef<number | null>(null);
+  const pressTimerRef = useRef<number | null>(null);
+  const longPressedRef = useRef(false);
+  const startPress = () => {
+    longPressedRef.current = false;
+    pressTimerRef.current = window.setTimeout(() => {
+      longPressedRef.current = true;
+      setOpen(true);
+    }, 450);
+  };
+  const cancelPress = () => {
+    if (pressTimerRef.current) window.clearTimeout(pressTimerRef.current);
+  };
   const active = value ? REACTION_META[value] : REACTION_META.like;
 
   useEffect(() => {
@@ -87,7 +99,16 @@ export function PostReactionPicker({
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={value ? `${active.label} reaction পরিবর্তন করুন` : "প্রতিক্রিয়া দিন"}
-        onClick={() => setOpen(true)}
+        title="এক চাপে লাইক, চেপে ধরে রাখলে অন্য প্রতিক্রিয়া"
+        onPointerDown={startPress}
+        onPointerUp={cancelPress}
+        onPointerLeave={cancelPress}
+        onContextMenu={(e) => e.preventDefault()}
+        onClick={() => {
+          if (longPressedRef.current) return;
+          setOpen(false);
+          onChange(value ? null : "like");
+        }}
         className={`home-pressable min-h-11 min-w-0 gap-1 rounded-lg px-1 text-xs font-semibold ${value ? active.className : "text-muted-foreground"}`}
       >
         {value ? (
