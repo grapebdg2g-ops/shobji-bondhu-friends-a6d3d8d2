@@ -32,6 +32,7 @@ import { toBn } from "@/lib/bn";
 import { getAllChemicalInfo, getBioOptions } from "@/data/crop-knowledge";
 import { SprayLogDialog, FirstAidCard } from "@/components/krishi/spray-log-dialog";
 import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
 
 type Props = {
   userId: string;
@@ -63,6 +64,7 @@ export function SprayScheduleSection({
   const main = events.filter((e) => e.kind !== "nutrient");
   const nutrients = events.filter((e) => e.kind === "nutrient");
   const [showNutrients, setShowNutrients] = useState(false);
+  const [sectionOpen, setSectionOpen] = useState(false);
   const [showMain, setShowMain] = useState(false);
   const [open, setOpen] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -368,6 +370,7 @@ export function SprayScheduleSection({
       )}
       <div className="bg-card rounded-2xl shadow-sm ring-1 ring-border overflow-hidden">
         <div className="p-4 flex items-start justify-between gap-3">
+          <Button variant="ghost" className="h-auto flex-1 justify-between whitespace-normal text-left p-0" aria-expanded={sectionOpen} aria-controls="spray-schedule-body" onClick={() => setSectionOpen((v) => !v)}>
           <div>
             <h2 className="text-lg font-bold text-foreground inline-flex items-center gap-2">
               <SprayCan className="h-5 w-5 text-primary" /> স্প্রে শিডিউল
@@ -377,15 +380,18 @@ export function SprayScheduleSection({
               {toBn(events.filter((e) => completions.has(e.id)).length)}টি
             </p>
           </div>
-          <button
+          {sectionOpen ? <ChevronUp /> : <ChevronDown />}
+          </Button>
+          <Button
             onClick={setReminders}
             disabled={busy}
             className="shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-primary text-primary-foreground text-[13px] font-bold disabled:opacity-60"
           >
             <Bell className="h-4 w-4" /> {busy ? "সেট হচ্ছে…" : "রিমাইন্ডার সেট"}
-          </button>
+          </Button>
         </div>
 
+        <div id="spray-schedule-body" hidden={!sectionOpen}>
         {next && (
           <div className="mx-4 mb-3 rounded-xl bg-primary/10 p-3 text-sm">
             <p className="text-[13px] font-semibold text-primary">পরবর্তী স্প্রে</p>
@@ -501,6 +507,7 @@ export function SprayScheduleSection({
             {showNutrients && <ol className="mt-2 space-y-2">{nutrients.map(renderEvent)}</ol>}
           </div>
         )}
+        </div>
       </div>
     </section>
   );

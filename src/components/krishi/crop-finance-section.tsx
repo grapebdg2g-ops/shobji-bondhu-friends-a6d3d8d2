@@ -193,7 +193,7 @@ ${ENTRY_TYPES.filter((t) => totals[t] > 0)
 
   return (
     <section className={embedded ? "mt-4" : "px-5 mt-5"}>
-      <div className="bg-card text-card-foreground rounded-lg shadow-md ring-1 ring-border overflow-hidden">
+      <div className={embedded ? "finance-embedded" : "bg-card text-card-foreground rounded-lg shadow-md ring-1 ring-border overflow-hidden"}>
         {/* Always-visible collapsed bar */}
         <Button
           variant="ghost"
@@ -221,7 +221,7 @@ ${ENTRY_TYPES.filter((t) => totals[t] > 0)
         </Button>
 
         {open && (
-          <div className="px-4 pb-4">
+          <div className="px-4 py-4 bg-card text-card-foreground rounded-lg">
             <div className="grid grid-cols-2 gap-2 text-[13px] mb-3">
               <div className={`rounded-xl p-2 ${profit >= 0 ? "bg-emerald-100" : "bg-rose-100"}`}>
                 🟢 আসল {profit >= 0 ? "লাভ" : "ক্ষতি"}
