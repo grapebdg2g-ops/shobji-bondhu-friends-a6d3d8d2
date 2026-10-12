@@ -249,10 +249,6 @@ function ThreadRow({ thread, onOpen }: { thread: DirectThread; onOpen: () => voi
             {thread.peer_name?.charAt(0) || "ক"}
           </div>
         )}
-        <span
-          className="absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white bg-[#31A24C]"
-          aria-label="অনলাইন"
-        />
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center justify-between gap-2">
