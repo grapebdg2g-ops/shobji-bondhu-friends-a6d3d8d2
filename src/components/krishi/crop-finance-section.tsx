@@ -242,7 +242,7 @@ ${ENTRY_TYPES.filter((t) => totals[t] > 0)
           </span>
           <span className="inline-flex items-center gap-2 shrink-0">
             <span
-              className={`px-2 py-0.5 rounded-full text-xs font-bold ${profit >= 0 ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"}`}
+              className={`px-2 py-0.5 rounded-full text-[13px] font-bold ${profit >= 0 ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"}`}
             >
               নীট {profit >= 0 ? "লাভ" : "ক্ষতি"} {fmtBdt(Math.abs(profit))}
             </span>
@@ -257,7 +257,7 @@ ${ENTRY_TYPES.filter((t) => totals[t] > 0)
 
         {open && (
           <div className="px-4 pb-4">
-            <div className="grid grid-cols-2 gap-2 text-xs mb-3">
+            <div className="grid grid-cols-2 gap-2 text-[13px] mb-3">
               <div className={`rounded-xl p-2 ${profit >= 0 ? "bg-emerald-100" : "bg-rose-100"}`}>
                 🟢 আসল {profit >= 0 ? "লাভ" : "ক্ষতি"}
                 <br />
@@ -282,7 +282,7 @@ ${ENTRY_TYPES.filter((t) => totals[t] > 0)
                 <b className="text-base">{fmtBdt(totals.receivable)}</b>
               </div>
             </div>
-            <p className="text-[11px] text-gray-500 mb-3">
+            <p className="text-[13px] text-gray-500 mb-3">
               মোট খরচ {fmtBdt(totals.totalCost)} · মোট আয় {fmtBdt(totals.totalIncome)} · মূলধন{" "}
               {fmtBdt(totals.capital)} · উত্তোলন {fmtBdt(totals.withdrawal)}
             </p>
@@ -299,13 +299,13 @@ ${ENTRY_TYPES.filter((t) => totals[t] > 0)
                     setEditId(null);
                     setShowCount(PAGE);
                   }}
-                  className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-bold ring-1 transition ${tab === t ? "bg-emerald-600 text-white ring-emerald-600" : "bg-gray-50 text-gray-700 ring-gray-200"}`}
+                  className={`shrink-0 px-3 py-1.5 rounded-full text-[13px] font-bold ring-1 transition ${tab === t ? "bg-emerald-600 text-white ring-emerald-600" : "bg-gray-50 text-gray-700 ring-gray-200"}`}
                 >
                   {LABEL[t]} ({toBn(rows.filter((r) => r.entry_type === t).length)})
                 </button>
               ))}
             </div>
-            <p className="text-[11px] text-gray-500 mb-3">{HINT[tab]}</p>
+            <p className="text-[13px] text-gray-500 mb-3">{HINT[tab]}</p>
 
             {/* Add item: dropdown select or custom name */}
             <div className="mb-3 rounded-xl bg-gray-50 p-3 space-y-2">
@@ -345,7 +345,7 @@ ${ENTRY_TYPES.filter((t) => totals[t] > 0)
                   type="date"
                   value={entryDate}
                   onChange={(e) => setEntryDate(e.target.value)}
-                  className="w-[6.5rem] shrink-0 rounded-lg border border-gray-200 px-1 py-1.5 text-xs"
+                  className="w-[6.5rem] shrink-0 rounded-lg border border-gray-200 px-1 py-1.5 text-[13px]"
                 />
                 <button
                   onClick={add}
@@ -403,7 +403,7 @@ ${ENTRY_TYPES.filter((t) => totals[t] > 0)
                       <div className="flex items-center gap-2">
                         <div className="flex-1 min-w-0">
                           <p className="text-sm text-gray-700 truncate">{r.title}</p>
-                          <p className="text-[11px] text-gray-400">{formatBnDate(r.entry_date)}</p>
+                          <p className="text-[13px] text-gray-400">{formatBnDate(r.entry_date)}</p>
                         </div>
                         <span className="text-sm font-bold text-gray-900 shrink-0">
                           {fmtBdt(Number(r.amount))}
@@ -411,7 +411,7 @@ ${ENTRY_TYPES.filter((t) => totals[t] > 0)
                         {(r.entry_type === "credit_purchase" || r.entry_type === "credit_sale") && (
                           <button
                             onClick={() => toggleSettled(r)}
-                            className={`shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold ring-1 ${r.is_settled ? "bg-emerald-50 text-emerald-700 ring-emerald-200" : "bg-amber-50 text-amber-700 ring-amber-200"}`}
+                            className={`shrink-0 px-2 py-0.5 rounded-full text-[13px] font-bold ring-1 ${r.is_settled ? "bg-emerald-50 text-emerald-700 ring-emerald-200" : "bg-amber-50 text-amber-700 ring-amber-200"}`}
                           >
                             {r.is_settled ? (
                               <span className="inline-flex items-center gap-0.5">
@@ -450,7 +450,7 @@ ${ENTRY_TYPES.filter((t) => totals[t] > 0)
                 {tabRows.length > showCount && (
                   <button
                     onClick={() => setShowCount((c) => c + PAGE)}
-                    className="mt-2 w-full inline-flex items-center justify-center gap-1 py-1.5 rounded-full bg-gray-50 text-gray-600 text-xs font-bold ring-1 ring-gray-200"
+                    className="mt-2 w-full inline-flex items-center justify-center gap-1 py-1.5 rounded-full bg-gray-50 text-gray-600 text-[13px] font-bold ring-1 ring-gray-200"
                   >
                     <ChevronDown className="h-3.5 w-3.5" /> আরও{" "}
                     {toBn(Math.min(PAGE, tabRows.length - showCount))}টি দেখুন (মোট{" "}
@@ -464,14 +464,14 @@ ${ENTRY_TYPES.filter((t) => totals[t] > 0)
               <Link
                 to="/crop-finance/$planId"
                 params={{ planId }}
-                className="mt-3 w-full inline-flex items-center justify-center gap-1 py-2 rounded-full bg-sky-50 text-sky-700 text-xs font-bold ring-1 ring-sky-200"
+                className="mt-3 w-full inline-flex items-center justify-center gap-1 py-2 rounded-full bg-sky-50 text-sky-700 text-[13px] font-bold ring-1 ring-sky-200"
               >
                 <BarChart3 className="h-4 w-4" /> পূর্ণ হিসাব: শতক/কেজি প্রতি খরচ ও চার্ট
               </Link>
             )}
             <button
               onClick={printReport}
-              className="mt-2 w-full inline-flex items-center justify-center gap-1 py-2 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold ring-1 ring-emerald-200"
+              className="mt-2 w-full inline-flex items-center justify-center gap-1 py-2 rounded-full bg-emerald-50 text-emerald-700 text-[13px] font-bold ring-1 ring-emerald-200"
             >
               <Printer className="h-4 w-4" /> প্রিন্ট / PDF
             </button>

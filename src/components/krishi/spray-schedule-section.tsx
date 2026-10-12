@@ -184,7 +184,7 @@ export function SprayScheduleSection({
             >
               {e.title}
             </p>
-            <p className="text-[11px] text-muted-foreground">
+            <p className="text-[13px] text-muted-foreground">
               {formatBnDate(addDays(plantingDate, e.day))} · {e.stageIcon} {e.stageName}
               {overdue && (
                 <span className="text-destructive font-semibold"> · তারিখ পেরিয়েছে</span>
@@ -192,7 +192,7 @@ export function SprayScheduleSection({
             </p>
           </div>
           {isGap && e.problem && (
-            <span className="shrink-0 rounded bg-primary/10 text-primary text-[10px] font-bold px-1.5 py-0.5">
+            <span className="shrink-0 rounded bg-primary/10 text-primary text-[13px] font-bold px-1.5 py-0.5">
               GAP ✓
             </span>
           )}
@@ -212,20 +212,20 @@ export function SprayScheduleSection({
                 {e.problem.chemicals.map((c) => {
                   const info = getAllChemicalInfo(c.name);
                   return (
-                    <div key={c.name} className="text-xs space-y-0.5">
+                    <div key={c.name} className="text-[13px] space-y-0.5">
                       <p>
                         <strong>{c.name}</strong> — {c.dose} ({c.method})
                       </p>
                       {info.map((a) => (
                         <div key={a.id} className="space-y-0.5">
-                          <p className="text-[11px] text-muted-foreground">
+                          <p className="text-[13px] text-muted-foreground">
                             <span className="inline-block rounded bg-primary/10 text-primary font-semibold px-1.5 mr-1">
                               {a.system} {a.group}
                             </span>
                             {a.ingredient} {a.formulation} · ফসল তোলার {toBn(a.phiDays)} দিন আগে
                             বন্ধ · বিষাক্ততা {a.toxicity} · {a.safety}
                           </p>
-                          <p className="text-[11px] text-foreground/80">
+                          <p className="text-[13px] text-foreground/80">
                             <span className="inline-block rounded bg-primary/10 text-primary font-semibold px-1.5 mr-1">
                               🌱 জৈব
                             </span>
@@ -238,15 +238,15 @@ export function SprayScheduleSection({
                 })}
                 {getBioOptions(`${e.title} ${e.desc} ${e.problem.name}`).length > 0 && (
                   <div className="rounded-lg bg-primary/5 p-2.5 space-y-1.5">
-                    <p className="text-xs font-bold text-primary">
+                    <p className="text-[13px] font-bold text-primary">
                       🧪 জৈব রাসায়নিক (একই সমস্যায় জৈব অপশন)
                     </p>
                     {getBioOptions(`${e.title} ${e.desc} ${e.problem.name}`).map((b) => (
-                      <div key={b.id} className="text-xs space-y-0.5">
+                      <div key={b.id} className="text-[13px] space-y-0.5">
                         <p className="text-foreground/90">
                           <strong>{b.name}</strong> — {b.dose}
                         </p>
-                        <p className="text-[11px] text-muted-foreground">
+                        <p className="text-[13px] text-muted-foreground">
                           {b.method} · {b.note}
                           {b.phiDays > 0 && ` · ফসল তোলার ${toBn(b.phiDays)} দিন আগে বন্ধ`}
                         </p>
@@ -255,12 +255,12 @@ export function SprayScheduleSection({
                   </div>
                 )}
                 {e.problem.organic[0] && (
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-[13px] text-muted-foreground">
                     জৈব বিকল্প: {e.problem.organic[0]}
                   </p>
                 )}
                 {e.problem.phi && (
-                  <p className="text-xs text-destructive">
+                  <p className="text-[13px] text-destructive">
                     ফসল তোলার অন্তত {e.problem.phi} আগে স্প্রে বন্ধ করুন
                   </p>
                 )}
@@ -279,19 +279,19 @@ export function SprayScheduleSection({
                 return (
                   <div className="space-y-2">
                     {pc.conflict && (
-                      <p className="rounded-lg bg-destructive/10 p-2 text-xs text-destructive font-semibold">
+                      <p className="rounded-lg bg-destructive/10 p-2 text-[13px] text-destructive font-semibold">
                         ⛔ ফসল তোলার মাত্র {toBn(Math.max(0, pc.daysLeft))} দিন বাকি, কিন্তু এই
                         ওষুধের বিষ কাটতে {toBn(phi)} দিন লাগে। এই স্প্রের পর {toBn(phi)} দিন ফসল
                         তুলবেন না/খাবেন না, অথবা জৈব বিকল্প ব্যবহার করুন।
                       </p>
                     )}
                     {rot && (
-                      <p className="rounded-lg bg-accent/50 p-2 text-xs text-foreground">
+                      <p className="rounded-lg bg-accent/50 p-2 text-[13px] text-foreground">
                         🔄 {rot}
                       </p>
                     )}
                     {dose && (
-                      <div className="rounded-lg bg-primary/5 p-2 text-xs space-y-1">
+                      <div className="rounded-lg bg-primary/5 p-2 text-[13px] space-y-1">
                         {doseInput(e)}
                         <p className="font-bold text-primary">
                           🪣 ড্রাম হিসাব ({toBn(TANK_LITERS)} লিটার স্প্রেয়ার)
@@ -318,7 +318,7 @@ export function SprayScheduleSection({
                       </div>
                     )}
                     {names.length > 1 && (
-                      <div className="rounded-lg bg-muted p-2 text-xs space-y-0.5">
+                      <div className="rounded-lg bg-muted p-2 text-[13px] space-y-0.5">
                         <p className="font-bold">🧴 একসাথে মেশালে এই ক্রমে দিন</p>
                         {mix.map((n, i) => (
                           <p key={n}>
@@ -338,7 +338,7 @@ export function SprayScheduleSection({
                   </div>
                 );
               })()}
-            <p className="text-[11px] text-muted-foreground">
+            <p className="text-[13px] text-muted-foreground">
               ⚠️ লেবেলের নির্দেশনা মেনে, সকাল/বিকেলে বাতাসহীন সময়ে স্প্রে করুন।
             </p>
             <button
@@ -372,7 +372,7 @@ export function SprayScheduleSection({
             <h2 className="text-lg font-bold text-foreground inline-flex items-center gap-2">
               <SprayCan className="h-5 w-5 text-primary" /> স্প্রে শিডিউল
             </h2>
-            <p className="text-xs text-muted-foreground mt-0.5">
+            <p className="text-[13px] text-muted-foreground mt-0.5">
               মোট {toBn(events.length)}টি স্প্রে · সম্পন্ন{" "}
               {toBn(events.filter((e) => completions.has(e.id)).length)}টি
             </p>
@@ -380,7 +380,7 @@ export function SprayScheduleSection({
           <button
             onClick={setReminders}
             disabled={busy}
-            className="shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold disabled:opacity-60"
+            className="shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-primary text-primary-foreground text-[13px] font-bold disabled:opacity-60"
           >
             <Bell className="h-4 w-4" /> {busy ? "সেট হচ্ছে…" : "রিমাইন্ডার সেট"}
           </button>
@@ -388,9 +388,9 @@ export function SprayScheduleSection({
 
         {next && (
           <div className="mx-4 mb-3 rounded-xl bg-primary/10 p-3 text-sm">
-            <p className="text-xs font-semibold text-primary">পরবর্তী স্প্রে</p>
+            <p className="text-[13px] font-semibold text-primary">পরবর্তী স্প্রে</p>
             <p className="font-bold text-foreground">{next.title}</p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-[13px] text-muted-foreground">
               {formatBnDate(addDays(plantingDate, next.day))} ({toBn(next.day)}তম দিন)
             </p>
           </div>
@@ -400,7 +400,7 @@ export function SprayScheduleSection({
           <FirstAidCard />
           {sw ? (
             <div
-              className={`rounded-xl p-3 text-xs ${sw.ok ? "bg-primary/10" : "bg-destructive/10"}`}
+              className={`rounded-xl p-3 text-[13px] ${sw.ok ? "bg-primary/10" : "bg-destructive/10"}`}
             >
               <p className={`font-bold text-sm ${sw.ok ? "text-primary" : "text-destructive"}`}>
                 {sw.ok ? "✅ আজ স্প্রে করার উপযোগী" : "⛔ আজ স্প্রে করবেন না"}
@@ -415,15 +415,15 @@ export function SprayScheduleSection({
               </p>
             </div>
           ) : !user?.district ? (
-            <p className="rounded-xl bg-muted p-3 text-xs text-muted-foreground">
+            <p className="rounded-xl bg-muted p-3 text-[13px] text-muted-foreground">
               প্রোফাইলে জেলা দিলে আজকের আবহাওয়া দেখে স্প্রে পরামর্শ পাবেন।
             </p>
           ) : weather.isLoading ? (
-            <p className="rounded-xl bg-muted p-3 text-xs text-muted-foreground">
+            <p className="rounded-xl bg-muted p-3 text-[13px] text-muted-foreground">
               আবহাওয়া দেখা হচ্ছে…
             </p>
           ) : null}
-          <label className="rounded-xl bg-muted p-3 text-xs flex items-center gap-2">
+          <label className="rounded-xl bg-muted p-3 text-[13px] flex items-center gap-2">
             <span className="font-semibold text-foreground">🌾 জমির পরিমাণ</span>
             <input
               inputMode="decimal"
@@ -436,7 +436,7 @@ export function SprayScheduleSection({
             <span className="text-muted-foreground">শতক — ড্রাম হিসাবের জন্য</span>
           </label>
           {land > 0 && (
-            <div className="rounded-xl bg-primary/5 ring-1 ring-primary/15 p-3 text-xs space-y-1">
+            <div className="rounded-xl bg-primary/5 ring-1 ring-primary/15 p-3 text-[13px] space-y-1">
               <p className="font-bold text-primary">🪣 ড্রাম হিসাব — {toBn(land)} শতক</p>
               <p className="text-foreground">
                 প্রতিটি স্প্রের জন্য পানি লাগবে ≈{" "}
@@ -466,7 +466,7 @@ export function SprayScheduleSection({
         </div>
 
         {cropType === "টমেটো" && (
-          <div className="mx-4 mb-3 rounded-xl bg-accent/40 p-3 text-xs text-foreground space-y-1">
+          <div className="mx-4 mb-3 rounded-xl bg-accent/40 p-3 text-[13px] text-foreground space-y-1">
             <p className="font-bold">📝 জরুরি নোট</p>
             {TOMATO_SPRAY_NOTES.map((n) => (
               <p key={n}>• {n}</p>

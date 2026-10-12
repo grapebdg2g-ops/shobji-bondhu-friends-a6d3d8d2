@@ -138,7 +138,7 @@ function FinancePage() {
         <div className="bg-white rounded-2xl p-4 shadow-sm ring-1 ring-emerald-100 space-y-3">
           <p className="font-bold text-gray-900">জমি ও ফলন</p>
           <div className="grid grid-cols-2 gap-2">
-            <label className="text-xs text-gray-600">
+            <label className="text-[13px] text-gray-600">
               জমি (শতক)
               <input
                 type="number"
@@ -149,7 +149,7 @@ function FinancePage() {
                 className="mt-1 w-full rounded-lg border border-gray-200 px-2 py-1.5 text-sm"
               />
             </label>
-            <label className="text-xs text-gray-600">
+            <label className="text-[13px] text-gray-600">
               মোট ফলন (কেজি)
               <input
                 type="number"
@@ -167,7 +167,7 @@ function FinancePage() {
           >
             সংরক্ষণ
           </button>
-          <div className="grid grid-cols-2 gap-2 text-xs">
+          <div className="grid grid-cols-2 gap-2 text-[13px]">
             <Stat label="শতক প্রতি খরচ" v={costPerShotok} />
             <Stat
               label={`শতক প্রতি ${s.profit >= 0 ? "লাভ" : "ক্ষতি"}`}
@@ -177,7 +177,7 @@ function FinancePage() {
             <Stat label="মণ প্রতি উৎপাদন খরচ" v={costPerMon} />
           </div>
           {(!shotok || !kg) && (
-            <p className="text-[11px] text-gray-500">জমি ও ফলন লিখলে এই হিসাবগুলো দেখা যাবে।</p>
+            <p className="text-[13px] text-gray-500">জমি ও ফলন লিখলে এই হিসাবগুলো দেখা যাবে।</p>
           )}
         </div>
       </section>
@@ -190,7 +190,7 @@ function FinancePage() {
           ) : (
             byCategory.map(([name, amt]) => (
               <div key={name} className="mb-2">
-                <div className="flex justify-between text-xs text-gray-700">
+                <div className="flex justify-between text-[13px] text-gray-700">
                   <span className="truncate">{name}</span>
                   <span className="font-bold">
                     {fmtBdt(amt)} ({toBn(Math.round((amt / s.totalCost) * 100))}%)
