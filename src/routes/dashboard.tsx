@@ -70,10 +70,7 @@ function Dashboard() {
 
   useEffect(() => {
     if (loading) return;
-    if (!user) {
-      navigate({ to: "/login" });
-      return;
-    }
+    if (!user) return; // guests may browse; actions redirect to login
     if (!user.district) {
       navigate({ to: "/register" });
       return;
@@ -107,6 +104,7 @@ function Dashboard() {
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <button
+                data-guest-allow
                 onClick={() => setCollapsed(false)}
                 aria-label="মেনু খুলুন"
                 className="home-pressable flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white ring-1 ring-white/20"
