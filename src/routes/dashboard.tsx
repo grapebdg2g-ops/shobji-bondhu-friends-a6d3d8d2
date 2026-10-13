@@ -63,6 +63,7 @@ function Dashboard() {
   const navigate = useNavigate();
   const { user, loading } = useUser();
   const { unreadCount, items: notifItems, markRead } = useNotifications(user?.id ?? null);
+  const push = usePushNotifications();
   const friendNotifs = notifItems.filter(
     (n) => !n.is_read && (n.type === "friend_added" || n.type === "connection_request"),
   );
