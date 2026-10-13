@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useNotifications } from "@/hooks/use-notifications";
+import { usePushNotifications } from "@/hooks/use-push-notifications";
 import { useUser } from "@/contexts/user-context";
 import { WeatherAlertBanner } from "@/components/krishi/weather-alert-banner";
 import { DashboardWeatherWidget } from "@/components/krishi/dashboard-weather-widget";
@@ -62,6 +63,7 @@ function Dashboard() {
   const navigate = useNavigate();
   const { user, loading } = useUser();
   const { unreadCount, items: notifItems, markRead } = useNotifications(user?.id ?? null);
+  const push = usePushNotifications();
   const friendNotifs = notifItems.filter(
     (n) => !n.is_read && (n.type === "friend_added" || n.type === "connection_request"),
   );
@@ -112,7 +114,15 @@ function Dashboard() {
                 <Menu className="h-5 w-5" strokeWidth={2.5} />
               </button>
               <button
-                onClick={() => navigate({ to: "/notifications" })}
+                onClick={async () => {
+                  if (user && push.supported && push.status === "disabled") {
+                    const ok = await push.enable();
+                    if (ok) toast.success("সব বিজ্ঞপ্তি চালু হয়েছে");
+                  } else if (push.status === "denied") {
+                    toast.error("ব্রাউজারের সাইট সেটিংস থেকে বিজ্ঞপ্তির অনুমতি দিন");
+                  }
+                  navigate({ to: "/notifications" });
+                }}
                 aria-label="বিজ্ঞপ্তি"
                 className="home-pressable relative flex h-10 w-10 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/20 backdrop-blur-md"
               >

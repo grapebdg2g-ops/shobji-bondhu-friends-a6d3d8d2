@@ -127,6 +127,13 @@
       "when": 1791837865545,
       "tag": "0017_public_market_price_reads",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1791878574915,
+      "tag": "0018_notification_push_dispatch",
+      "breakpoints": true
     }
   ]
 }

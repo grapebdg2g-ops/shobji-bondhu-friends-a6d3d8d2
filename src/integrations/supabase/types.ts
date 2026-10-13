@@ -713,6 +713,7 @@ export type Database = {
           created_at: string
           id: string
           is_read: boolean
+          pushed_at: string | null
           ref_id: string | null
           ref_type: string | null
           title: string
@@ -724,6 +725,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_read?: boolean
+          pushed_at?: string | null
           ref_id?: string | null
           ref_type?: string | null
           title: string
@@ -735,6 +737,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_read?: boolean
+          pushed_at?: string | null
           ref_id?: string | null
           ref_type?: string | null
           title?: string
