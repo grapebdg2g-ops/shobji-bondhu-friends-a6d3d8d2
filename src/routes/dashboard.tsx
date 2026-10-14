@@ -33,6 +33,7 @@ import { toast } from "sonner";
 import { useNotifications } from "@/hooks/use-notifications";
 import { usePushNotifications } from "@/hooks/use-push-notifications";
 import { useUser } from "@/contexts/user-context";
+import { NotificationPrompt } from "@/components/krishi/notification-prompt";
 import { WeatherAlertBanner } from "@/components/krishi/weather-alert-banner";
 import { DashboardWeatherWidget } from "@/components/krishi/dashboard-weather-widget";
 import { useSidebar } from "@/components/krishi/app-sidebar";
@@ -95,6 +96,14 @@ function Dashboard() {
 
   return (
     <main className="min-h-screen w-full bg-[#F6FBF7] md:mx-auto md:max-w-[760px]">
+      {push.supported && (
+        <NotificationPrompt
+          status={push.status}
+          busy={push.busy}
+          enable={push.enable}
+          loggedIn={!!user}
+        />
+      )}
       {/* SECTION 1 — Dynamic Hero */}
       <header
         className="relative overflow-hidden rounded-b-[32px] px-4 pt-5 pb-12 sm:px-6 sm:pt-7 sm:pb-14"
