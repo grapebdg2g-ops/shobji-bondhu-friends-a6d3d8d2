@@ -89,6 +89,7 @@ function VegetableGuidePage() {
         style={{ background: "var(--gradient-brand)" }}
       >
         <button
+          data-guest-allow
           onClick={() => navigate({ to: user ? "/dashboard" : "/" })}
           className="h-9 w-9 rounded-full bg-white/15 flex items-center justify-center"
         >
@@ -120,7 +121,7 @@ function VegetableGuidePage() {
         </Link>
       </div>
 
-      <div className="px-4 mt-4">
+      <div className="px-4 mt-4" data-guest-allow>
         <div className="bg-white rounded-2xl p-3 shadow-sm flex items-center gap-2">
           <Search className="h-5 w-5 text-gray-400 ml-1" />
           <input
@@ -132,7 +133,7 @@ function VegetableGuidePage() {
         </div>
       </div>
 
-      <div className="px-4 mt-4 flex gap-2 overflow-x-auto no-scrollbar pb-1">
+      <div className="px-4 mt-4 flex gap-2 overflow-x-auto no-scrollbar pb-1" data-guest-allow>
         {FILTERS.map((f) => (
           <button
             key={f.id}
