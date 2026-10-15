@@ -237,7 +237,7 @@ function PricesPage() {
         </div>
 
         <div className="mt-4 flex items-center gap-2">
-          <div className="flex-1 relative">
+          <div className="flex-1 relative" data-guest-allow>
             <MapPin className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-primary" />
             <select
               value={district}
@@ -263,7 +263,7 @@ function PricesPage() {
 
       {/* Upazila chips */}
       {upazilaOptions.length > 0 && (
-        <div className="px-5 mt-3 overflow-x-auto">
+        <div className="px-5 mt-3 overflow-x-auto" data-guest-allow>
           <div className="flex gap-2 min-w-max pb-1">
             <button
               onClick={() => setUpazila("all")}
@@ -289,7 +289,7 @@ function PricesPage() {
       )}
 
       {/* Filter chips */}
-      <div className="px-5 mt-4 -mb-1 overflow-x-auto">
+      <div className="px-5 mt-4 -mb-1 overflow-x-auto" data-guest-allow>
         <div className="flex gap-2 min-w-max pb-1">
           {CATEGORIES.map((c) => {
             const active = c === category;
@@ -310,7 +310,7 @@ function PricesPage() {
         </div>
       </div>
 
-      <div className="px-5 mt-3 overflow-x-auto">
+      <div className="px-5 mt-3 overflow-x-auto" data-guest-allow>
         <div className="flex min-w-max gap-2 pb-1">
           {SOURCE_FILTERS.map((source) => (
             <button
