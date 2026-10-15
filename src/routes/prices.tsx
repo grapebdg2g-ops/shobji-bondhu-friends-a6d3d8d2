@@ -237,7 +237,7 @@ function PricesPage() {
         </div>
 
         <div className="mt-4 flex items-center gap-2">
-          <div className="flex-1 relative">
+          <div className="flex-1 relative" data-guest-allow>
             <MapPin className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-primary" />
             <select
               value={district}
