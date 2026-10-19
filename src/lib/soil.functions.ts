@@ -356,10 +356,7 @@ function computeScore(data: z.infer<typeof SoilInputSchema>) {
 const scoreLabel = (s: number) =>
   s >= 80 ? "চমৎকার" : s >= 65 ? "ভালো" : s >= 50 ? "মোটামুটি" : s >= 35 ? "দুর্বল" : "ঝুঁকিপূর্ণ";
 
-// ── Gemini narrative layer ───────────────────────────────
-
-const GEMINI_URL =
-  "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
+// ── AI narrative layer (provider/model admin panel থেকে নিয়ন্ত্রিত) ──
 
 const LEVEL_BN: Record<string, string> = { low: "কম", medium: "মাঝারি", high: "বেশি" };
 
@@ -379,8 +376,6 @@ async function callGeminiNarrative(
   lime: ReturnType<typeof limeRecommendation>,
   doses: { name: string; amount: string }[],
 ): Promise<Narrative | null> {
-  const key = process.env.GEMINI_API_KEY;
-  if (!key) return null;
 
   const system = `তুমি বাংলাদেশ মৃত্তিকা সম্পদ উন্নয়ন ইনস্টিটিউট (SRDI) ও BARI-এর সুপারিশ অনুসরণকারী একজন অভিজ্ঞ মৃত্তিকা বিজ্ঞানী।
 শুদ্ধ প্রমিত বাংলায় বাস্তবসম্মত, কৃষকবান্ধব পরামর্শ দেবে। শুধু JSON দেবে, অন্য কোনো টেক্সট নয়।
