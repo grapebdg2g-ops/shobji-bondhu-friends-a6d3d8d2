@@ -408,30 +408,19 @@ EC ৪ dS/m-এর বেশি হলে শুধু লবণসহিষ্�
 ক্যালশিয়াম বা ম্যাগনেসিয়াম কম থাকলে soilManagement-এ তা সংশোধনের কথা বলবে (pH কম হলে ডলোচুন, pH ঠিক থাকলে জিপসাম/ম্যাগনেসিয়াম সালফেট)।`;
 
   try {
-    const res = await fetch(`${GEMINI_URL}?key=${key}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        system_instruction: { parts: [{ text: system }] },
-        contents: [{ role: "user", parts: [{ text: prompt }] }],
-        generationConfig: {
-          temperature: 0.4,
-          maxOutputTokens: 2048,
-          responseMimeType: "application/json",
-        },
-      }),
+    const setting = await getAiSetting("soil_analysis");
+    const text = await callAi(setting, {
+      system,
+      messages: [{ role: "user", content: prompt }],
+      json: true,
+      temperature: 0.4,
+      maxTokens: 2048,
     });
-    if (!res.ok) {
-      console.error("Gemini soil error", res.status, await res.text().catch(() => ""));
-      return null;
-    }
-    const json = await res.json();
-    const text: string = json?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
     const match = text.match(/\{[\s\S]*\}/);
     if (!match) return null;
     return JSON.parse(match[0]) as Narrative;
   } catch (err) {
-    console.error("Gemini soil exception", err);
+    console.error("AI soil narrative exception", err);
     return null;
   }
 }
