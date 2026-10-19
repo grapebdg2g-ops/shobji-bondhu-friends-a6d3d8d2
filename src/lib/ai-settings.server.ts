@@ -42,7 +42,7 @@ const DEFAULTS: Record<string, Omit<AiSetting, "feature_key" | "is_active">> = {
   },
   transcribe: {
     provider: "lovable_gateway",
-    model: "openai/gpt-4o-mini-transcribe",
+    model: "openai/gpt-transcribe",
     api_key_secret: "LOVABLE_API_KEY",
   },
 };
