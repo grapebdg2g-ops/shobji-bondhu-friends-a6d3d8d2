@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getDistrictLatLng } from "@/lib/bd-data";
+import { getAiSetting, callAi } from "@/lib/ai-settings.server";
 
 type HistoryRow = {
   price_date: string;
@@ -143,10 +144,6 @@ export const getPricePrediction = createServerFn({ method: "POST" })
     const currentAvg = history.length > 0 ? Number(history[history.length - 1]!.avg_price) : 0;
 
     // ── Step 5: Lovable AI Gateway ──
-    const apiKey = process.env.LOVABLE_API_KEY ?? "";
-    if (!apiKey) {
-      throw new Error("LOVABLE_API_KEY not configured");
-    }
 
     const prompt = `তুমি বাংলাদেশের একজন কৃষি বাজার বিশেষজ্ঞ।
 নিচের তথ্য বিশ্লেষণ করে ${product} এর দাম পূর্বাভাস দাও।
