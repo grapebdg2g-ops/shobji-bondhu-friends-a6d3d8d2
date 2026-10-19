@@ -14,6 +14,7 @@ import {
   ScrollText,
   Crown,
   Film,
+  Bot,
 } from "lucide-react";
 import { useState } from "react";
 
