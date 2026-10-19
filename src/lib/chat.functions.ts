@@ -6,6 +6,7 @@ import {
   detectDiseaseFromMasterData,
   buildMasterDataContext,
 } from "@/lib/crop-data";
+import { getAiSetting, callAi } from "@/lib/ai-settings.server";
 
 const MessageSchema = z.object({
   role: z.enum(["user", "assistant"]),
@@ -36,8 +37,6 @@ const FeedbackSchema = z.object({
   helpful: z.boolean(),
 });
 
-const GEMINI_MODEL = "gemini-2.5-flash";
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 const EMBEDDING_URL =
   "https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent";
 
@@ -93,45 +92,20 @@ ${masterDataContext ? `\nপ্রাসঙ্গিক master data (BRRI/BARI/D
 
 type ChatMsg = z.infer<typeof MessageSchema>;
 
-async function callGemini(
+// Provider/model/key admin panel (ai_model_settings) থেকে নিয়ন্ত্রিত
+async function callChatAi(
+  featureKey: "ai_chat" | "chat_suggestions",
   system: string,
   messages: ChatMsg[],
   opts: { temperature?: number; maxTokens?: number } = {},
 ): Promise<string> {
-  const key = process.env.GEMINI_API_KEY;
-  if (!key) throw new Error("AI সেবা এখন উপলব্ধ নয়");
-
-  const contents = messages.map((m) => ({
-    role: m.role === "user" ? "user" : "model",
-    parts: [{ text: m.content }],
-  }));
-
-  const res = await fetch(`${GEMINI_URL}?key=${key}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      system_instruction: { parts: [{ text: system }] },
-      contents,
-      generationConfig: {
-        temperature: opts.temperature ?? 0.7,
-        maxOutputTokens: opts.maxTokens ?? 500,
-        topP: 0.8,
-      },
-      safetySettings: [
-        { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
-      ],
-    }),
+  const setting = await getAiSetting(featureKey);
+  return callAi(setting, {
+    system,
+    messages,
+    temperature: opts.temperature ?? 0.7,
+    maxTokens: opts.maxTokens ?? 500,
   });
-
-  if (res.status === 429) throw new Error("অনেক অনুরোধ এসেছে, একটু পরে আবার চেষ্টা করুন");
-  if (!res.ok) {
-    const err = await res.text().catch(() => "");
-    console.error("Gemini API error", res.status, err);
-    throw new Error("AI সেবা সাড়া দিচ্ছে না");
-  }
-
-  const data = await res.json();
-  return (data?.candidates?.[0]?.content?.parts?.[0]?.text ?? "").trim();
 }
 
 async function generateEmbedding(text: string): Promise<number[] | null> {
