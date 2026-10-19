@@ -14,6 +14,7 @@ import {
   ScrollText,
   Crown,
   Film,
+  Bot,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -24,6 +25,7 @@ const ITEMS: Array<{ to: string; label: string; icon: typeof LayoutDashboard; ex
   { to: "/admin/prices", label: "বাজার দর", icon: TrendingUp },
   { to: "/admin/exchanges", label: "বিনিময়", icon: Repeat2 },
   { to: "/admin/diseases", label: "রোগ শনাক্ত লগ", icon: BugIcon },
+  { to: "/admin/ai-models", label: "AI সেটিংস", icon: Bot },
   { to: "/admin/reports", label: "রিপোর্ট", icon: Flag },
   { to: "/admin/notify", label: "নোটিফিকেশন", icon: Bell },
   { to: "/admin/organic-videos", label: "জৈব কর্নার ভিডিও", icon: Film },

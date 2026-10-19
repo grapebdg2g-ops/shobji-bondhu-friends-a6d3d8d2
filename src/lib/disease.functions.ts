@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { getAiSetting, callAi } from "@/lib/ai-settings.server";
 
 const InputSchema = z.object({
   imageBase64: z.string().min(100).max(8_000_000),
@@ -62,66 +63,41 @@ export const analyzeDisease = createServerFn({ method: "POST" })
       throw new Error("প্রতি ঘণ্টায় সর্বোচ্চ ১০টি বিশ্লেষণ করা যাবে, একটু পর আবার চেষ্টা করুন");
     }
 
-    // Canonical server-only name first; legacy NEXT_PUBLIC_ prefix kept as
-    // fallback during transition (Vite only exposes VITE_*, so it never leaked
-    // to the client, but the prefix is misleading — use KIMI_API_KEY).
-    const apiKey = process.env.KIMI_API_KEY ?? process.env.NEXT_PUBLIC_KIMI_API_KEY;
-    if (!apiKey) throw new Error("Kimi API key অনুপস্থিত");
+    // Provider/model/key admin panel থেকে নিয়ন্ত্রিত (ai_model_settings)
+    const setting = await getAiSetting("disease_detection");
 
-    const dataUrl = `data:${data.mimeType};base64,${data.imageBase64}`;
-
-    const res = await fetch("https://api.moonshot.ai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: "kimi-latest",
-        temperature: 0.3,
-        response_format: { type: "json_object" },
+    let content = "";
+    try {
+      content = await callAi(setting, {
+        system: SYSTEM_PROMPT,
         messages: [
-          { role: "system", content: SYSTEM_PROMPT },
           {
             role: "user",
-            content: [
-              { type: "image_url", image_url: { url: dataUrl } },
-              {
-                type: "text",
-                text: `ফসল: ${data.crop}\n\nএই ছবিতে কী রোগ দেখা যাচ্ছে? উপরে বলা JSON ফরম্যাটে উত্তর দাও।`,
-              },
-            ],
+            content: `ফসল: ${data.crop}\n\nএই ছবিতে কী রোগ দেখা যাচ্ছে? উপরে বলা JSON ফরম্যাটে উত্তর দাও।`,
           },
         ],
-      }),
-    });
-
-    if (!res.ok) {
-      const errText = await res.text().catch(() => "");
-      console.error("Kimi API error:", res.status, errText);
-      if (/exceeded_current_quota|insufficient balance|suspended/i.test(errText)) {
-        throw new Error("রোগ শনাক্তকরণ সেবা সাময়িকভাবে বন্ধ আছে, পরে আবার চেষ্টা করুন");
-      }
-      if (res.status === 429) {
-        throw new Error("অনেক অনুরোধ, কিছুক্ষণ পর আবার চেষ্টা করুন");
-      }
-      if (res.status === 401 || res.status === 403) {
-        throw new Error("API কী সমস্যা, পরে চেষ্টা করুন");
-      }
-      throw new Error(`API ত্রুটি (${res.status})`);
+        images: [{ mimeType: data.mimeType, data: data.imageBase64 }],
+        json: true,
+        temperature: 0.3,
+        maxTokens: 2048,
+      });
+    } catch (e) {
+      if (e instanceof Error) throw e;
+      throw new Error("রোগ শনাক্তকরণ সেবা সাময়িকভাবে বন্ধ আছে, পরে আবার চেষ্টা করুন");
     }
-
-    const json = (await res.json()) as {
-      choices?: { message?: { content?: string } }[];
-    };
-    const content = json.choices?.[0]?.message?.content ?? "";
 
     let parsed: Partial<DiseaseResult> = {};
     try {
       parsed = JSON.parse(content);
     } catch {
       const match = content.match(/\{[\s\S]*\}/);
-      if (match) parsed = JSON.parse(match[0]);
+      if (match) {
+        try {
+          parsed = JSON.parse(match[0]);
+        } catch {
+          parsed = {};
+        }
+      }
     }
 
     const detected = parsed.detected ?? false;
