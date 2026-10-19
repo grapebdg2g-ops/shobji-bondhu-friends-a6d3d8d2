@@ -134,6 +134,13 @@
       "when": 1791878574915,
       "tag": "0018_notification_push_dispatch",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1792400114776,
+      "tag": "0019_ai_model_settings",
+      "breakpoints": true
     }
   ]
 }

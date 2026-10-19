@@ -89,6 +89,36 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_model_settings: {
+        Row: {
+          api_key_secret: string
+          feature_key: string
+          is_active: boolean
+          model: string
+          provider: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          api_key_secret?: string
+          feature_key: string
+          is_active?: boolean
+          model: string
+          provider?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          api_key_secret?: string
+          feature_key?: string
+          is_active?: boolean
+          model?: string
+          provider?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       app_installs: {
         Row: {
           id: string
@@ -1804,6 +1834,16 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      update_ai_model_setting: {
+        Args: {
+          _api_key_secret: string
+          _feature_key: string
+          _is_active: boolean
+          _model: string
+          _provider: string
+        }
+        Returns: undefined
       }
     }
     Enums: {
