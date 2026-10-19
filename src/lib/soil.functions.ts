@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { CROP_FERTILIZERS, type FertilizerDose } from "@/lib/crop-data";
+import { getAiSetting, callAi } from "@/lib/ai-settings.server";
 
 const LevelSchema = z.enum(["low", "medium", "high"]).optional();
 
