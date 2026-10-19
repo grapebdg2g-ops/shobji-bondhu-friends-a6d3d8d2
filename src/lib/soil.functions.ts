@@ -566,8 +566,7 @@ export const extractSoilReport = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => SoilFileSchema.parse(d))
   .handler(async ({ data }): Promise<SoilExtraction> => {
-    const key = process.env.GEMINI_API_KEY;
-    if (!key) throw new Error("AI সেবা এখন কনফিগার করা নেই।");
+    const setting = await getAiSetting("soil_analysis");
 
     const totalBytes = data.files.reduce((s, f) => s + Math.floor((f.data.length * 3) / 4), 0);
     if (totalBytes > 12 * 1024 * 1024) {
@@ -623,85 +622,37 @@ ecValue: EC মান ডিএস/মিটার (dS/m) এককে সংখ
   "confidence": "high|medium|low"
 }`;
 
-    const parts: any[] = [
-      { text: "এই ফাইল/ছবি থেকে মাটির তথ্য বের করে JSON দাও।" },
-      ...data.files.map((f) => ({
-        inline_data: { mime_type: f.mimeType, data: f.data },
-      })),
-    ];
+    const images = data.files.map((f) => ({ mimeType: f.mimeType, data: f.data }));
 
     // মাঝে মাঝে মডেল খালি বা অর্ধেক উত্তর দেয় — তাই একবার ব্যর্থ হলে আরেকবার চেষ্টা করা হয়
-    let json: any;
-    let lastStatus = 0;
+    let text = "";
+    let failed = false;
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
-        const res = await fetch(`${GEMINI_URL}?key=${key}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            system_instruction: { parts: [{ text: system }] },
-            contents: [{ role: "user", parts }],
-            generationConfig: {
-              temperature: attempt === 0 ? 0.2 : 0.4,
-              maxOutputTokens: 4096,
-              responseMimeType: "application/json",
-            },
-          }),
+        text = await callAi(setting, {
+          system,
+          messages: [{ role: "user", content: "এই ফাইল/ছবি থেকে মাটির তথ্য বের করে JSON দাও।" }],
+          images,
+          json: true,
+          temperature: attempt === 0 ? 0.2 : 0.4,
+          maxTokens: 4096,
         });
-        if (!res.ok) {
-          lastStatus = res.status;
-          const body = await res.text().catch(() => "");
-          console.error("Gemini soil extract error", res.status, body);
-          if (res.status === 429) throw new Error("এখন অনুরোধ বেশি, একটু পরে আবার চেষ্টা করুন।");
-          continue;
-        }
-        const attemptJson = await res.json();
-        const attemptText: string = (attemptJson?.candidates?.[0]?.content?.parts ?? [])
-          .map((p: any) => (typeof p?.text === "string" ? p.text : ""))
-          .join("")
-          .trim();
-        if (!attemptText && attempt === 0) {
-          console.error(
-            "Gemini soil extract empty output, retrying",
-            attemptJson?.candidates?.[0]?.finishReason,
-          );
-          continue;
-        }
-        json = attemptJson;
-        break;
+        if (text) break;
+        console.error("AI soil extract empty output, retrying");
       } catch (err) {
         if (err instanceof Error && err.message.includes("চেষ্টা")) throw err;
-        console.error("Gemini soil extract exception", err);
+        console.error("AI soil extract exception", err);
+        failed = true;
         if (attempt === 1) throw new Error("ফাইল বিশ্লেষণে সমস্যা হয়েছে, আবার চেষ্টা করুন।");
       }
     }
-    if (!json) {
-      throw new Error(
-        lastStatus
-          ? "ফাইলটি পড়া যায়নি, পরিষ্কার ছবি দিয়ে আবার চেষ্টা করুন।"
-          : "ফাইল বিশ্লেষণে সমস্যা হয়েছে, আবার চেষ্টা করুন।",
-      );
-    }
-
-    const candidate = json?.candidates?.[0];
-    const finishReason: string = candidate?.finishReason ?? "";
-    const text: string = (candidate?.content?.parts ?? [])
-      .map((p: any) => (typeof p?.text === "string" ? p.text : ""))
-      .join("")
-      .trim();
 
     if (!text) {
-      console.error("Gemini soil extract empty output", {
-        finishReason,
-        promptFeedback: json?.promptFeedback,
-      });
-      if (finishReason === "MAX_TOKENS") {
-        throw new Error("ফাইলটি অনেক বড় — একবারে একটি পরিষ্কার পাতা দিয়ে আবার চেষ্টা করুন।");
-      }
-      if (finishReason === "SAFETY" || json?.promptFeedback?.blockReason) {
-        throw new Error("ফাইলটি বিশ্লেষণ করা যায়নি, অন্য একটি ছবি দিয়ে চেষ্টা করুন।");
-      }
-      throw new Error("ফাইল থেকে মাটির তথ্য পাওয়া যায়নি — পরিষ্কার ছবি দিয়ে আবার চেষ্টা করুন।");
+      throw new Error(
+        failed
+          ? "ফাইল বিশ্লেষণে সমস্যা হয়েছে, আবার চেষ্টা করুন।"
+          : "ফাইল থেকে মাটির তথ্য পাওয়া যায়নি — পরিষ্কার ছবি দিয়ে আবার চেষ্টা করুন।",
+      );
     }
 
     const cleaned = text
