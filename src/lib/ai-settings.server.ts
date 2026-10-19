@@ -16,7 +16,7 @@ export type AiSetting = {
 const DEFAULTS: Record<string, Omit<AiSetting, "feature_key" | "is_active">> = {
   disease_detection: {
     provider: "torveai",
-    model: "claude-opus-5-5",
+    model: "claude-sonnet-5",
     api_key_secret: "TORVEAI_API_KEY",
   },
   ai_chat: { provider: "gemini", model: "gemini-2.5-flash", api_key_secret: "GEMINI_API_KEY" },
