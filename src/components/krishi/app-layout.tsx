@@ -7,7 +7,7 @@ import { useUser } from "@/contexts/user-context";
 
 // Pages that render their own back button or are top-level tabs.
 const MAIN_TABS = ["/dashboard", "/prices", "/messages", "/profile", "/feed", "/ai-bondhu"];
-const NEEDS_BACK = ["/connections", "/crop-diary", "/farmers", "/ai-bondhu/chat", "/ai-bondhu/disease", "/admin"];
+const NEEDS_BACK = ["/connections", "/crop-diary", "/farmers", "/ai-bondhu/disease", "/admin"];
 
 const HIDDEN_ON = new Set<string>(["/", "/login", "/register", "/offline", "/onboarding"]);
 const ACTION_SELECTOR = 'button, [role="button"], input, textarea, select, [type="submit"]';

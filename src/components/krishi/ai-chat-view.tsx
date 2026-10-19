@@ -600,7 +600,7 @@ export function AiChatView({ sessionId: initialSessionId }: { sessionId?: string
 
   return (
     <div
-      className={`flex min-h-0 overflow-hidden bg-[#F0FFF4] md:h-dvh ${user ? "h-[calc(100dvh-4rem-env(safe-area-inset-bottom))]" : "h-dvh"}`}
+      className="flex h-[calc(100dvh-4rem-env(safe-area-inset-bottom))] min-h-0 overflow-hidden bg-[#F0FFF4] md:h-dvh"
     >
       {/* Desktop sidebar */}
       <div className="hidden md:block shrink-0">{Sidebar}</div>
@@ -632,7 +632,7 @@ export function AiChatView({ sessionId: initialSessionId }: { sessionId?: string
           </button>
           <button
             onClick={() => navigate({ to: "/ai-bondhu" })}
-            className="hidden md:flex h-9 w-9 rounded-full hover:bg-gray-100 items-center justify-center"
+            className="flex h-9 w-9 rounded-full hover:bg-gray-100 items-center justify-center"
             aria-label="ফিরে যান"
           >
             <ArrowLeft className="h-5 w-5" />
