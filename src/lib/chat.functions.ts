@@ -197,7 +197,10 @@ export const chatWithAI = createServerFn({ method: "POST" })
       // Cache miss → Gemini with master-data enriched prompt
       const masterCtx = buildMasterDataContext(cropType, disease, category);
       const system = buildSystemPrompt(data.userContext, masterCtx);
-      const reply = await callGemini(system, data.messages, { temperature: 0.7, maxTokens: 4096 });
+      const reply = await callChatAi("ai_chat", system, data.messages, {
+        temperature: 0.7,
+        maxTokens: 4096,
+      });
       const finalReply = reply || "দুঃখিত, উত্তর তৈরি করতে পারিনি।";
 
       if (embedding && reply) {
@@ -243,7 +246,7 @@ export const suggestFollowUps = createServerFn({ method: "POST" })
       .map((m) => `${m.role === "user" ? "কৃষক" : "সহকারী"}: ${m.content}`)
       .join("\n");
     try {
-      const raw = await callGemini(
+      const raw = await callChatAi("chat_suggestions",
         'তুমি একটি JSON generator। শুধু একটি JSON array দাও, অন্য কিছু নয়। format: ["প্রশ্ন১","প্রশ্ন২","প্রশ্ন৩"]',
         [
           {
