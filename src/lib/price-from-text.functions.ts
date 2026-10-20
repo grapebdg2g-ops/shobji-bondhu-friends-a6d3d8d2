@@ -39,8 +39,12 @@ export const capturePricesFromContent = createServerFn({ method: "POST" })
       .eq("id", userId)
       .maybeSingle();
     if (!profile?.district) return { added: 0 };
+    const district = profile.district;
 
-    const apiKey = process.env.LOVABLE_API_KEY;
+    const { getAiSetting, resolveAiKey, callAi } = await import("./ai-settings.server");
+    const setting = await getAiSetting("price_extraction");
+    if (!setting.is_active) return { added: 0 };
+    const apiKey = resolveAiKey(setting.api_key_secret);
     if (!apiKey) return { added: 0 };
 
     const prompt = `নিচের বাংলাদেশি কৃষকের লেখা থেকে শুধু সেই সবজি/ফসলের দাম বের করো যা লেখক নিজের এলাকায় আজ বা সম্প্রতি বিক্রি/কেনা হয়েছে বলে জানিয়েছেন। প্রশ্ন, অনুমান, পূর্বাভাস বা অন্য এলাকার দাম বাদ দাও।
@@ -74,42 +78,51 @@ export const capturePricesFromContent = createServerFn({ method: "POST" })
         },
       },
     };
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
-      method: "POST",
-      headers: {
-        "Lovable-API-Key": apiKey,
-        "Content-Type": "application/json",
-        "X-Lovable-AIG-SDK": "fetch",
-      },
-      body: JSON.stringify({
-        model: "openai/gpt-6-astra",
-        input: prompt,
-        stream: true,
-        store: false,
-        reasoning: { effort: "low" },
-        text: { format: { type: "json_schema", name: "prices", strict: true, schema } },
-      }),
-    });
-    if (!res.ok || !res.body) return { added: 0 };
     let raw = "";
-    const reader = res.body.getReader();
-    const decoder = new TextDecoder();
-    let buf = "";
-    for (;;) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      buf += decoder.decode(value, { stream: true });
-      const lines = buf.split("\n");
-      buf = lines.pop() ?? "";
-      for (const line of lines) {
-        if (!line.startsWith("data:")) continue;
-        try {
-          const ev = JSON.parse(line.slice(5).trim()) as { type?: string; delta?: string };
-          if (ev.type === "response.output_text.delta" && ev.delta) raw += ev.delta;
-        } catch {
-          /* ignore keep-alives */
+    if (setting.provider === "lovable_gateway" && setting.model.startsWith("openai/")) {
+      const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
+        method: "POST",
+        headers: {
+          "Lovable-API-Key": apiKey,
+          "Content-Type": "application/json",
+          "X-Lovable-AIG-SDK": "fetch",
+        },
+        body: JSON.stringify({
+          model: setting.model,
+          input: prompt,
+          stream: true,
+          store: false,
+          ...(setting.model !== "openai/chat-latest"
+            ? {
+                reasoning: { effort: "low", summary: "auto" },
+                include: ["reasoning.encrypted_content"],
+              }
+            : {}),
+          text: { format: { type: "json_schema", name: "prices", strict: true, schema } },
+        }),
+      });
+      if (!res.ok || !res.body) return { added: 0 };
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buf = "";
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buf += decoder.decode(value, { stream: true });
+        const lines = buf.split("\n");
+        buf = lines.pop() ?? "";
+        for (const line of lines) {
+          if (!line.startsWith("data:")) continue;
+          try {
+            const ev = JSON.parse(line.slice(5).trim()) as { type?: string; delta?: string };
+            if (ev.type === "response.output_text.delta" && ev.delta) raw += ev.delta;
+          } catch {
+            /* ignore keep-alives */
+          }
         }
       }
+    } else {
+      raw = await callAi(setting, { messages: [{ role: "user", content: prompt }], json: true });
     }
     let parsed: z.infer<typeof extractedSchema>;
     try {
@@ -128,7 +141,7 @@ export const capturePricesFromContent = createServerFn({ method: "POST" })
         price_type: p.price_type,
         source: "community",
         market_name: data.kind === "post" ? "কমিউনিটি পোস্ট" : "কমিউনিটি মন্তব্য",
-        district: profile.district!,
+        district,
         upazila: profile.upazila,
         category: p.category || "সবজি",
         user_id: userId,

@@ -21,32 +21,11 @@ export const transcribeAudio = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => InputSchema.parse(d))
   .handler(async ({ data }): Promise<{ text: string }> => {
-    const key = process.env.LOVABLE_API_KEY;
-    if (!key) throw new Error("ভয়েস সেবা এখন উপলব্ধ নয়");
-
-    const binary = Uint8Array.from(atob(data.audioBase64), (c) => c.charCodeAt(0));
-    const ext = mimeToExt(data.mimeType);
-    const blob = new Blob([binary as unknown as ArrayBuffer], { type: data.mimeType });
-
-    const form = new FormData();
-    form.append("file", blob, `recording.${ext}`);
-    form.append("model", "openai/gpt-4o-mini-transcribe");
-
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/audio/transcriptions", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${key}` },
-      body: form,
+    const { getAiSetting, callTranscription } = await import("./ai-settings.server");
+    const setting = await getAiSetting("transcribe");
+    const text = await callTranscription(setting, {
+      ...data,
+      extension: mimeToExt(data.mimeType),
     });
-
-    if (res.status === 429) throw new Error("অনেক অনুরোধ, একটু পরে চেষ্টা করুন");
-    if (res.status === 402) throw new Error("ক্রেডিট শেষ, পরে চেষ্টা করুন");
-    if (!res.ok) {
-      const err = await res.text().catch(() => "");
-      console.error("STT error", res.status, err);
-      throw new Error("ভয়েস রূপান্তর ব্যর্থ");
-    }
-
-    const json = await res.json();
-    const text = (json?.text ?? "").toString().trim();
     return { text };
   });
