@@ -4,11 +4,10 @@ export function dashboardWeatherLocation(
   district: string | null | undefined,
   upazila: string | null | undefined,
   pos: GeoPos | null,
-  selectedDistrict: string | null,
 ) {
-  const resolvedDistrict = selectedDistrict || district || "ঢাকা";
-  const usingGps = selectedDistrict === null && pos !== null;
-  const resolvedUpazila = selectedDistrict ? null : upazila ?? null;
+  const usingGps = pos !== null;
+  const resolvedDistrict = district || "ঢাকা";
+  const resolvedUpazila = upazila ?? null;
   return {
     district: resolvedDistrict,
     upazila: resolvedUpazila,
