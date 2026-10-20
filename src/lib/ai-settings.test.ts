@@ -1,3 +1,4 @@
+/// <reference types="bun" />
 import { afterEach, expect, mock, test } from "bun:test";
 
 let saved: Record<string, unknown> | null = null;
@@ -75,4 +76,20 @@ test("price extraction uses saved Gemini provider, model and key and saves the r
   }) as unknown as typeof fetch;
   expect((await capture({ data: { kind: "post", id: "post-id" }, context })).added).toBe(1);
   expect(inserted.at(-1)?.[0]).toMatchObject({ product_name: "টমেটো", price: 20, origin_type: "post", origin_id: "post-id", user_id: "author" });
+});
+
+test("price extraction preserves Responses protocol with the saved OpenAI model and key", async () => {
+  saved = setting("price_extraction", "lovable_gateway", "openai/gpt-6-astra");
+  globalThis.fetch = mock(async (url: string, init: RequestInit) => {
+    expect(url).toBe("https://ai.gateway.lovable.dev/v1/responses");
+    expect(new Headers(init.headers).get("Lovable-API-Key")).toBe("test-only-credential");
+    const body = JSON.parse(String(init.body));
+    expect(body.model).toBe("openai/gpt-6-astra");
+    expect(body.stream).toBe(true);
+    expect(body.store).toBe(false);
+    expect(body.text.format.type).toBe("json_schema");
+    const delta = JSON.stringify({ type: "response.output_text.delta", delta: JSON.stringify({ prices: [{ product_name: "টমেটো", price: 20, unit: "কেজি", price_type: "growers" }] }) });
+    return new Response(`data: ${delta}\n\n`);
+  }) as unknown as typeof fetch;
+  expect((await capture({ data: { kind: "post", id: "post-id" }, context })).added).toBe(1);
 });
