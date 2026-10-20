@@ -1,8 +1,8 @@
 # Tasks
 
 ## AI settings repair
-- [ ] Confirm and connect price extraction and transcription to saved settings, including disabled state.
-- [ ] Run focused regression tests and verify settings-driven requests.
+- [x] Confirm and connect price extraction and transcription to saved settings, including disabled state.
+- [x] Run focused regression tests and verify settings-driven requests.
 
 - [x] Crop stages: close gaps, single current-stage logic, invariant tests.
 - [x] PHI engine: first-harvest based, all chemicals, all plans; weather heat bug.
