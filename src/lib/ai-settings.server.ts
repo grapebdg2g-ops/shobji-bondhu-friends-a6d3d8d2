@@ -12,7 +12,7 @@ export type AiSetting = {
   is_active: boolean;
 };
 
-// Fallbacks used when a feature has no active row or the row cannot be read.
+// Fallbacks used only when a row is missing or cannot be read; disabled rows stay disabled.
 const DEFAULTS: Record<string, Omit<AiSetting, "feature_key" | "is_active">> = {
   disease_detection: {
     provider: "torveai",
@@ -57,7 +57,7 @@ export async function getAiSetting(featureKey: string): Promise<AiSetting> {
       .eq("feature_key", featureKey)
       .maybeSingle();
     const row = data as AiSetting | null;
-    if (row && row.is_active) return row;
+    if (row) return row;
   } catch (e) {
     console.error("ai setting read failed", featureKey, e);
   }
@@ -177,8 +177,58 @@ async function callGemini(setting: AiSetting, key: string, opts: AiCallOptions):
 
 /** Call the configured provider for a feature. Throws with a Bangla message on failure. */
 export async function callAi(setting: AiSetting, opts: AiCallOptions): Promise<string> {
+  assertAiActive(setting);
   const key = resolveAiKey(setting.api_key_secret);
   if (!key) throw new Error("AI সেবা এখন কনফিগার করা নেই");
   if (setting.provider === "gemini") return callGemini(setting, key, opts);
   return callOpenAiCompatible(setting, key, opts);
+}
+
+export function assertAiActive(setting: AiSetting): void {
+  if (!setting.is_active) throw new Error("এই AI সেবা অ্যাডমিন বন্ধ রেখেছেন");
+}
+
+/** Audio uses the selected provider's audio protocol, never a hidden fallback. */
+export async function callTranscription(
+  setting: AiSetting,
+  audio: { audioBase64: string; mimeType: string; extension: string },
+): Promise<string> {
+  assertAiActive(setting);
+  const key = resolveAiKey(setting.api_key_secret);
+  if (!key) throw new Error("ভয়েস সেবা এখন কনফিগার করা নেই");
+
+  if (setting.provider === "gemini") {
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(setting.model)}:generateContent`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-goog-api-key": key },
+        body: JSON.stringify({ contents: [{ role: "user", parts: [
+          { text: "এই অডিওর কথাগুলো মূল ভাষায় লিখুন। শুধু কথার প্রতিলিপি দিন, ব্যাখ্যা নয়।" },
+          { inline_data: { mime_type: audio.mimeType.split(";")[0], data: audio.audioBase64 } },
+        ] }] }),
+      },
+    );
+    await assertTranscriptionResponse(res);
+    const json = await res.json() as { candidates?: { content?: { parts?: { text?: string }[] } }[] };
+    return (json.candidates?.[0]?.content?.parts ?? []).map(p => p.text ?? "").join("").trim();
+  }
+
+  const binary = Uint8Array.from(atob(audio.audioBase64), c => c.charCodeAt(0));
+  const form = new FormData();
+  form.append("file", new Blob([binary], { type: audio.mimeType }), `recording.${audio.extension}`);
+  form.append("model", setting.model);
+  const base = setting.provider === "torveai" ? "https://api.torveai.com" : "https://ai.gateway.lovable.dev";
+  const res = await fetch(`${base}/v1/audio/transcriptions`, {
+    method: "POST", headers: { Authorization: `Bearer ${key}` }, body: form,
+  });
+  await assertTranscriptionResponse(res);
+  const json = await res.json() as { text?: string };
+  return (json.text ?? "").trim();
+}
+
+async function assertTranscriptionResponse(res: Response): Promise<void> {
+  if (res.status === 429) throw new Error("অনেক অনুরোধ, একটু পরে চেষ্টা করুন");
+  if (res.status === 402) throw new Error("ক্রেডিট শেষ, পরে চেষ্টা করুন");
+  if (!res.ok) throw new Error("নির্বাচিত ভয়েস মডেল বা API দিয়ে রূপান্তর ব্যর্থ হয়েছে");
 }

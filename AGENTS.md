@@ -1,5 +1,7 @@
 # Project architecture rules
 
+- All AI entry points resolve per-feature settings at request time, preserve disabled rows, and use provider-specific text/audio protocols; prevents successful admin saves from being silently ignored.
+
 - Serve the landing community preview through an anonymous, read-only server function with an explicit field allowlist and bounded latest-post query; never expose private profiles or use admin access for it.
 
 - Keep the introduction, market prices and static crop guides public through the shared public-page matcher and navigation; anonymous database access is read-only for market data, while personal plans and write actions require authentication.
