@@ -1,5 +1,9 @@
 # Tasks
 
+## Dashboard weather
+- [ ] Show weather without a profile district using GPS or an explicit Dhaka fallback.
+- [ ] Allow guest-friendly district selection and verify actual forecasts.
+
 ## AI settings repair
 - [x] Confirm and connect price extraction and transcription to saved settings, including disabled state.
 - [x] Run focused regression tests and verify settings-driven requests.

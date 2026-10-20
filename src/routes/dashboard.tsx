@@ -57,7 +57,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export const Route = createFileRoute("/dashboard")({
   component: Dashboard,
-  head: () => ({ meta: [{ title: "হোম — কৃষক বন্ধু" }] }),
+  head: () => ({ meta: [
+    { title: "হোম — কৃষক বন্ধু" },
+    { name: "description", content: "আপনার এলাকার আবহাওয়া, আজকের বাজারদর ও কৃষি পরামর্শ দেখুন কৃষক বন্ধুর হোমে।" },
+    { property: "og:title", content: "হোম — কৃষক বন্ধু" },
+    { property: "og:description", content: "আপনার এলাকার আবহাওয়া, আজকের বাজারদর ও কৃষি পরামর্শ একসাথে।" },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
 });
 
 function Dashboard() {
@@ -74,10 +81,6 @@ function Dashboard() {
   useEffect(() => {
     if (loading) return;
     if (!user) return; // guests may browse; actions redirect to login
-    if (!user.district) {
-      navigate({ to: "/register" });
-      return;
-    }
     // First login after sign-up: show the profile completion flow once.
     let cancelled = false;
     supabase

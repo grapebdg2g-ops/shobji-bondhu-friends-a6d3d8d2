@@ -13,19 +13,16 @@ export type GeoStatus =
   | "error";
 
 export function useGeolocation(autoRequest = true) {
-  const [pos, setPos] = useState<GeoPos | null>(() => {
-    if (typeof window === "undefined") return null;
+  const [pos, setPos] = useState<GeoPos | null>(null);
+  useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return null;
+      if (!raw) return;
       const p = JSON.parse(raw) as GeoPos;
       // Use cache if < 1 hour old
-      if (Date.now() - p.ts < 60 * 60_000) return p;
-      return null;
-    } catch {
-      return null;
-    }
-  });
+      if (Number.isFinite(p.lat) && Number.isFinite(p.lng) && Date.now() - p.ts < 60 * 60_000) setPos(p);
+    } catch {}
+  }, []);
   const [status, setStatus] = useState<GeoStatus>("idle");
   const [error, setError] = useState<string | null>(null);
 
