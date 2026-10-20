@@ -39,6 +39,7 @@ export const capturePricesFromContent = createServerFn({ method: "POST" })
       .eq("id", userId)
       .maybeSingle();
     if (!profile?.district) return { added: 0 };
+    const district = profile.district;
 
     const { getAiSetting, resolveAiKey, callAi } = await import("./ai-settings.server");
     const setting = await getAiSetting("price_extraction");
@@ -140,7 +141,7 @@ export const capturePricesFromContent = createServerFn({ method: "POST" })
         price_type: p.price_type,
         source: "community",
         market_name: data.kind === "post" ? "কমিউনিটি পোস্ট" : "কমিউনিটি মন্তব্য",
-        district: profile.district,
+        district,
         upazila: profile.upazila,
         category: p.category || "সবজি",
         user_id: userId,
