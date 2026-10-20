@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Link } from "@tanstack/react-router";
 import {
@@ -17,9 +16,7 @@ import { weatherCodeBn } from "@/lib/weather-rules";
 import { useGeolocation } from "@/hooks/use-geolocation";
 import type { Forecast, DailyPoint, CurrentWeather } from "@/lib/weather-types";
 import { dashboardWeatherLocation } from "@/lib/weather-location";
-import { getDistricts } from "@/data/bd-locations";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const BN_DAYS = ["রবি", "সোম", "মঙ্গল", "বুধ", "বৃহঃ", "শুক্র", "শনি"];
 
@@ -106,21 +103,12 @@ export function DashboardWeatherWidget({
 }) {
   const fetchForecast = useServerFn(getWeatherForecast);
   const { pos, status: geoStatus, request: requestGeo } = useGeolocation(true);
-  const [selectedDistrict, setSelectedDistrict] = useState<string | null>(null);
-  const location = dashboardWeatherLocation(district, upazila, pos, selectedDistrict);
+  const location = dashboardWeatherLocation(district, upazila, pos);
   const controls = (
-    <div data-guest-allow className="flex flex-wrap items-center gap-2">
-      <Select value={location.district} onValueChange={setSelectedDistrict}>
-        <SelectTrigger aria-label="আবহাওয়ার জেলা" className="h-11 w-auto min-w-36 flex-1 bg-background">
-          <MapPin className="h-4 w-4 shrink-0 text-primary" />
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent data-guest-allow>
-          {getDistricts().map((name) => <SelectItem key={name} value={name}>{name}</SelectItem>)}
-        </SelectContent>
-      </Select>
-      <Button variant="ghost" size="icon" aria-label="লাইভ লোকেশন" title="লাইভ লোকেশন" disabled={geoStatus === "loading"} onClick={() => { setSelectedDistrict(null); requestGeo(); }}>
+    <div data-guest-allow className="flex items-center gap-2">
+      <Button variant="ghost" size="sm" aria-label="লাইভ লোকেশন" title="লাইভ লোকেশন" disabled={geoStatus === "loading"} onClick={() => requestGeo()} className="gap-1.5 text-muted-foreground">
         <Navigation className="h-4 w-4" />
+        লাইভ লোকেশন
       </Button>
     </div>
   );
@@ -173,7 +161,7 @@ export function DashboardWeatherWidget({
     <section className="w-full space-y-4 px-4 pt-4 sm:space-y-5 sm:px-5 sm:pt-5">
       {geoStatus === "prompt" && (
         <Button data-guest-allow
-          onClick={() => { setSelectedDistrict(null); requestGeo(); }}
+          onClick={() => requestGeo()}
           className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary/10 border border-primary/30 text-primary text-sm font-semibold py-2.5 active:scale-[0.99] transition"
         >
           <Navigation className="h-4 w-4" />
@@ -204,8 +192,7 @@ export function DashboardWeatherWidget({
             </Button>
           </div>
         </div>
-        <div className="px-4 pt-3">{controls}</div>
-        {!district && !usingGps && selectedDistrict === null && <p className="px-4 pt-2 text-xs text-muted-foreground">ডিফল্ট এলাকা: ঢাকা</p>}
+        {!usingGps && !district && <p className="px-4 pt-2 text-xs text-muted-foreground">ডিফল্ট এলাকা: ঢাকা</p>}
 
         {/* Current */}
         <div className="grid grid-cols-[5rem_minmax(0,1fr)] gap-3 p-4 sm:grid-cols-[6.5rem_minmax(0,1fr)] sm:gap-4 sm:p-5">
