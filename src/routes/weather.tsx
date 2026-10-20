@@ -25,6 +25,10 @@ export const Route = createFileRoute("/weather")({
   head: () => ({
     meta: [
       { title: "আবহাওয়া — কৃষক বন্ধু" },
+      { property: "og:title", content: "আবহাওয়া — কৃষক বন্ধু" },
+      { property: "og:description", content: "আপনার জেলার আজকের ও আগামী ৭ দিনের আবহাওয়া ও কৃষি পরামর্শ।" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       {
         name: "description",
         content: "আপনার জেলার আজকের ও আগামী ৭ দিনের আবহাওয়া + কৃষি পরামর্শ।",

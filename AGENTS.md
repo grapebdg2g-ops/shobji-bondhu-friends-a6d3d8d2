@@ -1,5 +1,7 @@
 # Project architecture rules
 
+- Resolve dashboard weather through a shared location helper: explicit district selection overrides GPS, then profile location and a labelled fallback; public forecast controls never require a profile or mutate it.
+
 - All AI entry points resolve per-feature settings at request time, preserve disabled rows, and use provider-specific text/audio protocols; prevents successful admin saves from being silently ignored.
 
 - Serve the landing community preview through an anonymous, read-only server function with an explicit field allowlist and bounded latest-post query; never expose private profiles or use admin access for it.

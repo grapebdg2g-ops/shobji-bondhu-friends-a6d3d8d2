@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Link } from "@tanstack/react-router";
 import {
@@ -15,6 +16,10 @@ import { getWeatherForecast } from "@/lib/weather.functions";
 import { weatherCodeBn } from "@/lib/weather-rules";
 import { useGeolocation } from "@/hooks/use-geolocation";
 import type { Forecast, DailyPoint, CurrentWeather } from "@/lib/weather-types";
+import { dashboardWeatherLocation } from "@/lib/weather-location";
+import { getDistricts } from "@/data/bd-locations";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const BN_DAYS = ["রবি", "সোম", "মঙ্গল", "বুধ", "বৃহঃ", "শুক্র", "শনি"];
 
@@ -67,28 +72,28 @@ const tonePresentation: Record<
     label: "আবহাওয়া চাষের জন্য ভালো",
     badge: "নিরাপদ",
     icon: CheckCircle2,
-    card: "border-emerald-200 bg-gradient-to-br from-emerald-50 via-white to-[#F2FBF4]",
-    iconWrap: "bg-emerald-100",
-    iconColor: "text-emerald-700",
-    badgeColor: "bg-emerald-100 text-emerald-700",
+    card: "border-primary/20 bg-card",
+    iconWrap: "bg-primary/10",
+    iconColor: "text-primary",
+    badgeColor: "bg-primary/10 text-primary",
   },
   warn: {
     label: "আজ একটু সতর্ক থাকুন",
     badge: "সতর্কতা",
     icon: AlertTriangle,
-    card: "border-amber-200 bg-gradient-to-br from-amber-50 via-white to-[#FFF9ED]",
-    iconWrap: "bg-amber-100",
-    iconColor: "text-amber-700",
-    badgeColor: "bg-amber-100 text-amber-700",
+    card: "border-accent bg-card",
+    iconWrap: "bg-accent",
+    iconColor: "text-accent-foreground",
+    badgeColor: "bg-accent text-accent-foreground",
   },
   danger: {
     label: "আজ মাঠে যাওয়ার আগে সতর্ক হন",
     badge: "জরুরি",
     icon: ShieldAlert,
-    card: "border-orange-200 bg-gradient-to-br from-orange-50 via-white to-[#FFF4ED]",
-    iconWrap: "bg-orange-100",
-    iconColor: "text-orange-700",
-    badgeColor: "bg-orange-100 text-orange-700",
+    card: "border-destructive/30 bg-card",
+    iconWrap: "bg-destructive/10",
+    iconColor: "text-destructive",
+    badgeColor: "bg-destructive/10 text-destructive",
   },
 };
 
@@ -101,28 +106,44 @@ export function DashboardWeatherWidget({
 }) {
   const fetchForecast = useServerFn(getWeatherForecast);
   const { pos, status: geoStatus, request: requestGeo } = useGeolocation(true);
+  const [selectedDistrict, setSelectedDistrict] = useState<string | null>(null);
+  const location = dashboardWeatherLocation(district, upazila, pos, selectedDistrict);
+  const controls = (
+    <div data-guest-allow className="flex flex-wrap items-center gap-2">
+      <Select value={location.district} onValueChange={setSelectedDistrict}>
+        <SelectTrigger aria-label="আবহাওয়ার জেলা" className="h-11 w-auto min-w-36 flex-1 bg-background">
+          <MapPin className="h-4 w-4 shrink-0 text-primary" />
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent data-guest-allow>
+          {getDistricts().map((name) => <SelectItem key={name} value={name}>{name}</SelectItem>)}
+        </SelectContent>
+      </Select>
+      <Button variant="ghost" size="icon" aria-label="লাইভ লোকেশন" title="লাইভ লোকেশন" disabled={geoStatus === "loading"} onClick={() => { setSelectedDistrict(null); requestGeo(); }}>
+        <Navigation className="h-4 w-4" />
+      </Button>
+    </div>
+  );
 
   const { data, isLoading, isFetching, refetch, error } = useQuery({
-    queryKey: ["weather-dashboard", district, upazila ?? null, pos?.lat ?? null, pos?.lng ?? null],
+    queryKey: ["weather-dashboard", location.district, location.upazila, location.lat, location.lng],
     queryFn: () =>
       fetchForecast({
         data: {
-          district: district!,
-          upazila: upazila ?? null,
-          lat: pos?.lat ?? null,
-          lng: pos?.lng ?? null,
+          district: location.district,
+          upazila: location.upazila,
+          lat: location.lat,
+          lng: location.lng,
         },
       }),
-    enabled: !!district,
     staleTime: 30 * 60_000,
     refetchInterval: 30 * 60_000,
   });
 
-  if (!district) return null;
-
   if (isLoading) {
     return (
       <section className="w-full px-4 pt-4 sm:px-5 sm:pt-5">
+        {controls}
         <div className="rounded-2xl bg-card border border-border p-4 animate-pulse h-44" />
       </section>
     );
@@ -131,11 +152,12 @@ export function DashboardWeatherWidget({
   if (error || !data || !data.forecast) {
     return (
       <section className="w-full px-4 pt-4 sm:px-5 sm:pt-5">
+        {controls}
         <div className="rounded-2xl bg-card border border-border p-4 text-sm text-muted-foreground">
           আবহাওয়া তথ্য আনা যায়নি।{" "}
-          <button onClick={() => refetch()} className="text-primary font-semibold">
+          <Button data-guest-allow variant="link" onClick={() => refetch()} className="text-primary font-semibold">
             আবার চেষ্টা
-          </button>
+          </Button>
         </div>
       </section>
     );
@@ -145,22 +167,20 @@ export function DashboardWeatherWidget({
   const c = f.current;
   const today = f.daily[0];
   const advice = farmingAdvice(c, today);
-  const usingGps = !!pos;
-  const loc = usingGps ? "আপনার লোকেশন" : upazila ? `${upazila}, ${district}` : district;
+  const { usingGps, label: loc } = location;
 
   return (
     <section className="w-full space-y-4 px-4 pt-4 sm:space-y-5 sm:px-5 sm:pt-5">
       {geoStatus === "prompt" && (
-        <button
-          onClick={requestGeo}
+        <Button data-guest-allow
+          onClick={() => { setSelectedDistrict(null); requestGeo(); }}
           className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary/10 border border-primary/30 text-primary text-sm font-semibold py-2.5 active:scale-[0.99] transition"
         >
           <Navigation className="h-4 w-4" />
           লাইভ লোকেশন থেকে আবহাওয়া দেখুন
-        </button>
+        </Button>
       )}
-      <Link
-        to="/weather"
+      <div
         className="home-pressable block w-full overflow-hidden rounded-[24px] border border-border bg-card shadow-[var(--shadow-card)]"
       >
         {/* Header */}
@@ -175,32 +195,17 @@ export function DashboardWeatherWidget({
             )}
           </div>
           <div className="ml-auto flex shrink-0 items-center gap-2.5">
-            {!usingGps && geoStatus !== "loading" && (
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  requestGeo();
-                }}
-                aria-label="লাইভ লোকেশন"
-                className="flex items-center gap-1 rounded-full px-2 py-1 text-xs font-semibold text-primary transition hover:bg-primary/10"
-              >
-                <Navigation className="h-3.5 w-3.5" /> GPS
-              </button>
-            )}
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                refetch();
-              }}
+            <Button data-guest-allow variant="ghost" size="icon"
+              onClick={() => refetch()}
               aria-label="আপডেট"
-              className="flex items-center gap-1 rounded-full px-2 py-1 text-xs text-muted-foreground transition hover:bg-muted"
+              title="আবহাওয়া আপডেট"
             >
-              <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin" : ""}`} /> আপডেট
-            </button>
+              <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin" : ""}`} />
+            </Button>
           </div>
         </div>
+        <div className="px-4 pt-3">{controls}</div>
+        {!district && !usingGps && selectedDistrict === null && <p className="px-4 pt-2 text-xs text-muted-foreground">ডিফল্ট এলাকা: ঢাকা</p>}
 
         {/* Current */}
         <div className="grid grid-cols-[5rem_minmax(0,1fr)] gap-3 p-4 sm:grid-cols-[6.5rem_minmax(0,1fr)] sm:gap-4 sm:p-5">
@@ -251,7 +256,7 @@ export function DashboardWeatherWidget({
             })}
           </div>
         </div>
-      </Link>
+      </div>
 
       {/* Farming advice */}
       {(() => {
