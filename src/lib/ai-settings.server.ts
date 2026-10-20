@@ -121,7 +121,8 @@ async function callOpenAiCompatible(
   });
 
   if (res.status === 429) throw new Error("অনেক অনুরোধ এসেছে, একটু পরে আবার চেষ্টা করুন");
-  if (res.status === 401 || res.status === 403) throw new Error("AI API কী সমস্যা, পরে চেষ্টা করুন");
+  if (res.status === 401 || res.status === 403)
+    throw new Error("AI API কী সমস্যা, পরে চেষ্টা করুন");
   if (!res.ok) {
     const err = await res.text().catch(() => "");
     console.error("AI provider error", setting.provider, res.status, err.slice(0, 300));
@@ -203,27 +204,46 @@ export async function callTranscription(
       {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-goog-api-key": key },
-        body: JSON.stringify({ contents: [{ role: "user", parts: [
-          { text: "এই অডিওর কথাগুলো মূল ভাষায় লিখুন। শুধু কথার প্রতিলিপি দিন, ব্যাখ্যা নয়।" },
-          { inline_data: { mime_type: audio.mimeType.split(";")[0], data: audio.audioBase64 } },
-        ] }] }),
+        body: JSON.stringify({
+          contents: [
+            {
+              role: "user",
+              parts: [
+                {
+                  text: "এই অডিওর কথাগুলো মূল ভাষায় লিখুন। শুধু কথার প্রতিলিপি দিন, ব্যাখ্যা নয়।",
+                },
+                {
+                  inline_data: { mime_type: audio.mimeType.split(";")[0], data: audio.audioBase64 },
+                },
+              ],
+            },
+          ],
+        }),
       },
     );
     await assertTranscriptionResponse(res);
-    const json = await res.json() as { candidates?: { content?: { parts?: { text?: string }[] } }[] };
-    return (json.candidates?.[0]?.content?.parts ?? []).map(p => p.text ?? "").join("").trim();
+    const json = (await res.json()) as {
+      candidates?: { content?: { parts?: { text?: string }[] } }[];
+    };
+    return (json.candidates?.[0]?.content?.parts ?? [])
+      .map((p) => p.text ?? "")
+      .join("")
+      .trim();
   }
 
-  const binary = Uint8Array.from(atob(audio.audioBase64), c => c.charCodeAt(0));
+  const binary = Uint8Array.from(atob(audio.audioBase64), (c) => c.charCodeAt(0));
   const form = new FormData();
   form.append("file", new Blob([binary], { type: audio.mimeType }), `recording.${audio.extension}`);
   form.append("model", setting.model);
-  const base = setting.provider === "torveai" ? "https://api.torveai.com" : "https://ai.gateway.lovable.dev";
+  const base =
+    setting.provider === "torveai" ? "https://api.torveai.com" : "https://ai.gateway.lovable.dev";
   const res = await fetch(`${base}/v1/audio/transcriptions`, {
-    method: "POST", headers: { Authorization: `Bearer ${key}` }, body: form,
+    method: "POST",
+    headers: { Authorization: `Bearer ${key}` },
+    body: form,
   });
   await assertTranscriptionResponse(res);
-  const json = await res.json() as { text?: string };
+  const json = (await res.json()) as { text?: string };
   return (json.text ?? "").trim();
 }
 

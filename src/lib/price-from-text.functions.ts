@@ -79,42 +79,47 @@ export const capturePricesFromContent = createServerFn({ method: "POST" })
     };
     let raw = "";
     if (setting.provider === "lovable_gateway" && setting.model.startsWith("openai/")) {
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
-      method: "POST",
-      headers: {
-        "Lovable-API-Key": apiKey,
-        "Content-Type": "application/json",
-        "X-Lovable-AIG-SDK": "fetch",
-      },
-      body: JSON.stringify({
-        model: setting.model,
-        input: prompt,
-        stream: true,
-        store: false,
-        ...(setting.model !== "openai/chat-latest" ? { reasoning: { effort: "low", summary: "auto" }, include: ["reasoning.encrypted_content"] } : {}),
-        text: { format: { type: "json_schema", name: "prices", strict: true, schema } },
-      }),
-    });
-    if (!res.ok || !res.body) return { added: 0 };
-    const reader = res.body.getReader();
-    const decoder = new TextDecoder();
-    let buf = "";
-    for (;;) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      buf += decoder.decode(value, { stream: true });
-      const lines = buf.split("\n");
-      buf = lines.pop() ?? "";
-      for (const line of lines) {
-        if (!line.startsWith("data:")) continue;
-        try {
-          const ev = JSON.parse(line.slice(5).trim()) as { type?: string; delta?: string };
-          if (ev.type === "response.output_text.delta" && ev.delta) raw += ev.delta;
-        } catch {
-          /* ignore keep-alives */
+      const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
+        method: "POST",
+        headers: {
+          "Lovable-API-Key": apiKey,
+          "Content-Type": "application/json",
+          "X-Lovable-AIG-SDK": "fetch",
+        },
+        body: JSON.stringify({
+          model: setting.model,
+          input: prompt,
+          stream: true,
+          store: false,
+          ...(setting.model !== "openai/chat-latest"
+            ? {
+                reasoning: { effort: "low", summary: "auto" },
+                include: ["reasoning.encrypted_content"],
+              }
+            : {}),
+          text: { format: { type: "json_schema", name: "prices", strict: true, schema } },
+        }),
+      });
+      if (!res.ok || !res.body) return { added: 0 };
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buf = "";
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buf += decoder.decode(value, { stream: true });
+        const lines = buf.split("\n");
+        buf = lines.pop() ?? "";
+        for (const line of lines) {
+          if (!line.startsWith("data:")) continue;
+          try {
+            const ev = JSON.parse(line.slice(5).trim()) as { type?: string; delta?: string };
+            if (ev.type === "response.output_text.delta" && ev.delta) raw += ev.delta;
+          } catch {
+            /* ignore keep-alives */
+          }
         }
       }
-    }
     } else {
       raw = await callAi(setting, { messages: [{ role: "user", content: prompt }], json: true });
     }
