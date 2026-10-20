@@ -6,10 +6,9 @@ export function dashboardWeatherLocation(
   pos: GeoPos | null,
 ) {
   const usingGps = pos !== null;
-  const resolvedDistrict = usingGps ? district || "ঢাকা" : district || "ঢাকা";
+  const resolvedDistrict = district || "ঢাকা";
+  const resolvedUpazila = upazila ?? null;
   return {
-    district: resolvedDistrict,
-    upazila: resolvedUpazila,
     lat: usingGps ? pos?.lat ?? null : null,
     lng: usingGps ? pos?.lng ?? null : null,
     usingGps,
