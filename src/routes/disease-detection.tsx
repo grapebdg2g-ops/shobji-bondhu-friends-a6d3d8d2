@@ -12,6 +12,7 @@ import {
   Share2,
   ChevronDown,
   X,
+  History,
 } from "lucide-react";
 import { toast } from "sonner";
 import { BengaliButton } from "@/components/krishi/bengali-button";
@@ -196,7 +197,12 @@ function DiseaseDetectionPage() {
         savedAt: new Date().toISOString(),
       });
       localStorage.setItem("disease_saves", JSON.stringify(saved.slice(0, 50)));
-      toast.success("সংরক্ষণ করা হয়েছে");
+      toast.success("সংরক্ষণ করা হয়েছে", {
+        action: {
+          label: "ইতিহাস দেখুন",
+          onClick: () => navigate({ to: "/profile/disease-history" }),
+        },
+      });
     } catch {
       toast.error("সংরক্ষণ ব্যর্থ");
     }
@@ -237,6 +243,13 @@ function DiseaseDetectionPage() {
             <h1 className="text-lg font-bold text-foreground leading-tight">রোগ শনাক্ত</h1>
             <p className="text-xs text-muted-foreground">ফসলের ছবি তুলুন, রোগ জানুন</p>
           </div>
+          <button
+            onClick={() => navigate({ to: "/profile/disease-history" })}
+            className="h-10 w-10 -mr-2 rounded-full flex items-center justify-center active:bg-muted"
+            aria-label="রোগ শনাক্তের ইতিহাস"
+          >
+            <History className="h-5 w-5" />
+          </button>
         </div>
       </header>
 
