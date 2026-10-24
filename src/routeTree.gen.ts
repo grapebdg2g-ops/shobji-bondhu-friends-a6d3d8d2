@@ -74,6 +74,7 @@ import { Route as CropGuidePlanPlanIdRouteImport } from './routes/crop-guide.pla
 import { Route as ApiPublicHooksCheckPredictionAccuracyRouteImport } from './routes/api/public/hooks/check-prediction-accuracy'
 import { Route as ApiPublicHooksCropRemindersRouteImport } from './routes/api/public/hooks/crop-reminders'
 import { Route as ApiPublicHooksFetchGovtPricesRouteImport } from './routes/api/public/hooks/fetch-govt-prices'
+import { Route as ApiPublicHooksKrishokBartaRouteImport } from './routes/api/public/hooks/krishok-barta'
 import { Route as ApiPublicHooksPushNotificationsRouteImport } from './routes/api/public/hooks/push-notifications'
 import { Route as ApiPublicHooksSendScheduledBroadcastsRouteImport } from './routes/api/public/hooks/send-scheduled-broadcasts'
 import { Route as ApiPublicHooksWeatherAlertsRouteImport } from './routes/api/public/hooks/weather-alerts'
@@ -409,6 +410,12 @@ const ApiPublicHooksFetchGovtPricesRoute =
     path: '/api/public/hooks/fetch-govt-prices',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksKrishokBartaRoute =
+  ApiPublicHooksKrishokBartaRouteImport.update({
+    id: '/api/public/hooks/krishok-barta',
+    path: '/api/public/hooks/krishok-barta',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksPushNotificationsRoute =
   ApiPublicHooksPushNotificationsRouteImport.update({
     id: '/api/public/hooks/push-notifications',
@@ -494,6 +501,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/check-prediction-accuracy': typeof ApiPublicHooksCheckPredictionAccuracyRoute
   '/api/public/hooks/crop-reminders': typeof ApiPublicHooksCropRemindersRoute
   '/api/public/hooks/fetch-govt-prices': typeof ApiPublicHooksFetchGovtPricesRoute
+  '/api/public/hooks/krishok-barta': typeof ApiPublicHooksKrishokBartaRoute
   '/api/public/hooks/push-notifications': typeof ApiPublicHooksPushNotificationsRoute
   '/api/public/hooks/send-scheduled-broadcasts': typeof ApiPublicHooksSendScheduledBroadcastsRoute
   '/api/public/hooks/weather-alerts': typeof ApiPublicHooksWeatherAlertsRoute
@@ -562,6 +570,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/check-prediction-accuracy': typeof ApiPublicHooksCheckPredictionAccuracyRoute
   '/api/public/hooks/crop-reminders': typeof ApiPublicHooksCropRemindersRoute
   '/api/public/hooks/fetch-govt-prices': typeof ApiPublicHooksFetchGovtPricesRoute
+  '/api/public/hooks/krishok-barta': typeof ApiPublicHooksKrishokBartaRoute
   '/api/public/hooks/push-notifications': typeof ApiPublicHooksPushNotificationsRoute
   '/api/public/hooks/send-scheduled-broadcasts': typeof ApiPublicHooksSendScheduledBroadcastsRoute
   '/api/public/hooks/weather-alerts': typeof ApiPublicHooksWeatherAlertsRoute
@@ -633,6 +642,7 @@ export interface FileRoutesById {
   '/api/public/hooks/check-prediction-accuracy': typeof ApiPublicHooksCheckPredictionAccuracyRoute
   '/api/public/hooks/crop-reminders': typeof ApiPublicHooksCropRemindersRoute
   '/api/public/hooks/fetch-govt-prices': typeof ApiPublicHooksFetchGovtPricesRoute
+  '/api/public/hooks/krishok-barta': typeof ApiPublicHooksKrishokBartaRoute
   '/api/public/hooks/push-notifications': typeof ApiPublicHooksPushNotificationsRoute
   '/api/public/hooks/send-scheduled-broadcasts': typeof ApiPublicHooksSendScheduledBroadcastsRoute
   '/api/public/hooks/weather-alerts': typeof ApiPublicHooksWeatherAlertsRoute
@@ -705,6 +715,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/check-prediction-accuracy'
     | '/api/public/hooks/crop-reminders'
     | '/api/public/hooks/fetch-govt-prices'
+    | '/api/public/hooks/krishok-barta'
     | '/api/public/hooks/push-notifications'
     | '/api/public/hooks/send-scheduled-broadcasts'
     | '/api/public/hooks/weather-alerts'
@@ -773,6 +784,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/check-prediction-accuracy'
     | '/api/public/hooks/crop-reminders'
     | '/api/public/hooks/fetch-govt-prices'
+    | '/api/public/hooks/krishok-barta'
     | '/api/public/hooks/push-notifications'
     | '/api/public/hooks/send-scheduled-broadcasts'
     | '/api/public/hooks/weather-alerts'
@@ -843,6 +855,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/check-prediction-accuracy'
     | '/api/public/hooks/crop-reminders'
     | '/api/public/hooks/fetch-govt-prices'
+    | '/api/public/hooks/krishok-barta'
     | '/api/public/hooks/push-notifications'
     | '/api/public/hooks/send-scheduled-broadcasts'
     | '/api/public/hooks/weather-alerts'
@@ -895,6 +908,7 @@ export interface RootRouteChildren {
   ApiPublicHooksCheckPredictionAccuracyRoute: typeof ApiPublicHooksCheckPredictionAccuracyRoute
   ApiPublicHooksCropRemindersRoute: typeof ApiPublicHooksCropRemindersRoute
   ApiPublicHooksFetchGovtPricesRoute: typeof ApiPublicHooksFetchGovtPricesRoute
+  ApiPublicHooksKrishokBartaRoute: typeof ApiPublicHooksKrishokBartaRoute
   ApiPublicHooksPushNotificationsRoute: typeof ApiPublicHooksPushNotificationsRoute
   ApiPublicHooksSendScheduledBroadcastsRoute: typeof ApiPublicHooksSendScheduledBroadcastsRoute
   ApiPublicHooksWeatherAlertsRoute: typeof ApiPublicHooksWeatherAlertsRoute
@@ -1357,6 +1371,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksFetchGovtPricesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/krishok-barta': {
+      id: '/api/public/hooks/krishok-barta'
+      path: '/api/public/hooks/krishok-barta'
+      fullPath: '/api/public/hooks/krishok-barta'
+      preLoaderRoute: typeof ApiPublicHooksKrishokBartaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/push-notifications': {
       id: '/api/public/hooks/push-notifications'
       path: '/api/public/hooks/push-notifications'
@@ -1516,6 +1537,7 @@ const rootRouteChildren: RootRouteChildren = {
     ApiPublicHooksCheckPredictionAccuracyRoute,
   ApiPublicHooksCropRemindersRoute: ApiPublicHooksCropRemindersRoute,
   ApiPublicHooksFetchGovtPricesRoute: ApiPublicHooksFetchGovtPricesRoute,
+  ApiPublicHooksKrishokBartaRoute: ApiPublicHooksKrishokBartaRoute,
   ApiPublicHooksPushNotificationsRoute: ApiPublicHooksPushNotificationsRoute,
   ApiPublicHooksSendScheduledBroadcastsRoute:
     ApiPublicHooksSendScheduledBroadcastsRoute,
