@@ -115,7 +115,8 @@ export const Route = createFileRoute("/api/public/hooks/krishok-barta")({
         if (!item || !pick.summary) return Response.json({ ok: true, posted: 0, reason: "nothing relevant" });
 
         const userId = await ensureBotUser(admin);
-        const content = `📰 ${slot.tag} | ${item.title}\n\n${pick.summary.trim()}\n\nসূত্র: ${item.source || "সংবাদ"}\n${item.link}`;
+        let content = `📰 ${slot.tag} | ${item.title}\n\n${pick.summary.trim()}\n\nসূত্র: ${item.source || "সংবাদ"}\n${item.link}`;
+        if (content.length > 500) content = `📰 ${slot.tag} | ${item.title}\n\n${pick.summary.trim()}`.slice(0, 497 - item.link.length) + `\n${item.link}`;
         const { data: post, error } = await admin
           .from("posts")
           .insert({ user_id: userId, user_name: BOT_NAME, content, type: "general", crop_tag: null })
