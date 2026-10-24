@@ -668,6 +668,41 @@ export type Database = {
         }
         Relationships: []
       }
+      krishok_barta_items: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string | null
+          source_name: string | null
+          source_url: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id?: string | null
+          source_name?: string | null
+          source_url: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string | null
+          source_name?: string | null
+          source_url?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "krishok_barta_items_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       muted_users: {
         Row: {
           created_at: string
