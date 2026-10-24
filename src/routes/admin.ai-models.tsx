@@ -31,6 +31,7 @@ const FEATURE_LABELS: Record<string, string> = {
   price_prediction: "দাম পূর্বাভাস",
   soil_analysis: "মাটি বিশ্লেষণ",
   transcribe: "ভয়েস → লেখা",
+  krishok_barta: "কৃষক বার্তা (দৈনিক সংবাদ)",
 };
 
 const PROVIDERS = [
