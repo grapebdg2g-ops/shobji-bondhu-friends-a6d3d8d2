@@ -1,5 +1,9 @@
 # Tasks
 
+## কৃষক বার্তা troubleshooting
+- [ ] Diagnose scheduled news runs that produce no posts and repair the confirmed cause.
+- [ ] Verify a real news post appears in the community feed.
+
 ## Dashboard weather
 - [x] Show weather without a profile district using GPS or an explicit Dhaka fallback.
 - [x] Allow guest-friendly district selection and verify actual forecasts.
