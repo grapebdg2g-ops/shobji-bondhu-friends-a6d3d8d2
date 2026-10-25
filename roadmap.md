@@ -1,8 +1,8 @@
 # Tasks
 
 ## কৃষক বার্তা troubleshooting
-- [ ] Diagnose scheduled news runs that produce no posts and repair the confirmed cause.
-- [ ] Verify a real news post appears in the community feed.
+- [x] Diagnose missing posts: published run returns no news; local RSS/AI succeeds but bot creation fails because the Cloud backend hostname cannot resolve.
+- [ ] Restore news posting and verify a real post in the community feed — blocked by unavailable Cloud backend; published RSS also needs rechecking after service recovery.
 
 ## Dashboard weather
 - [x] Show weather without a profile district using GPS or an explicit Dhaka fallback.
