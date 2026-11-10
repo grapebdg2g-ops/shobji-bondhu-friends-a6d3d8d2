@@ -2,12 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { isAuthorizedCronRequest, unauthorizedCronResponse } from "@/lib/cron-auth.server";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { configureVapid, sendWebPush } from "@/lib/push.server";
+import { wasPushDelivered } from "@/lib/push-policy";
 
 // Types already pushed directly by their own senders.
 const ALREADY_PUSHED = (t: string) =>
-  t === "crop_reminder" || t === "group_message" || (t.startsWith("weather_") && t !== "ipm_weather");
+  t === "group_message" || (t.startsWith("weather_") && t !== "ipm_weather");
 
 function urlFor(n: { type: string; ref_type: string | null; ref_id: string | null }) {
+  if (n.type === "crop_reminder") return "/crop-diary";
   if (n.type === "message" && n.ref_id) return `/messages/${n.ref_id}`;
   if (n.ref_type === "group_chat" && n.ref_id) return `/groups/${n.ref_id}`;
   if (n.ref_type === "connection") return "/connections";
@@ -24,27 +26,25 @@ export const Route = createFileRoute("/api/public/hooks/push-notifications")({
       POST: async ({ request }) => {
         if (!isAuthorizedCronRequest(request)) return unauthorizedCronResponse();
         if (!configureVapid()) return Response.json({ ok: false, error: "VAPID missing" }, { status: 500 });
-        const since = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-        const { data: rows } = await supabaseAdmin
+        const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+        const { data: rows, error } = await supabaseAdmin
           .from("notifications")
           .select("id, user_id, type, title, body, ref_id, ref_type")
           .is("pushed_at", null)
           .gte("created_at", since)
           .order("created_at")
           .limit(200);
+        if (error) return Response.json({ ok: false, error: "Notification lookup failed" }, { status: 500 });
         const list = rows ?? [];
         if (!list.length) return Response.json({ ok: true, sent: 0 });
-        await supabaseAdmin
-          .from("notifications")
-          .update({ pushed_at: new Date().toISOString() })
-          .in("id", list.map((n) => n.id));
         const todo = list.filter((n) => !ALREADY_PUSHED(n.type));
         const userIds = Array.from(new Set(todo.map((n) => n.user_id)));
         if (!userIds.length) return Response.json({ ok: true, sent: 0 });
-        const { data: subs } = await supabaseAdmin
+        const { data: subs, error: subscriptionError } = await supabaseAdmin
           .from("push_subscriptions")
           .select("user_id, endpoint, p256dh, auth")
           .in("user_id", userIds);
+        if (subscriptionError) return Response.json({ ok: false, error: "Subscription lookup failed" }, { status: 500 });
         let sent = 0;
         for (const n of todo) {
           const mine = (subs ?? []).filter((s) => s.user_id === n.user_id);
@@ -61,6 +61,11 @@ export const Route = createFileRoute("/api/public/hooks/push-notifications")({
             ),
           );
           sent += results.filter((r) => r.ok).length;
+          if (wasPushDelivered(results)) {
+            const { error: updateError } = await supabaseAdmin.from("notifications")
+              .update({ pushed_at: new Date().toISOString() }).eq("id", n.id);
+            if (updateError) return Response.json({ ok: false, sent, error: "Delivery receipt failed" }, { status: 500 });
+          }
         }
         return Response.json({ ok: true, sent });
       },

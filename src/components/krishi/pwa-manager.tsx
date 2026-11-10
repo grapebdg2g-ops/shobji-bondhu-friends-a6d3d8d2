@@ -128,16 +128,6 @@ export function PWAManager() {
         } catch {
           // best-effort tracking
         }
-        // Best-effort: ask for notification permission right after install
-        try {
-          if ("Notification" in window && Notification.permission === "default") {
-            await Notification.requestPermission();
-            // Actual subscription happens on /weather page where the user can
-            // see the toggle and where the VAPID key + serverFn call live.
-          }
-        } catch {
-          // ignore
-        }
       }
     } finally {
       setDeferredPrompt(null);

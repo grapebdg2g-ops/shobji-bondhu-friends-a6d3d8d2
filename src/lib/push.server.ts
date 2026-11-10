@@ -30,6 +30,7 @@ export async function sendWebPush(subscription: StoredPushSubscription, payload:
         keys: { p256dh: subscription.p256dh, auth: subscription.auth },
       },
       JSON.stringify(payload),
+      { urgency: "high", TTL: 3600, timeout: 10000 },
     );
     return { ok: true as const };
   } catch (error: unknown) {

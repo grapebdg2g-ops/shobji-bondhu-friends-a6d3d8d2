@@ -4,9 +4,9 @@ import { toast } from "sonner";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import type { PushStatus } from "@/hooks/use-push-notifications";
+import { shouldPromptForPush } from "@/lib/push-policy";
 
 const KEY = "notifPromptDismissedAt";
-const SNOOZE_MS = 3 * 24 * 60 * 60 * 1000;
 
 export function NotificationPrompt({
   status,
@@ -22,14 +22,19 @@ export function NotificationPrompt({
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    if (!loggedIn || status !== "disabled") return;
+    if (!loggedIn || status !== "disabled" || Notification.permission !== "default") {
+      setOpen(false);
+      return;
+    }
     try {
       const at = parseInt(localStorage.getItem(KEY) || "0", 10);
-      if (Date.now() - at < SNOOZE_MS) return;
+      if (!shouldPromptForPush(Notification.permission, at, Date.now(), localStorage.getItem("pushOptedOut") === "true")) return;
     } catch {
       /* ignore */
     }
-    const t = setTimeout(() => setOpen(true), 1200);
+    const t = setTimeout(() => {
+      if (Notification.permission === "default") setOpen(true);
+    }, 1200);
     return () => clearTimeout(t);
   }, [loggedIn, status]);
 

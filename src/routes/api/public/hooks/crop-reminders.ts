@@ -3,7 +3,7 @@ import { stageAtDay } from "@/lib/crop-stage";
 import { createFileRoute } from "@tanstack/react-router";
 import { isAuthorizedCronRequest, unauthorizedCronResponse } from "@/lib/cron-auth.server";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { configureVapid, sendWebPush } from "@/lib/push.server";
+import { configureVapid } from "@/lib/push.server";
 import { FARMING_STAGES } from "@/data/farming-guide";
 
 type Reminder = {
@@ -13,13 +13,6 @@ type Reminder = {
   title: string;
   note: string | null;
   reminder_date: string;
-};
-
-type Subscription = {
-  user_id: string;
-  endpoint: string;
-  p256dh: string;
-  auth: string;
 };
 
 function isAuthorized(request: Request) {
@@ -121,24 +114,6 @@ export const Route = createFileRoute("/api/public/hooks/crop-reminders")({
         if (rows.length === 0 && planTasks.length === 0)
           return Response.json({ ok: true, due: 0, delivered: 0 });
 
-        const userIds = Array.from(
-          new Set([...rows.map((r) => r.user_id), ...planTasks.map((p) => p.user_id)]),
-        );
-        const { data: subscriptions, error: subscriptionError } = await supabaseAdmin
-          .from("push_subscriptions")
-          .select("user_id, endpoint, p256dh, auth")
-          .in("user_id", userIds);
-        if (subscriptionError)
-          return Response.json({ ok: false, error: subscriptionError.message }, { status: 500 });
-
-        const subsByUser = new Map<string, Subscription[]>();
-        for (const sub of (subscriptions ?? []) as Subscription[]) {
-          const list = subsByUser.get(sub.user_id) ?? [];
-          list.push(sub);
-          subsByUser.set(sub.user_id, list);
-        }
-
-        let delivered = 0;
         let notifications = 0;
         for (const reminder of rows) {
           const body = reminder.note
@@ -154,20 +129,9 @@ export const Route = createFileRoute("/api/public/hooks/crop-reminders")({
           });
           if (!notificationError) notifications += 1;
 
-          const payload = {
-            title: `🌱 ${reminder.title}`,
-            body,
-            type: "crop_reminder",
-            tag: `crop-reminder-${reminder.id}`,
-            severity: "normal",
-            url: "/crop-diary",
-          };
-          const results = await Promise.all(
-            (subsByUser.get(reminder.user_id) ?? []).map((sub) => sendWebPush(sub, payload)),
-          );
-          delivered += results.filter((result) => result.ok).length;
-
-          await supabaseAdmin
+          // The notification insert wakes the shared dispatcher. Failed delivery
+          // remains pending there; never send the same reminder from two paths.
+          if (!notificationError) await supabaseAdmin
             .from("crop_reminders")
             .update({ last_notified_date: today })
             .eq("id", reminder.id);
@@ -185,18 +149,6 @@ export const Route = createFileRoute("/api/public/hooks/crop-reminders")({
             ref_type: "crop_plan_task",
           });
           if (!notificationError) notifications += 1;
-          const payload = {
-            title: `🌾 ${title}`,
-            body,
-            type: "crop_reminder",
-            tag: `crop-plan-${task.plan_id}`,
-            severity: "normal",
-            url: "/crop-diary",
-          };
-          const results = await Promise.all(
-            (subsByUser.get(task.user_id) ?? []).map((sub) => sendWebPush(sub, payload)),
-          );
-          delivered += results.filter((result) => result.ok).length;
         }
 
         return Response.json({
@@ -204,7 +156,7 @@ export const Route = createFileRoute("/api/public/hooks/crop-reminders")({
           due: rows.length,
           plan_tasks: planTasks.length,
           notifications,
-          delivered,
+          queued: notifications,
           ran_at: new Date().toISOString(),
         });
       },

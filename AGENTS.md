@@ -1,5 +1,8 @@
 # Project architecture rules
 
+- Request push permission only from the dedicated notification action; silently re-register granted devices and retain explicit opt-outs so backend failures never trigger repeat permission prompts.
+- Mark notification pushes delivered only after successful delivery to subscribed devices; failed sends remain pending instead of being discarded before the network request.
+
 - Resolve dashboard weather through a shared location helper: explicit district selection overrides GPS, then profile location and a labelled fallback; public forecast controls never require a profile or mutate it.
 
 - All AI entry points resolve per-feature settings at request time, preserve disabled rows, and use provider-specific text/audio protocols; prevents successful admin saves from being silently ignored.

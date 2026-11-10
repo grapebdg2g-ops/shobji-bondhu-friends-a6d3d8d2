@@ -4,7 +4,6 @@ import {
   getVapidPublicKey,
   savePushSubscription,
   deletePushSubscription,
-  hasPushSubscription,
 } from "@/lib/weather.functions";
 import { useUser } from "@/contexts/user-context";
 
@@ -35,13 +34,44 @@ export function usePushNotifications() {
   const fetchKey = useServerFn(getVapidPublicKey);
   const saveSub = useServerFn(savePushSubscription);
   const deleteSub = useServerFn(deletePushSubscription);
-  const checkSub = useServerFn(hasPushSubscription);
 
   const supported =
     typeof window !== "undefined" &&
     "serviceWorker" in navigator &&
     "PushManager" in window &&
-    "Notification" in window;
+    "Notification" in window &&
+    window.self === window.top &&
+    import.meta.env.PROD &&
+    !window.location.hostname.includes("id-preview");
+
+  const persistSubscription = useCallback(async (sub: PushSubscription) => {
+    if (!user) return;
+    const json = sub.toJSON();
+    await saveSub({ data: {
+      endpoint: sub.endpoint,
+      p256dh: json.keys?.p256dh ?? arrayBufferToBase64(sub.getKey("p256dh")),
+      auth: json.keys?.auth ?? arrayBufferToBase64(sub.getKey("auth")),
+      district: user.district ?? null,
+      upazila: user.upazila ?? null,
+      user_agent: navigator.userAgent.slice(0, 512),
+    } });
+  }, [user, saveSub]);
+
+  const registerDevice = useCallback(async () => {
+    const { publicKey } = await fetchKey({});
+    if (!publicKey) throw new Error("VAPID public key not configured");
+    const reg = await navigator.serviceWorker.register("/sw.js", { scope: "/" });
+    await Promise.race([
+      navigator.serviceWorker.ready,
+      new Promise<never>((_, reject) => setTimeout(() => reject(new Error("Push registration timed out")), 15000)),
+    ]);
+    const existing = await reg.pushManager.getSubscription();
+    const sub = existing ?? await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(publicKey).buffer as ArrayBuffer,
+    });
+    await persistSubscription(sub);
+  }, [fetchKey, persistSubscription]);
 
   const refresh = useCallback(async () => {
     if (!supported) {
@@ -56,58 +86,41 @@ export function usePushNotifications() {
       setStatus("denied");
       return;
     }
+    if (localStorage.getItem("pushOptedOut") === "true") {
+      setStatus("disabled");
+      return;
+    }
+    if (Notification.permission !== "granted") {
+      setStatus("disabled");
+      return;
+    }
     try {
-      const reg = await navigator.serviceWorker.getRegistration();
-      const sub = reg ? await reg.pushManager.getSubscription() : null;
-      const { hasSubscription } = await checkSub({});
-      setStatus(
-        sub && hasSubscription && Notification.permission === "granted" ? "enabled" : "disabled",
-      );
+      await registerDevice();
+      setStatus("enabled");
     } catch {
       setStatus("disabled");
     }
-  }, [supported, user, checkSub]);
+  }, [supported, user, registerDevice]);
 
   useEffect(() => {
     refresh();
+    const onOnline = () => { void refresh(); };
+    window.addEventListener("online", onOnline);
+    return () => window.removeEventListener("online", onOnline);
   }, [refresh]);
 
   const enable = useCallback(async () => {
     if (!supported || !user) return false;
     setBusy(true);
     try {
-      const perm = await Notification.requestPermission();
+      const perm = Notification.permission === "granted" ? "granted" : await Notification.requestPermission();
       if (perm !== "granted") {
         setStatus(perm === "denied" ? "denied" : "disabled");
         return false;
       }
 
-      const { publicKey } = await fetchKey({});
-      if (!publicKey) throw new Error("VAPID public key not configured");
-
-      const reg = await navigator.serviceWorker.ready;
-      let sub = await reg.pushManager.getSubscription();
-      if (!sub) {
-        sub = await reg.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: urlBase64ToUint8Array(publicKey).buffer as ArrayBuffer,
-        });
-      }
-      const json = sub.toJSON() as { endpoint?: string; keys?: { p256dh?: string; auth?: string } };
-      const endpoint = sub.endpoint || json.endpoint!;
-      const p256dh = json.keys?.p256dh ?? arrayBufferToBase64(sub.getKey("p256dh"));
-      const auth = json.keys?.auth ?? arrayBufferToBase64(sub.getKey("auth"));
-
-      await saveSub({
-        data: {
-          endpoint,
-          p256dh,
-          auth,
-          district: user.district ?? null,
-          upazila: user.upazila ?? null,
-          user_agent: navigator.userAgent.slice(0, 512),
-        },
-      });
+      localStorage.removeItem("pushOptedOut");
+      await registerDevice();
       setStatus("enabled");
       return true;
     } catch (e) {
@@ -117,7 +130,7 @@ export function usePushNotifications() {
     } finally {
       setBusy(false);
     }
-  }, [supported, user, fetchKey, saveSub]);
+  }, [supported, user, registerDevice]);
 
   const disable = useCallback(async () => {
     if (!supported) return false;
@@ -128,6 +141,7 @@ export function usePushNotifications() {
       const endpoint = sub?.endpoint;
       if (sub) await sub.unsubscribe();
       await deleteSub({ data: endpoint ? { endpoint } : {} });
+      localStorage.setItem("pushOptedOut", "true");
       setStatus("disabled");
       return true;
     } catch (e) {

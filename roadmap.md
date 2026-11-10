@@ -1,5 +1,10 @@
 # Tasks
 
+## Notification reliability
+- [x] Stop repeat permission prompts and silently refresh permitted device registration; granted-permission account reloaded twice without a prompt (preview does not register push).
+- [x] Check scheduled delivery (06:00 Dhaka run delivered one push on Nov 10), preserve failed pushes for retry on subsequent dispatch, centralize crop push dispatch, and pass four focused tests.
+- [ ] Verify locked-phone delivery after publishing — needs the user's physical device; browser preview cannot receive production pushes and exact arrival also depends on phone/network settings.
+
 ## কৃষক বার্তা troubleshooting
 - [x] Diagnose missing posts: published run returns no news; local RSS/AI succeeds but bot creation fails because the Cloud backend hostname cannot resolve.
 - [ ] Restore news posting and verify a real post in the community feed — blocked by unavailable Cloud backend; published RSS also needs rechecking after service recovery.
