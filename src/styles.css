@@ -322,3 +322,8 @@ a:focus-visible,
   }
 }
 
+
+@keyframes home-cloud {
+  0%, 100% { transform: translateX(-4px); }
+  50% { transform: translateX(6px); }
+}

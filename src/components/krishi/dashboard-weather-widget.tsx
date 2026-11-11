@@ -132,7 +132,31 @@ export function DashboardWeatherWidget({
     return (
       <section className="w-full px-4 pt-4 sm:px-5 sm:pt-5">
         {controls}
-        <div className="rounded-2xl bg-card border border-border p-4 animate-pulse h-44" />
+        <div role="status" aria-label="আবহাওয়া লোড হচ্ছে" className="mt-2 overflow-hidden rounded-[24px] border border-border bg-card shadow-[var(--shadow-card)]">
+          <div className="flex items-center gap-2 border-b border-border bg-muted/40 px-4 py-3">
+            <MapPin className="h-4 w-4 animate-bounce text-primary" />
+            <span className="text-sm font-semibold text-muted-foreground">আপনার এলাকার আবহাওয়া আনা হচ্ছে…</span>
+          </div>
+          <div className="grid grid-cols-[5rem_minmax(0,1fr)] gap-3 p-4">
+            <div className="relative flex h-16 items-center justify-center">
+              <span className="absolute text-4xl animate-[spin_8s_linear_infinite]">☀️</span>
+              <span className="absolute left-5 top-6 text-4xl animate-[home-cloud_3s_ease-in-out_infinite]">☁️</span>
+            </div>
+            <div className="space-y-2">
+              <div className="h-3 w-24 rounded-full bg-muted animate-pulse" />
+              <div className="grid grid-cols-2 gap-2">
+                {[0, 1, 2, 3].map((i) => (
+                  <div key={i} className="h-3 rounded-full bg-muted animate-pulse" style={{ animationDelay: `${i * 150}ms` }} />
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="grid grid-cols-5 gap-1.5 border-t border-border px-3 py-3">
+            {[0, 1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-16 rounded-xl bg-muted/50 animate-pulse" style={{ animationDelay: `${i * 120}ms` }} />
+            ))}
+          </div>
+        </div>
       </section>
     );
   }
