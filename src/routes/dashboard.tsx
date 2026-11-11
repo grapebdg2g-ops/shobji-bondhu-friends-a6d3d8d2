@@ -42,6 +42,7 @@ const CreatePostSheet = lazy(() =>
 );
 import { CommentsSection } from "@/components/krishi/comments-section";
 import { PostSocialActions } from "@/components/krishi/post-social-actions";
+import { PostPhotoViewer } from "@/components/krishi/post-photo-viewer";
 const CropAdvisoryWidget = lazy(() =>
   import("@/components/krishi/crop-advisory-widget").then((m) => ({
     default: m.CropAdvisoryWidget,
@@ -825,6 +826,7 @@ function MiniPostCard({
     mine: myReaction,
     setReaction,
   } = usePostReactions(post.id, visiblePostIds);
+  const [photoOpen, setPhotoOpen] = useState(false);
   const handleReaction = async (reaction: Parameters<typeof setReaction>[0]) => {
     const result = await setReaction(reaction);
     if (!result.ok) {
@@ -875,12 +877,43 @@ function MiniPostCard({
         </p>
       </div>
       {newsPostPreview(post) ? <NewsLinkPreview post={post} /> : post.image_url && (
+        <button
+          type="button"
+          data-guest-allow
+          aria-label="ছবি বড় করে দেখুন"
+          className="block w-full"
+          onClick={() => setPhotoOpen(true)}
+        >
         <img
           src={post.image_url}
           alt=""
           loading="lazy"
           className="block aspect-[4/3] w-full bg-gray-100 object-cover"
         />
+        </button>
+      )}
+      {post.image_url && photoOpen && (
+        <PostPhotoViewer
+          src={post.image_url}
+          open={photoOpen}
+          onOpenChange={setPhotoOpen}
+          caption={post.content}
+        >
+          <PostSocialActions
+            myReaction={myReaction}
+            reactionCounts={reactionCounts}
+            commentsCount={post.comments_count}
+            saved={saved}
+            commentOpen
+            onReact={(reaction) => void handleReaction(reaction)}
+            onComment={() => {}}
+            onSave={onSave}
+            onShare={onShare}
+          />
+          <div className="px-4">
+            <CommentsSection postId={post.id} onCommentAdded={onCommentAdded} />
+          </div>
+        </PostPhotoViewer>
       )}
       <PostSocialActions
         myReaction={myReaction}

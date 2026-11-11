@@ -34,6 +34,7 @@ import { EmptyState } from "@/components/krishi/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LazyImage } from "@/components/krishi/lazy-image";
 import { PostSocialActions } from "@/components/krishi/post-social-actions";
+import { PostPhotoViewer } from "@/components/krishi/post-photo-viewer";
 import { readSavedPostIds, writeSavedPostIds } from "@/lib/saved-posts";
 import { usePostReactions } from "@/hooks/use-post-reactions";
 import { useAuthorAvatars } from "@/hooks/use-author-avatars";
@@ -651,6 +652,7 @@ function PostCard({
     mine: myReaction,
     setReaction,
   } = usePostReactions(post.id, visiblePostIds);
+  const [photoOpen, setPhotoOpen] = useState(false);
 
   const handleReaction = async (reaction: Parameters<typeof setReaction>[0]) => {
     const result = await setReaction(reaction);
@@ -761,7 +763,38 @@ function PostCard({
       </div>
 
       {news ? <NewsLinkPreview post={post} /> : post.image_url && (
+        <button
+          type="button"
+          data-guest-allow
+          aria-label="ছবি বড় করে দেখুন"
+          className="block w-full"
+          onClick={() => setPhotoOpen(true)}
+        >
         <LazyImage src={post.image_url} alt="" wrapperClassName="w-full aspect-[4/3] bg-muted" />
+        </button>
+      )}
+      {post.image_url && photoOpen && (
+        <PostPhotoViewer
+          src={post.image_url}
+          open={photoOpen}
+          onOpenChange={setPhotoOpen}
+          caption={post.content}
+        >
+          <PostSocialActions
+            myReaction={myReaction}
+            reactionCounts={reactionCounts}
+            commentsCount={post.comments_count}
+            saved={saved}
+            commentOpen
+            onReact={(reaction) => void handleReaction(reaction)}
+            onComment={() => {}}
+            onSave={onSave}
+            onShare={onShare}
+          />
+          <div className="px-4">
+            <CommentsSection postId={post.id} onCommentAdded={onCommentAdded} />
+          </div>
+        </PostPhotoViewer>
       )}
 
       <PostSocialActions
