@@ -1,5 +1,7 @@
 # Project architecture rules
 
+- Collect news publisher Open Graph images only in the authorized news hook with bounded, validated fetches; reuse posts.image_url and one shared source-link preview across feed surfaces to avoid per-card scraping.
+
 - Request push permission only from the dedicated notification action; silently re-register granted devices and retain explicit opt-outs so backend failures never trigger repeat permission prompts.
 - Mark notification pushes delivered only after successful delivery to subscribed devices; failed sends remain pending instead of being discarded before the network request.
 

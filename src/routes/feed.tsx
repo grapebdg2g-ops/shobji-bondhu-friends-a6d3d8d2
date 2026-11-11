@@ -38,6 +38,8 @@ import { readSavedPostIds, writeSavedPostIds } from "@/lib/saved-posts";
 import { usePostReactions } from "@/hooks/use-post-reactions";
 import { useAuthorAvatars } from "@/hooks/use-author-avatars";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { NewsLinkPreview } from "@/components/krishi/news-link-preview";
+import { newsPostPreview } from "@/lib/news-preview";
 
 const feedSearchSchema = z.object({
   filter: z.enum(["all", "help", "success"]).optional().catch("all"),
@@ -638,8 +640,10 @@ function PostCard({
   const meta = TYPE_META[post.type];
   const [expanded, setExpanded] = useState(false);
   const [showComments, setShowComments] = useState(false);
-  const long = post.content.length > 180;
-  const text = expanded || !long ? post.content : post.content.slice(0, 180) + "...";
+  const news = newsPostPreview(post);
+  const body = news?.summary || post.content;
+  const long = body.length > 180;
+  const text = expanded || !long ? body : body.slice(0, 180) + "...";
   const isAnswered = post.type === "help" && post.comments_count > 0;
   const isSuccessHighlight = mode === "success" && post.type === "success";
   const {
@@ -756,7 +760,7 @@ function PostCard({
         )}
       </div>
 
-      {post.image_url && (
+      {news ? <NewsLinkPreview post={post} /> : post.image_url && (
         <LazyImage src={post.image_url} alt="" wrapperClassName="w-full aspect-[4/3] bg-muted" />
       )}
 

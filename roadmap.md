@@ -1,8 +1,8 @@
 # Tasks
 
 ## কৃষক বার্তা link previews
-- [ ] Show source-linked featured image and headline in home and community posts.
-- [ ] Collect publisher images for new posts and enrich existing news posts; verify a real post.
+- [x] Show source-linked featured image and headline in home and community posts.
+- [x] Collect publisher images for new posts and enrich the existing real post; verified publisher image and source opening at 384px and 1280px, with four passing tests.
 
 ## Notification reliability
 - [x] Stop repeat permission prompts and silently refresh permitted device registration; granted-permission account reloaded twice without a prompt (preview does not register push).
@@ -11,7 +11,7 @@
 
 ## কৃষক বার্তা troubleshooting
 - [x] Diagnose missing posts: published run returns no news; local RSS/AI succeeds but bot creation fails because the Cloud backend hostname cannot resolve.
-- [ ] Restore news posting and verify a real post in the community feed — blocked by unavailable Cloud backend; published RSS also needs rechecking after service recovery.
+- [x] Cloud is reachable and a real news post is visible; enriched its source and image and verified it in the home feed.
 
 ## Dashboard weather
 - [x] Show weather without a profile district using GPS or an explicit Dhaka fallback.

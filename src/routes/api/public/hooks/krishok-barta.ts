@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { isAuthorizedCronRequest, unauthorizedCronResponse } from "@/lib/cron-auth.server";
+import { collectNewsPreview } from "@/lib/news-preview.server";
+import { newsPostPreview } from "@/lib/news-preview";
 
 // "কৃষক বার্তা": 3x daily (08/13/18 Dhaka) collects one public Bangladesh agri
 // news item from Google News RSS, summarises it in simple Bangla and posts it
@@ -73,6 +75,27 @@ export const Route = createFileRoute("/api/public/hooks/krishok-barta")({
         const { getAiSetting, callAi } = await import("@/lib/ai-settings.server");
         const admin = supabaseAdmin as any;
 
+        // A bounded repair mode enriches old posts without publishing duplicates.
+        if (new URL(request.url).searchParams.get("enrich") === "1") {
+          const { data: stored } = await admin.from("internal_secrets").select("value").eq("name", "krishok_barta_user_id").maybeSingle();
+          if (!stored?.value) return Response.json({ ok: true, enriched: 0 });
+          const { data: existing, error } = await admin.from("posts").select("id,user_name,content,image_url")
+            .eq("user_id", stored.value).is("image_url", null).order("created_at", { ascending: false }).limit(5);
+          if (error) return Response.json({ ok: false, error: error.message }, { status: 500 });
+          let enriched = 0;
+          for (const post of existing ?? []) {
+            const news = newsPostPreview(post);
+            if (!news) continue;
+            const preview = await collectNewsPreview(news.url);
+            if (!preview.image) continue;
+            const content = post.content.replace(news.url, preview.url);
+            const { error: updateError } = await admin.from("posts").update({ content, image_url: preview.image }).eq("id", post.id).eq("user_id", stored.value);
+            if (updateError) return Response.json({ ok: false, error: updateError.message }, { status: 500 });
+            enriched++;
+          }
+          return Response.json({ ok: true, enriched });
+        }
+
         const setting = await getAiSetting("krishok_barta");
         if (!setting.is_active) return Response.json({ ok: true, skipped: "disabled" });
 
@@ -115,11 +138,17 @@ export const Route = createFileRoute("/api/public/hooks/krishok-barta")({
         if (!item || !pick.summary) return Response.json({ ok: true, posted: 0, reason: "nothing relevant" });
 
         const userId = await ensureBotUser(admin);
-        let content = `📰 ${slot.tag} | ${item.title}\n\n${pick.summary.trim()}\n\nসূত্র: ${item.source || "সংবাদ"}\n${item.link}`;
-        if (content.length > 500) content = `📰 ${slot.tag} | ${item.title}\n\n${pick.summary.trim()}`.slice(0, 497 - item.link.length) + `\n${item.link}`;
+        const preview = await collectNewsPreview(item.link);
+        const footer = `\n\nসূত্র: ${item.source || "সংবাদ"}\n${preview.url}`;
+        const heading = `📰 ${slot.tag} | ${item.title}\n\n`;
+        const available = 500 - heading.length - footer.length;
+        // Never truncate the source URL; skip exceptionally long headlines/URLs.
+        if (available < 20) return Response.json({ ok: true, posted: 0, reason: "source too long" });
+        const summary = pick.summary.trim();
+        const content = heading + (summary.length > available ? summary.slice(0, available - 1) + "…" : summary) + footer;
         const { data: post, error } = await admin
           .from("posts")
-          .insert({ user_id: userId, user_name: BOT_NAME, content, type: "general", crop_tag: null })
+          .insert({ user_id: userId, user_name: BOT_NAME, content, image_url: preview.image, type: "general", crop_tag: null })
           .select("id")
           .single();
         if (error) return Response.json({ ok: false, error: error.message }, { status: 500 });

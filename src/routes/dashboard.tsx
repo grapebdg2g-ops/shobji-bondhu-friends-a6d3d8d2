@@ -54,6 +54,8 @@ import { readSavedPostIds, writeSavedPostIds } from "@/lib/saved-posts";
 import { usePostReactions } from "@/hooks/use-post-reactions";
 import { useAuthorAvatars } from "@/hooks/use-author-avatars";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { NewsLinkPreview } from "@/components/krishi/news-link-preview";
+import { newsPostPreview } from "@/lib/news-preview";
 
 export const Route = createFileRoute("/dashboard")({
   component: Dashboard,
@@ -869,10 +871,10 @@ function MiniPostCard({
           <span className="shrink-0 text-[10px] text-gray-400">কমিউনিটি</span>
         </div>
         <p className="mt-3 whitespace-pre-wrap break-words text-sm leading-relaxed text-gray-800 line-clamp-3">
-          {post.content}
+          {newsPostPreview(post)?.summary || post.content}
         </p>
       </div>
-      {post.image_url && (
+      {newsPostPreview(post) ? <NewsLinkPreview post={post} /> : post.image_url && (
         <img
           src={post.image_url}
           alt=""
