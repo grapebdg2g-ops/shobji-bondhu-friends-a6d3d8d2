@@ -898,6 +898,8 @@ function MiniPostCard({
           open={photoOpen}
           onOpenChange={setPhotoOpen}
           caption={post.content}
+          authorName={post.user_name}
+          subtitle={post.upazila ? `${post.upazila}, ${post.district ?? ""}` : (post.district ?? undefined)}
         >
           <PostSocialActions
             myReaction={myReaction}

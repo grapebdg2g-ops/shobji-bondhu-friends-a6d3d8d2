@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ChevronDown, Reply, Send } from "lucide-react";
+import { ChevronDown, Send } from "lucide-react";
 import { toast } from "sonner";
 import { capturePricesFromContent } from "@/lib/price-from-text.functions";
 import { supabase } from "@/integrations/supabase/client";
@@ -207,27 +207,23 @@ export function CommentsSection({
         <div className="flex min-w-0 gap-2">
           {authorAvatar(comment.user_id, comment.user_name, "h-8 w-8")}
           <div className="min-w-0 flex-1">
-            <div className="rounded-2xl bg-muted/70 px-3 py-2">
-              <div className="flex items-center justify-between gap-2">
-                <p className="truncate text-xs font-bold text-foreground">{comment.user_name}</p>
-                <span className="shrink-0 text-[10px] text-muted-foreground">
-                  {timeAgo(comment.created_at)}
-                </span>
-              </div>
-              <p className="mt-0.5 whitespace-pre-wrap break-words text-sm text-foreground">
+            <div className="inline-block max-w-full rounded-[18px] bg-muted px-3 py-2">
+              <p className="truncate text-[13px] font-semibold text-foreground">{comment.user_name}</p>
+              <p className="whitespace-pre-wrap break-words text-[15px] leading-snug text-foreground">
                 {comment.content}
               </p>
             </div>
-            <div className="mt-1 flex items-center gap-3 pl-2">
+            <div className="mt-0.5 flex items-center gap-4 pl-3 text-xs">
+              <span className="text-muted-foreground">{timeAgo(comment.created_at)}</span>
               {depth < 2 && (
                 <button
                   type="button"
                   onClick={() =>
                     setReplyTo((current) => (current === comment.id ? null : comment.id))
                   }
-                  className="inline-flex min-h-7 items-center gap-1 text-[11px] font-bold text-muted-foreground hover:text-primary"
+                  className="inline-flex min-h-7 items-center font-bold text-muted-foreground hover:underline"
                 >
-                  <Reply className="h-3.5 w-3.5" /> উত্তর দিন
+                  উত্তর দিন
                 </button>
               )}
             </div>
