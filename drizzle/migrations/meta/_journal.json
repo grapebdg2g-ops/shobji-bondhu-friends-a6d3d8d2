@@ -148,6 +148,13 @@
       "when": 1794489437136,
       "tag": "0020_migration",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1794490875487,
+      "tag": "0021_scope_social_and_prediction_reads",
+      "breakpoints": true
     }
   ]
 }
