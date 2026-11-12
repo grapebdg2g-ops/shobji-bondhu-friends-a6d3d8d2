@@ -80,6 +80,7 @@ export const getPricePrediction = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
+    const { supabase } = context;
     const { product, district } = data;
 
     // ── Cache: reuse same product+district within 6h ──
