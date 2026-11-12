@@ -141,6 +141,13 @@
       "when": 1792400114776,
       "tag": "0019_ai_model_settings",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1794489437136,
+      "tag": "0020_migration",
+      "breakpoints": true
     }
   ]
 }

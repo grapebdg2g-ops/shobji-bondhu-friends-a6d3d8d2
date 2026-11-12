@@ -1,0 +1,10 @@
+DROP POLICY IF EXISTS "Anyone can read comments" ON public.post_comments;
+CREATE POLICY "Signed-in users can read comments" ON public.post_comments FOR SELECT TO authenticated USING (auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "Anyone can read likes" ON public.post_likes;
+CREATE POLICY "Signed-in users can read likes" ON public.post_likes FOR SELECT TO authenticated USING (auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "Anyone can read reactions" ON public.post_reactions;
+CREATE POLICY "Signed-in users can read reactions" ON public.post_reactions FOR SELECT TO authenticated USING (auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "Anyone authenticated can read predictions" ON public.price_predictions;
+CREATE POLICY "Signed-in users can read predictions" ON public.price_predictions FOR SELECT TO authenticated USING (auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "Authed users can view profiles" ON public.profiles;
+CREATE POLICY "Signed-in users can view profiles" ON public.profiles FOR SELECT TO authenticated USING (auth.uid() IS NOT NULL);
