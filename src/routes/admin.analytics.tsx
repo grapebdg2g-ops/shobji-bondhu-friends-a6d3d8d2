@@ -149,7 +149,7 @@ function AnalyticsPage() {
     const keys = Object.keys(rows[0]);
     const csv = [
       keys.join(","),
-      ...rows.map((r) => keys.map((k) => JSON.stringify(r[k] ?? "")).join(",")),
+      ...rows.map((r) => keys.map((k) => { const v = String(r[k] ?? ""); return JSON.stringify(/^[=+\-@\t\r]/.test(v) ? `'${v}` : v); }).join(",")),
     ].join("\n");
     const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
     const a = document.createElement("a");

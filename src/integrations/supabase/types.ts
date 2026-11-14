@@ -1669,7 +1669,6 @@ export type Database = {
         Args: { _member_ids: string[]; _name: string; _topic: string }
         Returns: string
       }
-      decrement_likes: { Args: { post_id: string }; Returns: undefined }
       get_connected_farmer_phone: {
         Args: { target_user_id: string }
         Returns: string
@@ -1746,8 +1745,6 @@ export type Database = {
         Returns: boolean
       }
       increment_cache_hit: { Args: { _id: string }; Returns: undefined }
-      increment_comments: { Args: { post_id: string }; Returns: undefined }
-      increment_likes: { Args: { post_id: string }; Returns: undefined }
       invoke_cron_hook: { Args: { _path: string }; Returns: number }
       is_active_user: { Args: { _user_id: string }; Returns: boolean }
       is_group_admin: {

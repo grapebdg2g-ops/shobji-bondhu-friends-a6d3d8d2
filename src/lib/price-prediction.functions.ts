@@ -86,10 +86,10 @@ export const getPricePrediction = createServerFn({ method: "POST" })
     // ── Cache: reuse same product+district within 6h ──
     const cacheSince = new Date(Date.now() - CACHE_HOURS * 3600 * 1000).toISOString();
     // Shared forecast cache: read server-side, only non-identifying columns.
-    const { supabaseAdmin: cacheClient } = await import("@/integrations/supabase/client.server");
-    const { data: cached } = await cacheClient
+    const { data: cached } = await supabase
       .from("price_predictions")
       .select("prediction_json, data_points, trend, created_at")
+      .eq("user_id", context.userId)
       .eq("product_name", product)
       .eq("district", district)
       .gte("created_at", cacheSince)

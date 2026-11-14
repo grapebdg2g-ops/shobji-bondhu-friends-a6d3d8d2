@@ -194,7 +194,6 @@ export function CommentsSection({
         ? withoutTemporary
         : [...withoutTemporary, data as Comment];
     });
-    await supabase.rpc("increment_comments", { post_id: postId });
     reportPrices("comment", data.id);
     onCommentAdded();
     setSending(false);
