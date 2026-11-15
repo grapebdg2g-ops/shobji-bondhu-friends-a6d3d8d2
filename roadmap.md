@@ -11,7 +11,7 @@
 
 ## কৃষক বার্তা troubleshooting
 - [x] Repair daily RSS and Gemini selection failures; 15 tests passed, real callback published a post in 7.2 seconds, and its headline was verified on the mobile home feed.
-- [ ] Extend the existing daily callback timeout — the scheduling tool rejects this legacy job as unmanaged; requires legacy-job migration before its timeout can be changed safely. Existing 08:00 Dhaka schedule remains active.
+- [ ] Replace the legacy news schedule with a managed authenticated HTTP schedule at 08:00 Dhaka; verify the new callback before retiring the old job.
 - [x] Diagnose missing posts: published run returns no news; local RSS/AI succeeds but bot creation fails because the Cloud backend hostname cannot resolve.
 - [x] Cloud is reachable and a real news post is visible; enriched its source and image and verified it in the home feed.
 

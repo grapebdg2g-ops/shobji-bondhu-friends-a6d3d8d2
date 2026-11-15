@@ -78,6 +78,7 @@ import { Route as ApiPublicHooksKrishokBartaRouteImport } from './routes/api/pub
 import { Route as ApiPublicHooksPushNotificationsRouteImport } from './routes/api/public/hooks/push-notifications'
 import { Route as ApiPublicHooksSendScheduledBroadcastsRouteImport } from './routes/api/public/hooks/send-scheduled-broadcasts'
 import { Route as ApiPublicHooksWeatherAlertsRouteImport } from './routes/api/public/hooks/weather-alerts'
+import { Route as ApiPublicJobsKrishokBartaRouteImport } from './routes/api/public/jobs/krishok-barta'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -434,6 +435,12 @@ const ApiPublicHooksWeatherAlertsRoute =
     path: '/api/public/hooks/weather-alerts',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicJobsKrishokBartaRoute =
+  ApiPublicJobsKrishokBartaRouteImport.update({
+    id: '/api/public/jobs/krishok-barta',
+    path: '/api/public/jobs/krishok-barta',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -505,6 +512,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/push-notifications': typeof ApiPublicHooksPushNotificationsRoute
   '/api/public/hooks/send-scheduled-broadcasts': typeof ApiPublicHooksSendScheduledBroadcastsRoute
   '/api/public/hooks/weather-alerts': typeof ApiPublicHooksWeatherAlertsRoute
+  '/api/public/jobs/krishok-barta': typeof ApiPublicJobsKrishokBartaRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -574,6 +582,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/push-notifications': typeof ApiPublicHooksPushNotificationsRoute
   '/api/public/hooks/send-scheduled-broadcasts': typeof ApiPublicHooksSendScheduledBroadcastsRoute
   '/api/public/hooks/weather-alerts': typeof ApiPublicHooksWeatherAlertsRoute
+  '/api/public/jobs/krishok-barta': typeof ApiPublicJobsKrishokBartaRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -646,6 +655,7 @@ export interface FileRoutesById {
   '/api/public/hooks/push-notifications': typeof ApiPublicHooksPushNotificationsRoute
   '/api/public/hooks/send-scheduled-broadcasts': typeof ApiPublicHooksSendScheduledBroadcastsRoute
   '/api/public/hooks/weather-alerts': typeof ApiPublicHooksWeatherAlertsRoute
+  '/api/public/jobs/krishok-barta': typeof ApiPublicJobsKrishokBartaRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -719,6 +729,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/push-notifications'
     | '/api/public/hooks/send-scheduled-broadcasts'
     | '/api/public/hooks/weather-alerts'
+    | '/api/public/jobs/krishok-barta'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -788,6 +799,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/push-notifications'
     | '/api/public/hooks/send-scheduled-broadcasts'
     | '/api/public/hooks/weather-alerts'
+    | '/api/public/jobs/krishok-barta'
   id:
     | '__root__'
     | '/'
@@ -859,6 +871,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/push-notifications'
     | '/api/public/hooks/send-scheduled-broadcasts'
     | '/api/public/hooks/weather-alerts'
+    | '/api/public/jobs/krishok-barta'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -912,6 +925,7 @@ export interface RootRouteChildren {
   ApiPublicHooksPushNotificationsRoute: typeof ApiPublicHooksPushNotificationsRoute
   ApiPublicHooksSendScheduledBroadcastsRoute: typeof ApiPublicHooksSendScheduledBroadcastsRoute
   ApiPublicHooksWeatherAlertsRoute: typeof ApiPublicHooksWeatherAlertsRoute
+  ApiPublicJobsKrishokBartaRoute: typeof ApiPublicJobsKrishokBartaRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1399,6 +1413,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksWeatherAlertsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/jobs/krishok-barta': {
+      id: '/api/public/jobs/krishok-barta'
+      path: '/api/public/jobs/krishok-barta'
+      fullPath: '/api/public/jobs/krishok-barta'
+      preLoaderRoute: typeof ApiPublicJobsKrishokBartaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -1542,6 +1563,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksSendScheduledBroadcastsRoute:
     ApiPublicHooksSendScheduledBroadcastsRoute,
   ApiPublicHooksWeatherAlertsRoute: ApiPublicHooksWeatherAlertsRoute,
+  ApiPublicJobsKrishokBartaRoute: ApiPublicJobsKrishokBartaRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
