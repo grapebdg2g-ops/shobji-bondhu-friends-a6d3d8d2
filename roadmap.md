@@ -10,6 +10,8 @@
 - [ ] Verify locked-phone delivery after publishing — needs the user's physical device; browser preview cannot receive production pushes and exact arrival also depends on phone/network settings.
 
 ## কৃষক বার্তা troubleshooting
+- [x] Repair daily RSS and Gemini selection failures; 15 tests passed, real callback published a post in 7.2 seconds, and its headline was verified on the mobile home feed.
+- [ ] Extend the existing daily callback timeout — the scheduling tool rejects this legacy job as unmanaged; requires legacy-job migration before its timeout can be changed safely. Existing 08:00 Dhaka schedule remains active.
 - [x] Diagnose missing posts: published run returns no news; local RSS/AI succeeds but bot creation fails because the Cloud backend hostname cannot resolve.
 - [x] Cloud is reachable and a real news post is visible; enriched its source and image and verified it in the home feed.
 

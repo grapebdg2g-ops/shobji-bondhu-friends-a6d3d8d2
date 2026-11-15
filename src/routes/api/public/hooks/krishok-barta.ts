@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { isAuthorizedCronRequest, unauthorizedCronResponse } from "@/lib/cron-auth.server";
 import { collectNewsPreview } from "@/lib/news-preview.server";
 import { newsPostPreview } from "@/lib/news-preview";
+import { isDhakaNewsToday, parseNewsSelection } from "@/lib/krishok-barta";
 
 // "কৃষক বার্তা": daily at 08:00 Dhaka, analyses today's agri news across Bangladesh
 // newspapers and posts the single most useful item from Google News RSS, summarises it in simple Bangla and posts it
@@ -36,7 +37,10 @@ function decode(s: string) {
 
 async function fetchNews(query: string): Promise<NewsItem[]> {
   const url = `https://news.google.com/rss/search?q=${encodeURIComponent(query + " when:1d")}&hl=bn&gl=BD&ceid=BD:bn`;
-  const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0 KrishokBondhu" } });
+  const res = await fetch(url, {
+    headers: { "User-Agent": "Mozilla/5.0 KrishokBondhu" },
+    signal: AbortSignal.timeout(8000),
+  });
   if (!res.ok) return [];
   const xml = await res.text();
   const items: NewsItem[] = [];
@@ -104,17 +108,17 @@ export const Route = createFileRoute("/api/public/hooks/krishok-barta")({
         if (!setting.is_active) return Response.json({ ok: true, skipped: "disabled" });
 
         // Today's (Dhaka) agriculture news from every listed newspaper, in small site groups.
-        const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Dhaka" });
-        const all: NewsItem[] = [];
+        const queries: string[] = [];
         for (let i = 0; i < PAPERS.length; i += 6) {
           const sites = PAPERS.slice(i, i + 6).map((d) => `site:${d}`).join(" OR ");
-          all.push(...(await fetchNews(`${TOPICS} (${sites})`)));
+          queries.push(`${TOPICS} (${sites})`);
         }
-        const todays = all.filter((n) => {
-          const d = new Date(n.pubDate);
-          return isNaN(d.getTime()) || d.toLocaleDateString("en-CA", { timeZone: "Asia/Dhaka" }) === today
-            || Date.now() - d.getTime() < 24 * 36e5;
-        });
+        const batches = await Promise.allSettled(queries.map(fetchNews));
+        const all = batches.flatMap((batch) => batch.status === "fulfilled" ? batch.value : []);
+        if (batches.every((batch) => batch.status === "rejected")) {
+          return Response.json({ ok: false, error: "news sources unavailable" }, { status: 502 });
+        }
+        const todays = all.filter((n) => isDhakaNewsToday(n.pubDate));
         if (!todays.length) return Response.json({ ok: true, posted: 0, reason: "no news" });
         const { data: seen } = await admin
           .from("krishok_barta_items")
@@ -127,6 +131,7 @@ export const Route = createFileRoute("/api/public/hooks/krishok-barta")({
         const list = fresh.map((n, i) => `${i + 1}. ${n.title} (${n.source || "সংবাদ"})`).join("\n");
         const raw = await callAi(setting, {
           json: true,
+          thinkingBudget: 0,
           system:
             "তুমি 'কৃষক বার্তা' — বাংলাদেশের কৃষকদের জন্য সংবাদ সম্পাদক। শুধু দেওয়া শিরোনাম থেকে তথ্য নাও, কিছু বানাবে না।",
           messages: [
@@ -138,7 +143,9 @@ export const Route = createFileRoute("/api/public/hooks/krishok-barta")({
         });
         let pick: { index: number; summary: string; tag?: string };
         try {
-          pick = JSON.parse(raw.replace(/```json|```/g, "").trim());
+          const parsed = parseNewsSelection(raw, fresh.length);
+          if (!parsed.success) return Response.json({ ok: false, error: "bad ai output" }, { status: 502 });
+          pick = parsed.data;
         } catch {
           return Response.json({ ok: false, error: "bad ai output" }, { status: 502 });
         }

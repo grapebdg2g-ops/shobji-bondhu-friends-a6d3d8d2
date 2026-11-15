@@ -79,6 +79,8 @@ export type AiCallOptions = {
   json?: boolean;
   temperature?: number;
   maxTokens?: number;
+  /** Only supported by Gemini 2.5 Flash; leave other feature requests unchanged. */
+  thinkingBudget?: number;
 };
 
 const PROVIDER_URLS: Record<Exclude<AiProvider, "gemini">, string> = {
@@ -155,6 +157,9 @@ async function callGemini(setting: AiSetting, key: string, opts: AiCallOptions):
         maxOutputTokens: opts.maxTokens ?? 2048,
         topP: 0.8,
         ...(opts.json ? { responseMimeType: "application/json" } : {}),
+        ...(opts.thinkingBudget !== undefined && /^gemini-2\.5-flash(?:$|-)/.test(setting.model)
+          ? { thinkingConfig: { thinkingBudget: opts.thinkingBudget } }
+          : {}),
       },
       safetySettings: [
         { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },

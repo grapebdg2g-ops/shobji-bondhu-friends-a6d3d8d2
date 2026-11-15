@@ -66,6 +66,28 @@ test("disabled stored setting never falls back or calls an AI provider", async (
   expect(globalThis.fetch).not.toHaveBeenCalled();
 });
 
+test("news JSON disables Gemini Flash thinking without changing output budget", async () => {
+  globalThis.fetch = mock(async (_url: string, init: RequestInit) => {
+    const config = JSON.parse(String(init.body)).generationConfig;
+    expect(config.thinkingConfig.thinkingBudget).toBe(0);
+    expect(config.maxOutputTokens).toBe(2048);
+    return Response.json({ candidates: [{ content: { parts: [{ text: '{"index":1}' }] } }] });
+  }) as unknown as typeof fetch;
+  expect(await callAi(setting("krishok_barta", "gemini", "gemini-2.5-flash"), {
+    messages: [{ role: "user", content: "news" }], json: true, thinkingBudget: 0,
+  })).toBe('{"index":1}');
+});
+
+test("unrelated Gemini calls retain their original thinking configuration", async () => {
+  globalThis.fetch = mock(async (_url: string, init: RequestInit) => {
+    expect(JSON.parse(String(init.body)).generationConfig.thinkingConfig).toBeUndefined();
+    return Response.json({ candidates: [{ content: { parts: [{ text: "ok" }] } }] });
+  }) as unknown as typeof fetch;
+  await callAi(setting("ai_chat", "gemini", "gemini-2.5-flash"), {
+    messages: [{ role: "user", content: "hello" }],
+  });
+});
+
 for (const provider of ["gemini", "torveai", "lovable_gateway"] as const) {
   test(`voice handler uses saved ${provider} model and key`, async () => {
     saved = setting("transcribe", provider, "chosen-voice-model");
