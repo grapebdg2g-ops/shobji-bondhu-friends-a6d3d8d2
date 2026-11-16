@@ -12,7 +12,8 @@
 ## কৃষক বার্তা troubleshooting
 - [x] Repair daily RSS and Gemini selection failures; 15 tests passed, real callback published a post in 7.2 seconds, and its headline was verified on the mobile home feed.
 - [x] Create managed schedule #14 (krishok-barta-daily-managed, 0 2 * * *, /api/public/jobs/krishok-barta, body {}); new callback rejects unauthenticated requests and published a real post in 8.3 seconds locally; 11 tests passed.
-- [ ] Publish the new callback, verify it on the published origin, resume managed job #14 and retire legacy job #13. Blocker: publishing permission; published callback currently returns 404. Job #14 was paused successfully; legacy #13 retained. Latest schedule-list retry failed, so re-list before changing jobs. Daily managed calls can start about 30 seconds after 08:00 Dhaka; publication then requires processing time.
+- [x] Publish the new callback after explicit approval; published endpoint rejects unauthenticated requests (401) and accepts the managed credential (200, posted 0/no news in 8.6 seconds).
+- [ ] Resume managed job #14 and retire legacy job #13 after Cloud is resumed. Blocker: Cloud reports paused and schedule-list requests fail. Job #14 was paused successfully; legacy #13 retained. Re-list before changing jobs. Daily managed calls can start about 30 seconds after 08:00 Dhaka; publication then requires processing time. Pre-publication security scan could not complete; retry before broad sharing.
 - [x] Diagnose missing posts: published run returns no news; local RSS/AI succeeds but bot creation fails because the Cloud backend hostname cannot resolve.
 - [x] Cloud is reachable and a real news post is visible; enriched its source and image and verified it in the home feed.
 
