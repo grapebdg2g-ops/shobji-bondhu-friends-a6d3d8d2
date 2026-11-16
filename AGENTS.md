@@ -5,7 +5,7 @@
 - Share news publication in a server-only module; managed schedules use a separate generated-auth callback while legacy callbacks retain their authentication to avoid breaking existing jobs during migration.
 
 - Request push permission only from the dedicated notification action; silently re-register granted devices and retain explicit opt-outs so backend failures never trigger repeat permission prompts.
-- Mark notification pushes delivered only after successful delivery to subscribed devices; failed sends remain pending instead of being discarded before the network request.
+- Mark a notification delivered after at least one subscribed device succeeds; retain wholly failed/unsubscribed rows, exclude separate senders before selection, and keyset-page the queue so old rows cannot block new alerts or replay successful partial deliveries.
 
 - Resolve dashboard weather through a shared location helper: explicit district selection overrides GPS, then profile location and a labelled fallback; public forecast controls never require a profile or mutate it.
 

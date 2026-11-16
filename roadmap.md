@@ -5,6 +5,7 @@
 - [x] Collect publisher images for new posts and enrich the existing real post; verified publisher image and source opening at 384px and 1280px, with four passing tests.
 
 ## Notification reliability
+- [x] Fix dispatcher starvation with pre-limit separate-sender filtering, newest-first keyset scanning, and success-only receipts; 12 regression tests cover queues over 200, no devices, failures, partial success, pagination and connection limits. Live delivery verification blocked by inaccessible Cloud and requires a physical device.
 - [x] Stop repeat permission prompts and silently refresh permitted device registration; granted-permission account reloaded twice without a prompt (preview does not register push).
 - [x] Check scheduled delivery (06:00 Dhaka run delivered one push on Nov 10), preserve failed pushes for retry on subsequent dispatch, centralize crop push dispatch, and pass four focused tests.
 - [ ] Verify locked-phone delivery after publishing — needs the user's physical device; browser preview cannot receive production pushes and exact arrival also depends on phone/network settings.

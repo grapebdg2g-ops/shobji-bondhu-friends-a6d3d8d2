@@ -12,9 +12,11 @@ test("later snoozes prompts across visits for three days", () => {
   expect(shouldPromptForPush("default", 1000, 1000 + 3 * 86400000 - 1)).toBe(false);
   expect(shouldPromptForPush("default", 1000, 1000 + 3 * 86400000)).toBe(true);
 });
-test("failed delivery is not marked sent", () => {
+test("a notification with no successful delivery is not marked sent", () => {
   expect(wasPushDelivered([{ ok: false }])).toBe(false);
-  expect(wasPushDelivered([{ ok: true }, { ok: false }])).toBe(false);
   expect(wasPushDelivered([])).toBe(false);
   expect(wasPushDelivered([{ ok: true }])).toBe(true);
+});
+test("one failed device does not cause successful devices to receive the notification again", () => {
+  expect(wasPushDelivered([{ ok: true }, { ok: false }])).toBe(true);
 });

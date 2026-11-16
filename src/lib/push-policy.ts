@@ -5,5 +5,11 @@ export function shouldPromptForPush(permission: NotificationPermission, dismisse
 }
 
 export function wasPushDelivered(results: { ok: boolean }[]) {
-  return results.length > 0 && results.every((result) => result.ok);
+  // A notification is delivered when at least one registered device receives it.
+  // Replaying it to every device because another endpoint failed creates duplicates.
+  return results.some((result) => result.ok);
+}
+
+export function usesSeparatePushSender(type: string) {
+  return type === "group_message" || type.startsWith("weather_");
 }
